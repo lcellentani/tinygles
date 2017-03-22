@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PlatformTypes.h"
+#include <string>
 
 namespace tinygles
 {
@@ -13,8 +14,10 @@ public:
 	virtual Result Present() = 0;
 
 	virtual Result MakeCurrent() = 0;
+
+	virtual std::string GetInfo() = 0;
 };
 
-extern "C" IPlatformContext* CreatePlatformContext(void* windowHandle, Api requiredApi = Api::Unspecified);
+extern "C" IPlatformContext* CreatePlatformContext(void* windowHandle, const ContextAttribs& attributes);
 
 } // namespace tinygles

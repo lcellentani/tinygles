@@ -44,6 +44,10 @@ typedef EGLenum(EGLAPIENTRY* PROC_EGL_eglQueryAPI)(void);
 typedef EGLBoolean(EGLAPIENTRY* PROC_EGL_eglReleaseThread)(void);
 typedef EGLBoolean(EGLAPIENTRY* PROC_EGL_eglWaitClient)(void);
 
+// EGL extensions
+typedef EGLBoolean(EGLAPIENTRY* PROC_EGL_eglSetSwapRectangleANDROID)(EGLDisplay dpy, EGLSurface draw, EGLint left, EGLint top, EGLint width, EGLint height);
+typedef EGLClientBuffer(EGLAPIENTRY* PROC_EGL_eglGetRenderBufferANDROID)(EGLDisplay dpy, EGLSurface draw);
+
 // KHR_lock_surface
 typedef EGLBoolean(EGLAPIENTRY* PROC_EGL_eglLockSurfaceKHR)(EGLDisplay display, EGLSurface surface, const EGLint* attrib_list);
 typedef EGLBoolean(EGLAPIENTRY* PROC_EGL_eglUnlockSurfaceKHR)(EGLDisplay display, EGLSurface surface);
@@ -89,6 +93,24 @@ public:
 	static PROC_EGL_eglQueryAPI QueryAPI;
 	static PROC_EGL_eglReleaseThread ReleaseThread;
 	static PROC_EGL_eglWaitClient WaitClient;
+};
+
+class eglext {
+public:
+	static bool InitExtensions(const char* const extensions);
+
+	// EGL_ANDROID_swap_rectangle
+	static bool supports_EGL_ANDROID_swap_rectangle;
+	// EGL_ANDROID_get_render_buffer
+	static bool supports_EGL_ANDROID_get_render_buffer;
+	// EGL_KHR_lock_surface
+	static bool supports_EGL_KHR_lock_surface;
+
+public:
+	// EGL_ANDROID_swap_rectangle
+	static PROC_EGL_eglSetSwapRectangleANDROID SetSwapRectangleANDROID;
+	// EGL_ANDROID_get_render_buffer
+	static PROC_EGL_eglGetRenderBufferANDROID GetRenderBufferANDROID;
 
 	// EGL_KHR_lock_surface
 	static PROC_EGL_eglLockSurfaceKHR LockSurfaceKHR;

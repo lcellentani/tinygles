@@ -195,7 +195,7 @@ int16_t PlatformBridge::Run() {
 
 	mImpl->CreateNativeWindow();
 
-	mImpl->mPlatformContext = CreatePlatformContext(mImpl->mHwnd);
+	mImpl->mPlatformContext = CreatePlatformContext(mImpl->mHwnd, app->GetContextAttribs());
 	mImpl->mPlatformContext->Initialize();
 
 	app->InitView();

@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include <memory>
+
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 
@@ -8,6 +10,20 @@ public:
 	HelloTriangle() = default;
 	virtual ~HelloTriangle() {
 
+	}
+
+	tinygles::ContextAttribs GetContextAttribs() override {
+		static tinygles::ContextAttribs sAttributes;
+
+		sAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
+		sAttributes.mDepthBPP = 32;
+		sAttributes.mStencilBPP = 0;
+		sAttributes.mRedBits = 8;
+		sAttributes.mGreenBits = 8;
+		sAttributes.mBlueBits = 8;
+		sAttributes.mAlphaBits = 8;
+
+		return sAttributes;
 	}
 
 	void InitApplication() override {

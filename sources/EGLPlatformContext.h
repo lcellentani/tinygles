@@ -17,12 +17,14 @@ struct NativeWindowHandle {
 
 class EGLPlatformContext : public IPlatformContext {
 public:
-	EGLPlatformContext(const NativeWindowHandle& handle, Api requiredApi = Api::Unspecified);
+	EGLPlatformContext(const NativeWindowHandle& handle, const ContextAttribs& attributes);
 
 	Result Initialize() override;
 	Result Terminate() override;
 	Result Present() override;
 	Result MakeCurrent() override;
+
+	std::string GetInfo() override;
 
 private:
 	Result InitializeBinding();
@@ -34,7 +36,7 @@ private:
 	EGLContext mEGLContext;
 	EGLSurface mEGLSurface;
 
-	Api mRequiredApi = Api::Unspecified;
+	ContextAttribs mAttributes;
 };
 
 } // namespace tinygles

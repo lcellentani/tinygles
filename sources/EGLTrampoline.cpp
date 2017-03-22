@@ -14,6 +14,44 @@ namespace {
 		static tinygles::DynLibLoader sEGLLibrary(sEGLLibraryPath);
 		return sEGLLibrary;
 	}
+
+	static bool isExtensionSupported(const char* const extensionString, const char* const extension) {
+		if (!extensionString) {
+			return false;
+		}
+
+		// The recommended technique for querying OpenGL extensions;
+		// from http://opengl.org/resources/features/OGLextensions/
+		const char* start = extensionString;
+		char* position, *terminator;
+
+		// Extension names should not have spaces.
+		position = (char*)strchr(extension, ' ');
+
+		if (position || *extension == '\0') {
+			return 0;
+		}
+
+		/* It takes a bit of care to be fool-proof about parsing the
+		OpenGL extensions string. Don't be fooled by sub-strings, etc. */
+		for (;;) {
+			position = (char*)strstr((char*)start, extension);
+			if (!position) {
+				break;
+			}
+
+			terminator = position + strlen(extension);
+
+			if (position == start || *(position - 1) == ' ') {
+				if (*terminator == ' ' || *terminator == '\0') {
+					return true;
+				}
+			}
+			start = terminator;
+		}
+
+		return false;
+	}
 }
 
 bool egl::InitTrampoline() {
@@ -60,37 +98,66 @@ bool egl::InitTrampoline() {
 	return true;
 }
 
-PROC_EGL_eglChooseConfig egl::ChooseConfig;
-PROC_EGL_eglCopyBuffers egl::CopyBuffers;
-PROC_EGL_eglCreateContext egl::CreateContext;
-PROC_EGL_eglCreatePbufferSurface egl::CreatePbufferSurface;
-PROC_EGL_eglCreatePixmapSurface egl::CreatePixmapSurface;
-PROC_EGL_eglCreateWindowSurface egl::CreateWindowSurface;
-PROC_EGL_eglDestroyContext egl::DestroyContext;
-PROC_EGL_eglDestroySurface egl::DestroySurface;
-PROC_EGL_eglGetConfigAttrib egl::GetConfigAttrib;
-PROC_EGL_eglGetConfigs egl::GetConfigs;
-PROC_EGL_eglGetCurrentContext egl::GetCurrentContext;
-PROC_EGL_eglGetCurrentDisplay egl::GetCurrentDisplay;
-PROC_EGL_eglGetCurrentSurface egl::GetCurrentSurface;
-PROC_EGL_eglGetDisplay egl::GetDisplay;
-PROC_EGL_eglGetError egl::GetError;
-PROC_EGL_eglGetProcAddress egl::GetProcAddress;
-PROC_EGL_eglInitialize egl::Initialize;
-PROC_EGL_eglMakeCurrent egl::MakeCurrent;
-PROC_EGL_eglQueryContext egl::QueryContext;
-PROC_EGL_eglQueryString egl::QueryString;
-PROC_EGL_eglQuerySurface egl::QuerySurface;
-PROC_EGL_eglSwapBuffers egl::SwapBuffers;
-PROC_EGL_eglTerminate egl::Terminate;
-PROC_EGL_eglWaitGL egl::WaitGL;
-PROC_EGL_eglWaitNative egl::WaitNative;
-PROC_EGL_eglBindTexImage egl::BindTexImage;
-PROC_EGL_eglReleaseTexImage egl::ReleaseTexImage;
-PROC_EGL_eglSurfaceAttrib egl::SurfaceAttrib;
-PROC_EGL_eglSwapInterval egl::SwapInterval;
-PROC_EGL_eglBindAPI egl::BindAPI;
-PROC_EGL_eglCreatePbufferFromClientBuffer egl::CreatePbufferFromClientBuffer;
-PROC_EGL_eglQueryAPI egl::QueryAPI;
-PROC_EGL_eglReleaseThread egl::ReleaseThread;
-PROC_EGL_eglWaitClient egl::WaitClient;
+PROC_EGL_eglChooseConfig egl::ChooseConfig = nullptr;
+PROC_EGL_eglCopyBuffers egl::CopyBuffers = nullptr;
+PROC_EGL_eglCreateContext egl::CreateContext = nullptr;
+PROC_EGL_eglCreatePbufferSurface egl::CreatePbufferSurface = nullptr;
+PROC_EGL_eglCreatePixmapSurface egl::CreatePixmapSurface = nullptr;
+PROC_EGL_eglCreateWindowSurface egl::CreateWindowSurface = nullptr;
+PROC_EGL_eglDestroyContext egl::DestroyContext = nullptr;
+PROC_EGL_eglDestroySurface egl::DestroySurface = nullptr;
+PROC_EGL_eglGetConfigAttrib egl::GetConfigAttrib = nullptr;
+PROC_EGL_eglGetConfigs egl::GetConfigs = nullptr;
+PROC_EGL_eglGetCurrentContext egl::GetCurrentContext = nullptr;
+PROC_EGL_eglGetCurrentDisplay egl::GetCurrentDisplay = nullptr;
+PROC_EGL_eglGetCurrentSurface egl::GetCurrentSurface = nullptr;
+PROC_EGL_eglGetDisplay egl::GetDisplay = nullptr;
+PROC_EGL_eglGetError egl::GetError = nullptr;
+PROC_EGL_eglGetProcAddress egl::GetProcAddress = nullptr;
+PROC_EGL_eglInitialize egl::Initialize = nullptr;
+PROC_EGL_eglMakeCurrent egl::MakeCurrent = nullptr;
+PROC_EGL_eglQueryContext egl::QueryContext = nullptr;
+PROC_EGL_eglQueryString egl::QueryString = nullptr;
+PROC_EGL_eglQuerySurface egl::QuerySurface = nullptr;
+PROC_EGL_eglSwapBuffers egl::SwapBuffers = nullptr;
+PROC_EGL_eglTerminate egl::Terminate = nullptr;
+PROC_EGL_eglWaitGL egl::WaitGL = nullptr;
+PROC_EGL_eglWaitNative egl::WaitNative = nullptr;
+PROC_EGL_eglBindTexImage egl::BindTexImage = nullptr;
+PROC_EGL_eglReleaseTexImage egl::ReleaseTexImage = nullptr;
+PROC_EGL_eglSurfaceAttrib egl::SurfaceAttrib = nullptr;
+PROC_EGL_eglSwapInterval egl::SwapInterval = nullptr;
+PROC_EGL_eglBindAPI egl::BindAPI = nullptr;
+PROC_EGL_eglCreatePbufferFromClientBuffer egl::CreatePbufferFromClientBuffer = nullptr;
+PROC_EGL_eglQueryAPI egl::QueryAPI = nullptr;
+PROC_EGL_eglReleaseThread egl::ReleaseThread = nullptr;
+PROC_EGL_eglWaitClient egl::WaitClient = nullptr;
+
+bool eglext::InitExtensions(const char* const extensions) {
+	if (extensions == nullptr) {
+		return false;
+	}
+
+	// EGL_ANDROID_swap_rectangle
+	supports_EGL_ANDROID_swap_rectangle = isExtensionSupported(extensions, "EGL_ANDROID_swap_rectangle");
+	eglext::SetSwapRectangleANDROID = reinterpret_cast<PROC_EGL_eglSetSwapRectangleANDROID>(egl::GetProcAddress("eglSetSwapRectangleANDROID"));
+	// EGL_ANDROID_get_render_buffer
+	supports_EGL_ANDROID_get_render_buffer = isExtensionSupported(extensions, "EGL_ANDROID_get_render_buffer");
+	eglext::GetRenderBufferANDROID = reinterpret_cast<PROC_EGL_eglGetRenderBufferANDROID>(egl::GetProcAddress("eglGetRenderBufferANDROID"));
+
+	// EGL_KHR_lock_surface
+	supports_EGL_KHR_lock_surface = isExtensionSupported(extensions, "EGL_KHR_lock_surface");
+	eglext::LockSurfaceKHR = reinterpret_cast<PROC_EGL_eglLockSurfaceKHR>(egl::GetProcAddress("eglLockSurfaceKHR"));
+	eglext::UnlockSurfaceKHR = reinterpret_cast<PROC_EGL_eglUnlockSurfaceKHR>(egl::GetProcAddress("eglUnlockSurfaceKHR"));
+
+	return true;
+}
+
+bool eglext::supports_EGL_ANDROID_swap_rectangle = false;
+bool eglext::supports_EGL_ANDROID_get_render_buffer = false;
+bool eglext::supports_EGL_KHR_lock_surface = false;
+
+PROC_EGL_eglSetSwapRectangleANDROID eglext::SetSwapRectangleANDROID = nullptr;
+PROC_EGL_eglGetRenderBufferANDROID eglext::GetRenderBufferANDROID = nullptr;
+PROC_EGL_eglLockSurfaceKHR eglext::LockSurfaceKHR = nullptr;
+PROC_EGL_eglUnlockSurfaceKHR eglext::UnlockSurfaceKHR = nullptr;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace tinygles
 {
 
@@ -67,5 +69,15 @@ enum class Result
 };
 
 struct NativeWindowHandle;
+
+struct ContextAttribs {
+	Api mRequiredApi;
+	uint32_t mDepthBPP;
+	uint32_t mStencilBPP;
+	uint32_t mRedBits;
+	uint32_t mGreenBits;
+	uint32_t mBlueBits;
+	uint32_t mAlphaBits;
+};
 
 } // namespace tinygles
