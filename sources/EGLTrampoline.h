@@ -57,6 +57,8 @@ class egl {
 public:
 	static bool InitTrampoline();
 
+	static bool isEglExtensionSupported(EGLDisplay display, const char* extension);
+
 public:
 	static PROC_EGL_eglChooseConfig ChooseConfig;
 	static PROC_EGL_eglCopyBuffers CopyBuffers;

@@ -5,6 +5,7 @@
 //#include "make_unique.h"
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <Windows.h>
 
 namespace tinygles

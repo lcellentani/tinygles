@@ -28,7 +28,7 @@ public:
 
 private:
 	Result InitializeBinding();
-	Result InitializeContext();
+	Result InitializeContext(EGLConfig& config, bool wantsWindow);
 
 private:
 	NativeWindowHandle mWindowHandle;
@@ -37,6 +37,9 @@ private:
 	EGLSurface mEGLSurface;
 
 	ContextAttribs mAttributes;
+
+	uint32_t mSurfaceWidth;
+	uint32_t mSurfaceHeight;
 };
 
 } // namespace tinygles

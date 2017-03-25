@@ -98,6 +98,37 @@ bool egl::InitTrampoline() {
 	return true;
 }
 
+bool egl::isEglExtensionSupported(EGLDisplay dpy, const char* extension) {
+	// The recommended technique for querying EGL extensions matches OpenGLES; from http://opengl.org/resources/features/OGLextensions/
+	const char* extensions = nullptr;
+	const char* start;
+	char* terminator;
+
+	char* where = (char*)strchr(extension, ' ');
+	if (where || *extension == '\0') {
+		return 0;
+	}
+
+	extensions = egl::QueryString(dpy, EGL_EXTENSIONS);
+	if (!extensions) {
+		return false;
+	}
+
+	start = extensions;
+	for (;;) {
+		where = (char*)strstr((const char*)start, extension);
+		if (!where) {
+			break;
+		}
+		terminator = where + strlen(extension);
+		if ((where == start || *(where - 1) == ' ') && (*terminator == ' ' || *terminator == '\0')) {
+			return true;
+		}
+		start = terminator;
+	}
+	return false;
+}
+
 PROC_EGL_eglChooseConfig egl::ChooseConfig = nullptr;
 PROC_EGL_eglCopyBuffers egl::CopyBuffers = nullptr;
 PROC_EGL_eglCreateContext egl::CreateContext = nullptr;
