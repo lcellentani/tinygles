@@ -1,0 +1,5 @@
+// the configured options and settings for Tutorial
+#pragma once
+
+#define TINYGLES_VERSION_MAJOR @TINYGLES_VERSION_MAJOR@
+#define TINYGLES_VERSION_MINOR @TINYGLES_VERSION_MINOR@

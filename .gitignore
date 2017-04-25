@@ -4,6 +4,7 @@
 .svn
 tags
 .gdb_history
+.vs
 
 # Compiled Object files
 *.slo
@@ -36,3 +37,4 @@ tags
 *.app
 
 media
+sources/Config.h

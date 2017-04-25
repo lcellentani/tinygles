@@ -1,3 +1,2 @@
-tools\bin\windows\genie.exe clean
-tools\bin\windows\genie.exe vs2017
-pause
+REM cmake .. -G "Visual Studio 15"
+REM pause
