@@ -5,6 +5,10 @@
 .build/
 .vs/
 
+Win32/
+Debug/
+Release/
+
 # Compiled Object files
 *.slo
 *.lo
