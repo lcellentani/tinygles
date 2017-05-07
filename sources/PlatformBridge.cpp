@@ -12,7 +12,7 @@ namespace tinygles
 {
 struct PlatformBridge::Impl
 {
-	IPlatformContext* mPlatformContext;
+	IPlatformContext* mPlatformContext = nullptr;
 
 	uint32_t mDefaultWidth = 800;
 	uint32_t mDefaultHeight = 600;
@@ -28,6 +28,9 @@ struct PlatformBridge::Impl
 	DWORD mStyle;
 	uint32_t mWindowWidth;
 	uint32_t mWindowHeight;
+	
+
+	Application* mApplication;
 
 	void CreateNativeWindow();
 	void ReshapeNativeWindow(uint32_t width, uint32_t height, bool windowFrame);
@@ -92,7 +95,7 @@ void PlatformBridge::Impl::ReshapeNativeWindow(uint32_t width, uint32_t height, 
 
 	ShowWindow(mHwnd, SW_SHOWNORMAL);
 	RECT rect;
-	RECT newrect = { 0, 0, (LONG)mWidth, (LONG)mHeight };
+	RECT newrect = { 0, 0, (LONG)width, (LONG)height };
 	DWORD style = WS_POPUP | WS_SYSMENU;
 
 	if (mWindowed) {
@@ -120,6 +123,7 @@ void PlatformBridge::Impl::ReshapeNativeWindow(uint32_t width, uint32_t height, 
 	AdjustWindowRect(&newrect, style, FALSE);
 	mWindowWidth = (newrect.right - newrect.left) - prewidth;
 	mWindowHeight = (newrect.bottom - newrect.top) - preheight;
+
 	UpdateWindow(mHwnd);
 
 	if (rect.left == -32000 || rect.top == -32000) {
@@ -148,6 +152,10 @@ void PlatformBridge::Impl::ReshapeNativeWindow(uint32_t width, uint32_t height, 
 	mWindowed = windowFrame;
 	if (mWindowed) {
 		GetWindowRect(mHwnd, &mRect);
+	}
+
+	if (mApplication) {
+		mApplication->OnReshape(newLeft, newTop, mWidth, mHeight);
 	}
 }
 
@@ -190,16 +198,24 @@ PlatformBridge& PlatformBridge::operator=(PlatformBridge& rhs) {
 }
 
 int16_t PlatformBridge::Run() {
-	std::unique_ptr<Application> app{ CreateApplication() };
+	mImpl->mApplication = CreateApplication();
+	if (!mImpl->mApplication) {
+		return 1;
+	}
 
-	app->InitApplication();
+	mImpl->mApplication->InitApplication();
 
 	mImpl->CreateNativeWindow();
 
-	mImpl->mPlatformContext = CreatePlatformContext(mImpl->mHwnd, app->GetContextAttribs());
+	mImpl->mPlatformContext = CreatePlatformContext(mImpl->mHwnd, mImpl->mApplication->GetContextAttribs());
+	if (!mImpl->mPlatformContext) {
+		mImpl->mApplication->ReleaseApplication();
+		return 1;
+	}
+
 	mImpl->mPlatformContext->Initialize();
 
-	app->InitView();
+	mImpl->mApplication->InitView();
 
 	MSG msg{ 0 };
 	while (!mImpl->mExitRequired) {
@@ -207,15 +223,15 @@ int16_t PlatformBridge::Run() {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		app->RenderFrame();
+		mImpl->mApplication->RenderFrame();
 
 		mImpl->mPlatformContext->Present();
 	}
 
-	app->ReleaseView();
+	mImpl->mApplication->ReleaseView();
 	mImpl->mPlatformContext->Terminate();
 
-	app->ReleaseApplication();
+	mImpl->mApplication->ReleaseApplication();
 
 	return 0;
 }

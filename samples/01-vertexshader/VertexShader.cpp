@@ -12,7 +12,7 @@ public:
 
 	}
 
-	tinygles::ContextAttribs GetContextAttribs() override {
+	tinygles::ContextAttribs& GetContextAttribs() override {
 		static tinygles::ContextAttribs sAttributes;
 
 		sAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
@@ -38,7 +38,7 @@ public:
 	void RenderFrame() override {
 		GLenum lastError;
 
-		glClearColor(0.00f, 0.70f, 0.67f, 1.0f);
+		glClearColor(0.36f, 0.36f, 0.36f, 1.0f);
 
 		//	Clears the color buffer.
 		//	glClear is used here with the Color Buffer to clear the color. It can also be used to clear the depth or stencil buffer using

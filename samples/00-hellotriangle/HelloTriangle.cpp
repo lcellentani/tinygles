@@ -7,23 +7,29 @@
 
 class HelloTriangle : public tinygles::Application {
 public:
-	HelloTriangle() = default;
+	HelloTriangle()
+		: mAttributes()
+		, mVertexBuffer(0)
+		, mFragmentShader(0)
+		, mVertexShader(0)
+		, mShaderProgram(0)
+		, mVertexArray(0)
+		, mWindowWidth(0)
+		, mWindowHeight(0) {
+		mAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
+		mAttributes.mDepthBPP = 32;
+		mAttributes.mStencilBPP = 0;
+		mAttributes.mRedBits = 8;
+		mAttributes.mGreenBits = 8;
+		mAttributes.mBlueBits = 8;
+		mAttributes.mAlphaBits = 8;
+	}
 	virtual ~HelloTriangle() {
 
 	}
 
-	tinygles::ContextAttribs GetContextAttribs() override {
-		static tinygles::ContextAttribs sAttributes;
-
-		sAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
-		sAttributes.mDepthBPP = 32;
-		sAttributes.mStencilBPP = 0;
-		sAttributes.mRedBits = 8;
-		sAttributes.mGreenBits = 8;
-		sAttributes.mBlueBits = 8;
-		sAttributes.mAlphaBits = 8;
-
-		return sAttributes;
+	tinygles::ContextAttribs& GetContextAttribs() override {
+		return mAttributes;
 	}
 
 	void InitApplication() override {
@@ -36,27 +42,23 @@ public:
 	}
 
 	void RenderFrame() override {
-		GLenum lastError;
-
-		glClearColor(0.00f, 0.70f, 0.67f, 1.0f);
-
-		//	Clears the color buffer.
-		//	glClear is used here with the Color Buffer to clear the color. It can also be used to clear the depth or stencil buffer using
-		//	GL_DEPTH_BUFFER_BIT or GL_STENCIL_BUFFER_BIT, respectively.
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// Get the location of the transformation matrix in the shader using its name
-		int matrixLocation = glGetUniformLocation(mShaderProgram, "transformationMatrix");
-
 		// Matrix used to specify the orientation of the triangle on screen.
-		const float transformationMatrix[] =
-		{
+		static const float transformationMatrix[] = {
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f
 		};
 
+		GLenum lastError;
+
+		glViewport(0, 0, mWindowWidth, mWindowHeight);
+
+		glClearColor(0.36f, 0.36f, 0.36f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		// Get the location of the transformation matrix in the shader using its name
+		int matrixLocation = glGetUniformLocation(mShaderProgram, "u_mvpMatrix");
 		// Pass the transformationMatrix to the shader using its location
 		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, transformationMatrix);
 		lastError = glGetError();
@@ -70,14 +72,6 @@ public:
 		lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return; }
 
-		//	Draw the triangle
-		//	glDrawArrays is a draw call, and executes the shader program using the vertices and other state set by the user. Draw calls are the
-		//	functions which tell OpenGL ES when to actually draw something to the framebuffer given the current state.
-		//	glDrawArrays causes the vertices to be submitted sequentially from the position given by the "first" argument until it has processed
-		//	"count" vertices. Other draw calls exist, notably glDrawElements which also accepts index data to allow the user to specify that
-		//	some vertices are accessed multiple times, without copying the vertex multiple times.
-		//	Others include versions of the above that allow the user to draw the same object multiple times with slightly different data, and
-		//	a version of glDrawElements which allows a user to restrict the actual indices accessed.
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return; }
@@ -90,7 +84,6 @@ public:
 		glDeleteShader(mVertexShader);
 		glDeleteProgram(mShaderProgram);
 
-		// Delete the VBO as it is no longer needed
 		glDeleteBuffers(1, &mVertexBuffer);
 	}
 
@@ -98,31 +91,21 @@ public:
 
 	}
 
+	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
+		mWindowWidth = width;
+		mWindowHeight = height;
+	}
+
 private:
 	bool initializeBuffer(GLuint& vertexBuffer) {
-		//	Concept: Vertices
-		//	When rendering a polygon or model to screen, OpenGL ES has to be told where to draw the object, and more fundamentally what shape
-		//	it is. The data used to do this is referred to as vertices, points in 3D space which are usually collected into groups of three
-		//	to render as triangles. Fundamentally, any advanced 3D shape in OpenGL ES is constructed from a series of these vertices - each
-		//	vertex representing one corner of a polygon.
-
-
-		//  Concept: Buffer Objects
-		//	To operate on any data, OpenGL first needs to be able to access it. The GPU maintains a separate pool of memory it uses independent
-		//	of the CPU. Whilst on many embedded systems these are in the same physical memory, the distinction exists so that they can use and
-		//	allocate memory without having to worry about synchronising with any other processors in the device.
-		//	To this end, data needs to be uploaded into buffers, which are essentially a reserved bit of memory for the GPU to use. By creating
-		//	a buffer and giving it some data we can tell the GPU how to render a triangle.
-
-
 		// Vertex data containing the positions of each point of the triangle
 		GLfloat vertexData[] = {
 			-0.4f, -0.4f, 0.0f, // Bottom Left
 			0.4f, -0.4f, 0.0f, // Bottom Right
-			0.0f, 0.4f, 0.0f
-		}; // Top Middle
+			0.0f, 0.4f, 0.0f // Top Middle
+		};
 
-		   // Generate a buffer object
+		// Generate a buffer object
 		glGenBuffers(1, &vertexBuffer);
 
 		// Bind buffer as an vertex buffer so we can fill it with data
@@ -139,34 +122,7 @@ private:
 		return true;
 	}
 
-	/*!*********************************************************************************************************************
-	\param[out]	fragmentShader   Handle to a fragment shader
-	\param[out]	vertexShader     Handle to a vertex shader
-	\param[out]	shaderProgram    Handle to a shader program containing the fragment and vertex shader
-	\param		nativeWindow     A native window, used to display error messages
-	\return	Whether the function succeeds or not.
-	\brief	Initializes shaders, buffers and other state required to begin rendering with OpenGL ES
-	***********************************************************************************************************************/
 	bool initializeShaders(GLuint& fragmentShader, GLuint& vertexShader, GLuint& shaderProgram) {
-
-		//	Concept: Shaders
-		//	OpenGL ES 2.0 uses what are known as shaders to determine how to draw objects on the screen. Instead of the fixed function
-		//	pipeline in early OpenGL or OpenGL ES 1.x, users can now programmatically define how vertices are transformed on screen, what
-		//	data is used where, and how each pixel on the screen is colored.
-		//	These shaders are written in GL Shading Language ES: http://www.khronos.org/registry/gles/specs/2.0/GLSL_ES_Specification_1.0.17.pdf
-		//	which is usually abbreviated to simply "GLSL ES".
-		//	Each shader is compiled on-device and then linked into a shader program, which combines a vertex and fragment shader into a form
-		//	that the OpenGL ES implementation can execute.
-
-
-		//	Concept: Fragment Shaders
-		//	In a final buffer of image data, each individual point is referred to as a pixel. Fragment shaders are the part of the pipeline
-		//	which determine how these final pixels are colored when drawn to the framebuffer. When data is passed through here, the positions
-		//	of these pixels is already set, all that's left to do is set the final color based on any defined inputs.
-		//	The reason these are called "fragment" shaders instead of "pixel" shaders is due to a small technical difference between the two
-		//	concepts. When you color a fragment, it may not be the final color which ends up on screen. This is particularly true when
-		//	performing blending, where multiple fragments can contribute to the final pixel color.
-
 		const char* const fragmentShaderSource = "\
 											 void main (void)\
 											 {\
@@ -185,8 +141,7 @@ private:
 		// Check that the shader compiled
 		GLint isShaderCompiled;
 		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isShaderCompiled);
-		if (!isShaderCompiled)
-		{
+		if (!isShaderCompiled) {
 			// If an error happened, first retrieve the length of the log message
 			int infoLogLength, charactersWritten;
 			glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infoLogLength);
@@ -199,19 +154,13 @@ private:
 			return false;
 		}
 
-		//	Concept: Vertex Shaders
-		//	Vertex shaders primarily exist to allow a developer to express how to orient vertices in 3D space, through transformations like
-		//	Scaling, Translation or Rotation. Using the same basic layout and structure as a fragment shader, these take in vertex data and
-		//	output a fully transformed set of positions. Other inputs are also able to be used such as normals or texture coordinates, and can
-		//	also be transformed and output alongside the position data.
-
 		// Vertex shader code
 		const char* const vertexShaderSource = "\
-										   attribute highp vec4	myVertex;\
-										   uniform mediump mat4	transformationMatrix;\
+										   attribute highp vec4	a_position;\
+										   uniform mediump mat4	u_mvpMatrix;\
 										   void main(void)\
 										   {\
-										   gl_Position = transformationMatrix * myVertex;\
+										   gl_Position = u_mvpMatrix * a_position;\
 										   }";
 
 		// Create a vertex shader object
@@ -225,8 +174,7 @@ private:
 
 		// Check the shader has compiled
 		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isShaderCompiled);
-		if (!isShaderCompiled)
-		{
+		if (!isShaderCompiled) {
 			// If an error happened, first retrieve the length of the log message
 			int infoLogLength, charactersWritten;
 			glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infoLogLength);
@@ -248,7 +196,7 @@ private:
 		glAttachShader(shaderProgram, vertexShader);
 
 		// Bind the vertex attribute "myVertex" to location VERTEX_ARRAY (0)
-		glBindAttribLocation(shaderProgram, mVertexArray, "myVertex");
+		glBindAttribLocation(shaderProgram, mVertexArray, "a_position");
 
 		// Link the program
 		glLinkProgram(shaderProgram);
@@ -256,8 +204,7 @@ private:
 		// Check if linking succeeded in the same way we checked for compilation success
 		GLint isLinked;
 		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &isLinked);
-		if (!isLinked)
-		{
+		if (!isLinked) {
 			// If an error happened, first retrieve the length of the log message
 			int infoLogLength, charactersWritten;
 			glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
@@ -270,28 +217,25 @@ private:
 			return false;
 		}
 
-		//	Use the Program
-		//	Calling glUseProgram tells OpenGL ES that the application intends to use this program for rendering. Now that it's installed into
-		//	the current state, any further glDraw* calls will use the shaders contained within it to process scene data. Only one program can
-		//	be active at once, so in a multi-program application this function would be called in the render loop. Since this application only
-		//	uses one program it can be installed in the current state and left there.
-
 		glUseProgram(shaderProgram);
-
 		GLenum lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return false; }
 
 		return true;
 	}
 
-
 private:
+	tinygles::ContextAttribs mAttributes;
+
 	GLuint mVertexBuffer;
 	GLuint mFragmentShader;
 	GLuint mVertexShader;
 	GLuint mShaderProgram;
 
 	GLuint mVertexArray;
+
+	uint32_t mWindowWidth;
+	uint32_t mWindowHeight;
 };
 
 
