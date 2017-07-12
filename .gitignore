@@ -46,3 +46,4 @@ sources/Config.h
 !/bin/libEGL.dll
 !/bin/libGLES_CM.dll
 !/bin/libGLESv2.dll
+*.bat
