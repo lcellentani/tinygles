@@ -3,11 +3,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
-#include <cmath>
 #include <limits>
+#include <cmath>
 
 #include "math/Array.h"
-
 
 namespace mathlib
 {
@@ -37,8 +36,8 @@ public:
 		mData[0] = value; mData[1] = value; mData[2] = value;
 	}
 
-	Vector3(const T* other) {
-		std::copy(other, other + Vector3::Size, mData.begin());
+	Vector3(const T* data) {
+		std::copy(data, data + Vector3::Size, mData.begin());
 	}
 
 	const_pointer data() const {
