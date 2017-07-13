@@ -224,3 +224,77 @@ TEST(MathlibVector3, OperatorsUnary) {
 	EXPECT_EQ(result2.y(), expected2.y());
 	EXPECT_EQ(result2.z(), expected2.z());
 }
+
+TEST(MathlibVector3, OperatorsComparison) {
+	vec3 a1(0.0f, 0.0f, 0.0f);
+	vec3 b1(0.0f, 0.0f, 0.0f);
+	EXPECT_EQ(a1, b1);
+
+	vec3 a2(1.0f, 2.0f, 3.0f);
+	vec3 b2(1.0f, 2.0f, -3.0f);
+	EXPECT_NE(a2, b2);
+
+	const vec3i i1(1, 2, 3);
+	const vec3i j1(1, 2, 3);
+	EXPECT_EQ(i1, j1);
+
+	vec3 a3(0.0f, 0.0f, 1.0f);
+	vec3 b3(-1.0f, -1.0f, 0.0f);
+	EXPECT_TRUE(a3 > b3);
+}
+
+TEST(MathlibVector3, FunctionDot) {
+	const vec3 a(3.0f, 6.0f, 1.0f);
+	const vec3 b(5.0f, 2.0f, 7.0f);
+
+	const float result = vec3::dot(a, b);
+	const float expected = 34.0f;
+	EXPECT_FLOAT_EQ(result, expected);
+}
+
+TEST(MathlibVector3, FunctionCross) {
+	const vec3 a(3.0f, -3.0f, 1.0f);
+	const vec3 b(4.0f, 9.0f, 2.0f);
+
+	const vec3 result = vec3::cross(a, b);
+	const vec3 expected(-15.0f, -2.0f, 39.0f);
+	EXPECT_EQ(result, expected);
+}
+
+TEST(MathlibVector3, FunctionMagnitude) {
+	const vec3 data(1.0f, 2.0f, 3.0f);
+	const float result1 = data.magnitude();
+	const float expected1 = std::sqrt(14.0f);
+	EXPECT_FLOAT_EQ(result1, expected1);
+
+	const vec3 unitX = vec3::UnitX();
+	const float result2 = unitX.magnitude();
+	const float expected2 = 1.0f;
+	EXPECT_FLOAT_EQ(result2, expected2);
+}
+
+TEST(MathlibVector3, FunctionNormalize) {
+	const float scalar = 2.0f / std::sqrt(12.0f);
+	vec3 data(2.0f, 2.0f, 2.0f);
+
+	const vec3 result1 = data.normalize();
+	vec3 result2 = data.normalized();
+
+	const vec3 expected(scalar, scalar, scalar);
+	EXPECT_EQ(result1, expected);
+	EXPECT_EQ(result2, expected);
+}
+
+TEST(MathlibVector3, FunctionMinMax) {
+	const vec3 a1(-1.0f, 1.0f, 2.0f);
+	const vec3 b1(0.0f, -1.0f, -3.0f);
+	const vec3 expected1(-1.0f, -1.0f, -3.0f);
+	const vec3 result1 = vec3::min(a1, b1);
+	EXPECT_EQ(result1, expected1);
+
+	const vec3 a2(-1.0f, 1.0f, 2.0f);
+	const vec3 b2(0.0f, -1.0f, -3.0f);
+	const vec3 expected2(0.0f, 1.0f, 2.0f);
+	const vec3 result2 = vec3::max(a2, b2);
+	EXPECT_EQ(result2, expected2);
+}

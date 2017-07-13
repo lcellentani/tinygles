@@ -2,6 +2,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
+#include <cmath>
+#include <limits>
 
 #include "math/Array.h"
 
@@ -198,9 +201,80 @@ public:
 		return Vector3(mData[0] / other.mData[0], mData[1] / other.mData[1], mData[2] / other.mData[2]);
 	}
 
+	// Comparison operators
+	bool operator<(const Vector3& other) const {
+		return mData[0] < other.mData[0] && mData[1] && other.mData[1] && mData[2] < other.mData[2];
+	}
+
+	bool operator> (const Vector3& other) const {
+		return !(*this < other);
+	}
+
+	// Functions
+	static const Vector3 min(const Vector3& a, const Vector3& b) {
+		return Vector3(std::min(a.x(), b.x()), std::min(a.y(), b.y()), std::min(a.z(), b.z()));
+	}
+
+	static const Vector3 max(const Vector3& a, const Vector3& b) {
+		return Vector3(std::max(a.x(), b.x()), std::max(a.y(), b.y()), std::max(a.z(), b.z()));
+	}
+
+	static T dot(const Vector3& a, const Vector3& b) {
+		return (a.mData[0] * b.mData[0]) + (a.mData[1] * b.mData[1]) + (a.mData[2] * b.mData[2]);
+	}
+
+	template<typename U = T>
+	static typename std::enable_if<std::is_floating_point<U>::value, const Vector3>::type cross(const Vector3& a, const Vector3& b) {
+		const T rx = a.y() * b.z() - a.z() * b.y();
+		const T ry = a.z() * b.x() - a.x() * b.z();
+		const T rz = a.x() * b.y() - a.y() * b.x();
+		return Vector3(rx, ry, rz);
+	}
+
+	template<typename U = T>
+	typename std::enable_if<std::is_floating_point<U>::value, T>::type magnitude() const {
+		T sum = dot(*this, *this);
+		if (std::abs(sum - 1.0f) > std::numeric_limits<T>::epsilon()) {
+			return std::sqrt(sum);
+		}
+		return 1.0f;
+	}
+
+	template<typename U = T>
+	typename std::enable_if<std::is_floating_point<U>::value, Vector3&>::type normalize() {
+		const T scalar = static_cast<T>(static_cast<T>(1) / magnitude());
+		return *this *= scalar;
+	}
+
+	template<typename U = T>
+	typename std::enable_if<std::is_floating_point<U>::value, Vector3>::type normalized() const {
+		const T scalar = static_cast<T>(static_cast<T>(1) / magnitude());
+		return Vector3(*this) *= scalar;
+	}
+
 private:
 	Array<T, Size> mData;
 };
+
+template<typename T>
+typename std::enable_if<std::is_floating_point<T>::value, bool>::type
+operator==(const Vector3<T>& v1, const Vector3<T>& v2) {
+	const bool b1 = std::abs(v1.x() - v2.x()) < std::numeric_limits<T>::epsilon();
+	const bool b2 = std::abs(v1.y() - v2.y()) < std::numeric_limits<T>::epsilon();
+	const bool b3 = std::abs(v1.z() - v2.z()) < std::numeric_limits<T>::epsilon();
+	return b1 && b2 && b3;
+}
+
+template<typename T>
+typename std::enable_if<std::is_integral<T>::value, bool>::type
+operator==(const Vector3<T>& v1, const Vector3<T>& v2) {
+	return v1.x() == v2.x() && v1.y() == v2.y() && v1.z() == v2.z();
+}
+
+template<typename T>
+bool operator!=(const Vector3<T>& v1, const Vector3<T>& v2) {
+	return !(v1 == v2);
+}
 
 typedef Vector3<int32_t> vec3i;
 typedef Vector3<float> vec3;
