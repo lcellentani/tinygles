@@ -7,6 +7,8 @@
 #include <cmath>
 
 #include "math/Array.h"
+#include "math/Vector3.h"
+#include "math/Vector4.h"
 
 namespace mathlib
 {
