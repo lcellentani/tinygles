@@ -19,7 +19,7 @@ link_directories("${PROJECT_SOURCE_DIR}/3rdparty/khronos/lib")
 
 add_subdirectory(sources/tinygles)
 add_subdirectory(sources/samples/00-hellotriangle)
-#add_subdirectory("${PROJECT_SOURCE_DIR}/samples/01-vertexshader")
+add_subdirectory(sources/samples/01-vertexshader)
 
 if (MSVC)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT 00-hellotriangle)
