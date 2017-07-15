@@ -7,22 +7,7 @@
 
 class HelloTriangle : public tinygles::Application {
 public:
-	HelloTriangle()
-		: mAttributes()
-		, mVertexBuffer(0)
-		, mFragmentShader(0)
-		, mVertexShader(0)
-		, mShaderProgram(0)
-		, mVertexArray(0)
-		, mWindowWidth(0)
-		, mWindowHeight(0) {
-		mAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
-		mAttributes.mDepthBPP = 32;
-		mAttributes.mStencilBPP = 0;
-		mAttributes.mRedBits = 8;
-		mAttributes.mGreenBits = 8;
-		mAttributes.mBlueBits = 8;
-		mAttributes.mAlphaBits = 8;
+	HelloTriangle() {
 	}
 
 	virtual ~HelloTriangle() {
@@ -30,7 +15,17 @@ public:
 	}
 
 	tinygles::ContextAttribs& GetContextAttribs() override {
-		return mAttributes;
+		static tinygles::ContextAttribs sAttributes;
+
+		sAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
+		sAttributes.mDepthBPP = 32;
+		sAttributes.mStencilBPP = 0;
+		sAttributes.mRedBits = 8;
+		sAttributes.mGreenBits = 8;
+		sAttributes.mBlueBits = 8;
+		sAttributes.mAlphaBits = 8;
+
+		return sAttributes;
 	}
 
 	void InitApplication() override {
@@ -93,7 +88,7 @@ public:
 	}
 
 	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
-		UNUSED(x); UNUSED(y);
+		TINYGLES_UNUSED(x); TINYGLES_UNUSED(y);
 		mWindowWidth = width;
 		mWindowHeight = height;
 	}
@@ -227,17 +222,15 @@ private:
 	}
 
 private:
-	tinygles::ContextAttribs mAttributes;
+	GLuint mVertexBuffer = 0;
+	GLuint mFragmentShader = 0;
+	GLuint mVertexShader = 0;
+	GLuint mShaderProgram = 0;
 
-	GLuint mVertexBuffer;
-	GLuint mFragmentShader;
-	GLuint mVertexShader;
-	GLuint mShaderProgram;
+	GLuint mVertexArray = 0;
 
-	GLuint mVertexArray;
-
-	uint32_t mWindowWidth;
-	uint32_t mWindowHeight;
+	uint32_t mWindowWidth = 0;
+	uint32_t mWindowHeight = 0;
 };
 
 

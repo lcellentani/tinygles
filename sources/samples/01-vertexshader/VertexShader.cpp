@@ -1,6 +1,6 @@
 #include "Application.h"
-#include "Shapes.h"
-#include "Mathlib.h"
+//#include "Shapes.h"
+//#include "Mathlib.h"
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
@@ -31,13 +31,13 @@ public:
 	}
 
 	void InitView() override {
-		mNumIndexes = tinygles::GenerateCube(1.0f, &mVertices, nullptr, nullptr, &mIndices);
+		//mNumIndexes = tinygles::GenerateCube(1.0f, &mVertices, nullptr, nullptr, &mIndices);
 
-		initializeShaders(mFragmentShader, mVertexShader, mShaderProgram);
+		//initializeShaders(mFragmentShader, mVertexShader, mShaderProgram);
 	}
 
 	void RenderFrame() override {
-		mat4 P = mathlib::Matrix<float, 4>::Perspective(60.0f, mAspect, 1.0f, 10.0f);
+		/*mat4 P = mathlib::Matrix<float, 4>::Perspective(60.0f, mAspect, 1.0f, 10.0f);
 		mat4 T = mat4::FromTranslationVector(vec3(0.0f, 0.0f, -2.0f));
 
 		mat4 MVP = T * P;
@@ -56,13 +56,13 @@ public:
 		//lastError = glGetError();
 		//if (lastError != GL_NO_ERROR) { return; }
 
-		glFinish();
+		glFinish();*/
 	}
 
 	void ReleaseView() override {
-		glDeleteShader(mFragmentShader);
-		glDeleteShader(mVertexShader);
-		glDeleteProgram(mShaderProgram);
+		//glDeleteShader(mFragmentShader);
+		//glDeleteShader(mVertexShader);
+		//glDeleteProgram(mShaderProgram);
 
 		//glDeleteBuffers(1, &mVertexBuffer);
 	}
@@ -72,13 +72,14 @@ public:
 	}
 
 	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
+		TINYGLES_UNUSED(x); TINYGLES_UNUSED(y);
 		mWindowWidth = width;
 		mWindowHeight = height;
 		mAspect = (float)mWindowWidth / (float)mWindowHeight;
 	}
 
 private:
-	bool initializeShaders(GLuint& fragmentShader, GLuint& vertexShader, GLuint& shaderProgram) {
+	/*bool initializeShaders(GLuint& fragmentShader, GLuint& vertexShader, GLuint& shaderProgram) {
 		const char* const fragmentShaderSource = "\
 											 void main (void)\
 											 {\
@@ -178,7 +179,7 @@ private:
 		if (lastError != GL_NO_ERROR) { return false; }
 
 		return true;
-	}
+	}*/
 
 private:
 	uint32_t mWindowWidth;

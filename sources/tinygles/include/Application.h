@@ -17,7 +17,7 @@ public:
 	virtual void ReleaseView() = 0;
 	virtual void ReleaseApplication() = 0;
 
-	virtual void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) { UNUSED(x); UNUSED(y); UNUSED(width); UNUSED(height); }
+	virtual void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) { TINYGLES_UNUSED(x); TINYGLES_UNUSED(y); TINYGLES_UNUSED(width); TINYGLES_UNUSED(height); }
 };
 
 extern "C" Application * CreateApplication();

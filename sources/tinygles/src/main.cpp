@@ -2,7 +2,7 @@
 #include "math/Array.h"
 
 int main(int _argc, char** _argv) {
-	UNUSED(_argc); UNUSED(_argv);
+	TINYGLES_UNUSED(_argc); TINYGLES_UNUSED(_argv);
 
 	tinygles::PlatformBridge platformInstance;
 	return platformInstance.Run();
