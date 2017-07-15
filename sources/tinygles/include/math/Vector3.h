@@ -15,10 +15,10 @@ template<typename T>
 class Vector3 {
 public:
 	using value_type = T;
-	using pointer = T*;
-	using const_pointer = const T*;
-	using reference = T&;
-	using const_reference = const T&;
+	using value_type_ptr = T*;
+	using const_value_type_ptr = const T*;
+	using value_type_ref = T&;
+	using const_value_type_ref = const T&;
 
 public:
 	static constexpr std::size_t Size = 3;
@@ -40,39 +40,43 @@ public:
 		std::copy(data, data + Vector3::Size, mData.begin());
 	}
 
-	const_pointer data() const {
+	value_type_ptr data() {
 		return mData.data();
 	}
 
-	reference operator[](const std::size_t n) {
+	const_value_type_ptr data() const {
+		return mData.data();
+	}
+
+	value_type_ref operator[](const std::size_t n) {
 		return mData[n];
 	}
 
-	const_reference operator[](const std::size_t n) const {
+	const_value_type_ref operator[](const std::size_t n) const {
 		return mData[n];
 	}
 
-	reference x() {
+	value_type_ref x() {
 		return mData[0];
 	}
 
-	reference y() {
+	value_type_ref y() {
 		return mData[1];
 	}
 
-	reference z() {
+	value_type_ref z() {
 		return mData[2];
 	}
 
-	const_reference x() const {
+	const_value_type_ref x() const {
 		return mData[0];
 	}
 
-	const_reference y() const {
+	const_value_type_ref y() const {
 		return mData[1];
 	}
 
-	const_reference z() const {
+	const_value_type_ref z() const {
 		return mData[2];
 	}
 
