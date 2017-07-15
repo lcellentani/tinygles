@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <limits>
 #include <cmath>
+#include <cassert>
 
 #include "math/Array.h"
 
@@ -36,7 +37,9 @@ public:
 		mData[0] = value; mData[1] = value; mData[2] = value; mData[3] = value;
 	}
 
-	Vector4(const T* data) {
+	template<std::size_t N>
+	Vector4(const T (&data)[N]) {
+		assert(TINYGLES_COUNTOF(data) == Size);
 		std::copy(data, data + Vector4::Size, mData.begin());
 	}
 

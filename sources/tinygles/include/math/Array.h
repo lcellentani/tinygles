@@ -3,6 +3,8 @@
 #include <memory>
 #include <algorithm>
 
+#include "PlatformDefine.h"
+
 namespace mathlib
 {
 
@@ -23,7 +25,9 @@ public:
 		std::fill(mData, mData + Count, static_cast<T>(0));
 	}
 
-	Array(const T* data) {
+	template<std::size_t N>
+	Array(const T (&data)[N]) {
+		assert(Count <= TINYGLES_COUNTOF(data));
 		std::copy(data, data + Count, mData);
 	}
 

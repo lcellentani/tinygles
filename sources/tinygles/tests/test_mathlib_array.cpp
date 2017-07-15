@@ -5,28 +5,24 @@
 
 using namespace mathlib;
 
-TEST(MathlibArray, Construction)
-{
+TEST(MathlibArray, Construction) {
 	const Array<float, 3> result;
 	const float expected[]{ 0.0f, 0.0f, 0.0f };
 	EXPECT_TRUE(std::equal(result.begin(), result.end(), expected));
 }
 
-TEST(MathlibArray, ConstructionArray)
-{
+TEST(MathlibArray, ConstructionArray) {
 	const float expected[]{ 2.0f, -1.0f, 4.4f};
 	const Array<float, 3> result(expected);
 	EXPECT_TRUE(std::equal(result.begin(), result.end(), expected));
 }
 
-TEST(MathlibArray, Size)
-{
+TEST(MathlibArray, Size) {
 	const Array<float, 3> result;
 	EXPECT_TRUE(result.Size() == 3);
 }
 
-TEST(MathlibArray, Fill)
-{
+TEST(MathlibArray, Fill) {
 	Array<float, 4> result;
 	result.fill(4.0f);
 
@@ -34,8 +30,7 @@ TEST(MathlibArray, Fill)
 	EXPECT_TRUE(std::equal(result.begin(), result.end(), expected));
 }
 
-TEST(MathlibArray, Swap)
-{
+TEST(MathlibArray, Swap) {
 	const float data[]{ 1.0f, 2.0f, 3.0f, 4.0f };
 	const float swapped_data[]{ 4.0f, 3.0f, 2.0f, 1.0f };
 
@@ -48,8 +43,7 @@ TEST(MathlibArray, Swap)
 	EXPECT_TRUE(std::equal(expected.begin(), expected.end(), data));
 }
 
-TEST(MathlibArray, Front)
-{
+TEST(MathlibArray, Front) {
 	const float data[]{ 2.0f, -1.0f, 4.4f, -7.0f };
 	const Array<float, 4> mutable_result(data);
 	Array<float, 3> const_result(data);
@@ -58,8 +52,7 @@ TEST(MathlibArray, Front)
 	EXPECT_FLOAT_EQ(const_result.front(), 2.0f);
 }
 
-TEST(MathlibArray, Back)
-{
+TEST(MathlibArray, Back) {
 	const float data[]{ 2.0f, -1.0f, 4.4f, -7.0f };
 	const Array<float, 4> mutable_result(data);
 	Array<float, 3> const_result(data);
@@ -68,8 +61,7 @@ TEST(MathlibArray, Back)
 	EXPECT_FLOAT_EQ(const_result.back(), 4.4f);
 }
 
-TEST(MathlibArray, Data)
-{
+TEST(MathlibArray, Data) {
 	const float data[]{ 1.0f, 2.0f, 3.0f, 5.0f };
 	const Array<float, 4> const_result(data);
 	for (std::size_t i = 0; i < const_result.Size(); i++) {
@@ -86,8 +78,7 @@ TEST(MathlibArray, Data)
 	}
 }
 
-TEST(MathlibArray, Iterator)
-{
+TEST(MathlibArray, Iterator) {
 	const float data[]{ 1.0f, 2.0f, 3.0f, 4.0f };
 
 	const Array<float, 4> const_result(data);
@@ -97,8 +88,7 @@ TEST(MathlibArray, Iterator)
 	EXPECT_TRUE(std::equal(mutable_result.begin(), mutable_result.end(), data));
 }
 
-TEST(MathlibArray, ReverseIterator)
-{
+TEST(MathlibArray, ReverseIterator) {
 	const float data[]{ 1.0f, 2.0f, 3.0f, 4.0f };
 	const float expected[]{ 4.0f, 3.0f, 2.0f, 1.0f };
 

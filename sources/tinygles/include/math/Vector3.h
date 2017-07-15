@@ -36,7 +36,9 @@ public:
 		mData[0] = value; mData[1] = value; mData[2] = value;
 	}
 
-	Vector3(const T* data) {
+	template<std::size_t N>
+	Vector3(const T (&data)[N]) {
+		assert(TINYGLES_COUNTOF(data) == Size);
 		std::copy(data, data + Vector3::Size, mData.begin());
 	}
 
