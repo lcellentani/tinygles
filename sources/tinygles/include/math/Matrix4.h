@@ -87,7 +87,7 @@ public:
 	}
 
 	template<std::size_t N>
-	void ColumnMajor(T(&data)[N]) const {
+	void ColumnMajor(T(& data)[N]) const {
 		assert(TINYGLES_COUNTOF(data) == Size);
 		for (std::size_t r = 0; r < Rows; r++) {
 			for (std::size_t c = 0; c < Columns; c++) {
@@ -223,12 +223,28 @@ public:
 	const Vector4<T> operator*(const Vector4<T>& other) const {
 		Vector4<T> result;
 
-		result.x() = other.x() * mData[0] + other.y() * mData[1] + other.z() * mData[2] + other.w() * mData[3];
-		result.y() = other.x() * mData[4] + other.y() * mData[5] + other.z() * mData[6] + other.w() * mData[7];
-		result.z() = other.x() * mData[8] + other.y() * mData[9] + other.z() * mData[10] + other.w() * mData[11];
+		result.x() = other.x() * mData[ 0] + other.y() * mData[ 1] + other.z() * mData[ 2] + other.w() * mData[ 3];
+		result.y() = other.x() * mData[ 4] + other.y() * mData[ 5] + other.z() * mData[ 6] + other.w() * mData[ 7];
+		result.z() = other.x() * mData[ 8] + other.y() * mData[ 9] + other.z() * mData[10] + other.w() * mData[11];
 		result.w() = other.x() * mData[12] + other.y() * mData[13] + other.z() * mData[14] + other.w() * mData[15];
 
 		return result;
+	}
+
+	// Division operators
+	Matrix4& operator/=(const_value_type_ref scalar) {
+		for (std::size_t n = 0; n < Size; n++) {
+			mData[n] /= scalar;
+		}
+		return *this;
+	}
+
+	const Matrix4 operator/(const_value_type_ref scalar) const {
+		T data[Size];
+		for (std::size_t n = 0; n < Size; n++) {
+			data[n] = mData[n] / scalar;
+		}
+		return Matrix4(data);
 	}
 
 	// Functions
@@ -246,6 +262,74 @@ public:
 			}
 		}
 		return Matrix4(data);
+	}
+
+	static const Matrix4 FromTranslationVector(const Vector3<T>& translation) {
+		return Matrix4(
+			1, 0, 0, translation.x(),
+			0, 1, 0, translation.y(),
+			0, 0, 1, translation.z(),
+			0, 0, 0, 1
+		);
+	}
+
+	static const Matrix4 FromTranslationVector(const_value_type_ref x, const_value_type_ref y, const_value_type_ref z) {
+		return Matrix4(
+			1, 0, 0, x,
+			0, 1, 0, y,
+			0, 0, 1, z,
+			0, 0, 0, 1
+		);
+	}
+
+	static const Matrix4 FromScaleVector(const Vector3<T>& scale) {
+		return Matrix4(
+			scale.x(), 0, 0, 0,
+			0, scale.y(), 0, 0,
+			0, 0, scale.z(), 0,
+			0, 0, 0, 1
+		);
+	}
+
+	static const Matrix4 FromScaleVector(const_value_type_ref x, const_value_type_ref y, const_value_type_ref z) {
+		return Matrix4(
+			x, 0, 0, 0,
+			0, y, 0, 0,
+			0, 0, z, 0,
+			0, 0, 0, 1
+		);
+	}
+
+	static const Matrix4 FromRotation(const_value_type_ref angle, const Vector3<T>& axis) {
+		return Matrix4();
+	}
+
+	static const Matrix4 RotationX(const_value_type_ref angle) {
+		return Matrix4();
+	}
+
+	static const Matrix4 RotationY(const_value_type_ref angle) {
+		return Matrix4();
+	}
+
+	static const Matrix4 RotationZ(const_value_type_ref angle) {
+		return Matrix4();
+	}
+
+	static const Matrix4 Perspective() {
+		return Matrix4();
+	}
+
+	static const Matrix4 Ortho() {
+		return Matrix4();
+	}
+
+	static const Matrix4 LookAt() {
+		return Matrix4();
+	}
+
+	static const Matrix4 Unproject() {
+		return Matrix4();
 	}
 
 private:

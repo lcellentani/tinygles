@@ -355,6 +355,39 @@ TEST(MathlibMatrix4, OperationMultiplication) {
 	EXPECT_EQ(r, expected);
 }
 
+TEST(MathlibMatrix4, OperationDivision) {
+	const float scalar = 2.0f;
+	const mat4 A(
+		1.0f, 0.0f, -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, -1.0f, 0.0f,
+		1.0f, 2.0f, 3.0f, 1.0f
+	);
+	mat4 B(
+		-1.0f, 0.0f, 0.5f, 0.0f,
+		0.0f, 0.5f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 2.0f,
+		2.0f, 1.0f, -3.0f, 1.0f
+	);
+	const mat4 expected1(
+		0.5f, 0.0f, -0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, -0.5f, 0.0f,
+		0.5f, 1.0f, 1.5f, 0.5f
+	);
+	const mat4 expected2(
+		-0.5f, 0.0f, 0.25f, 0.0f,
+		0.0f, 0.25f, 0.5f, 0.0f,
+		0.0f, 0.0f, 0.5f, 1.0f,
+		1.0f, 0.5f, -1.5f, 0.5f
+	);
+
+	mat4 result1 = A / scalar;
+	B /= scalar;
+	EXPECT_EQ(result1, expected1);
+	EXPECT_EQ(B, expected2);
+}
+
 TEST(MathlibMatrix4, OperatorComparison) {
 	const mat4 A(
 		1.0f, 0.001f, 0.0f, 0.1f,
@@ -436,4 +469,48 @@ TEST(MathlibMatrix4, FunctionTranspose) {
 	mat4 result = A.Transpose();
 
 	EXPECT_TRUE(result == expected);
+}
+
+TEST(MathlibMatrix4, FunctionFromTranslationVector) {
+	const float data[3]{ 1.0f, -2.0f, 3.0f };
+	mat4 A = mat4::FromTranslationVector(data);
+	mat4 B = mat4::FromTranslationVector(-2.0f, 3.5f, -1.5f);
+
+	const mat4 expected1(
+		1.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, -2.0f,
+		0.0f, 0.0f, 1.0f, 3.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
+	const mat4 expected2(
+		1.0f, 0.0f, 0.0f, -2.0f,
+		0.0f, 1.0f, 0.0f, 3.5f,
+		0.0f, 0.0f, 1.0f, -1.5f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
+
+	EXPECT_EQ(A, expected1);
+	EXPECT_EQ(B, expected2);
+}
+
+TEST(MathlibMatrix4, FunctionFromScaleVector) {
+	const float data[3]{ 1.0f, -2.0f, 3.0f };
+	mat4 A = mat4::FromScaleVector(data);
+	mat4 B = mat4::FromScaleVector(-2.0f, 3.5f, -1.5f);
+
+	const mat4 expected1(
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, -2.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 3.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
+	const mat4 expected2(
+		-2.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 3.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, -1.5f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
+
+	EXPECT_EQ(A, expected1);
+	EXPECT_EQ(B, expected2);
 }

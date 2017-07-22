@@ -38,7 +38,7 @@ public:
 
 	template<std::size_t N>
 	Vector3(const T (&data)[N]) {
-		assert(TINYGLES_COUNTOF(data) == Size);
+		static_assert(TINYGLES_COUNTOF(data) >= Size, "requires at least 3-length array");
 		std::copy(data, data + Vector3::Size, mData.begin());
 	}
 

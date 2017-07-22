@@ -39,7 +39,7 @@ public:
 
 	template<std::size_t N>
 	Vector4(const T (&data)[N]) {
-		assert(TINYGLES_COUNTOF(data) == Size);
+		static_assert(TINYGLES_COUNTOF(data) >= Size, "requires at least 4-length array");
 		std::copy(data, data + Vector4::Size, mData.begin());
 	}
 
