@@ -674,4 +674,60 @@ TEST(MathlibMatrix4, FunctionLookAt) {
 		1, 0, 0, 0,
 		0, 0, 0, 1);
 	EXPECT_EQ(originAlongX, expected4);
+
+	const mat4 originAlongY = LookAt(vec3(0, 1, 0), vec3(0, 0, 0), vec3(1, 0, 0));
+	const mat4 expected5(
+		0, 0, 1, 0,
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 0, 1);
+	EXPECT_EQ(originAlongY, expected5);
+
+	const mat4 translatedAlongZ = LookAt(vec3(1, 1, 2), vec3(1, 1, 1), vec3(0, 1, 0));
+	const mat4 expected6(
+		1, 0, 0, -1,
+		0, 1, 0, -1,
+		0, 0, 1, -1,
+		0, 0, 0, 1);
+	EXPECT_EQ(translatedAlongZ, expected6);
+
+	const mat4 originAlongDiagonalRH = LookAt(vec3(0, 0, 0), vec3(1, 1, 1), vec3(0, 1, 0), 1.0f);
+	const mat4 expected7(
+		 0.707106781f,            0, -0.707106781f,             0,
+		-0.408248290f, 0.816496580f, -0.408248290f,             0,
+		 0.577350269f, 0.577350269f,  0.577350269f, -1.732050808f,
+		            0,            0,             0,             1);
+	EXPECT_EQ(originAlongDiagonalRH, expected7);
+
+	const mat4 originAlongZRH = LookAt(vec3(0, 0, 1), vec3(0, 0, 0), vec3(0, 1, 0), 1.0f);
+	const mat4 expected8(
+		-1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, -1, 0,
+		0, 0, 0, 1);
+	EXPECT_EQ(originAlongZRH, expected8);
+
+	const mat4 originAlongXRH = LookAt(vec3(1, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0), 1.0f);
+	const mat4 expected9(
+		0, 0, 1, 0,
+		0, 1, 0, 0,
+		-1, 0, 0, 0,
+		0, 0, 0, 1);
+	EXPECT_EQ(originAlongXRH, expected9);
+
+	const mat4 originAlongYRH = LookAt(vec3(0, 1, 0), vec3(0, 0, 0), vec3(1, 0, 0), 1.0f);
+	const mat4 expected10(
+		0, 0, -1, 0,
+		1, 0, 0, 0,
+		0, -1, 0, 0,
+		0, 0, 0, 1);
+	EXPECT_EQ(originAlongYRH, expected10);
+
+	const mat4 translatedAlongXRH = LookAt(vec3(2, 1, 1), vec3(1, 1, 1), vec3(0, 1, 0), 1.0f);
+	const mat4 expected11(
+		0, 0, 1, -1,
+		0, 1, 0, -1,
+		-1, 0, 0, 1,
+		0, 0, 0, 1);
+	EXPECT_EQ(translatedAlongXRH, expected11);
 }

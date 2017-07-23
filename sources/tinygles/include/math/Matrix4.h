@@ -489,12 +489,6 @@ LookAt(const Vector3<T>& at, const Vector3<T>& eye, const Vector3<T>& up, T hand
 	);
 }
 
-template<typename T>
-typename std::enable_if<std::is_floating_point<T>::value, const Matrix4<T>>::type
-Unproject() {
-	return Matrix4<T>();
-}
-
 typedef Matrix4<int32_t> mat4i;
 typedef Matrix4<float> mat4;
 
