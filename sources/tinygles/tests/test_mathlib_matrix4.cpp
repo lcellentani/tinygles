@@ -514,3 +514,164 @@ TEST(MathlibMatrix4, FunctionFromScaleVector) {
 	EXPECT_EQ(A, expected1);
 	EXPECT_EQ(B, expected2);
 }
+
+TEST(MathlibMatrix4, FunctionRotationMatrix) {
+	const float angle = 30.0f;
+	const vec3 axisX(1.0f, 0.0f, 0.0f);
+	const vec3 axisY(0.0f, 1.0f, 0.0f);
+	const vec3 axisZ(0.0f, 0.0f, 1.0f);
+	
+	mat4 result1 = mat4::FromRotation(angle, axisX);
+	mat4 exptected1 = mat4::RotationX(angle);
+	EXPECT_EQ(result1, exptected1);
+
+	mat4 result2 = mat4::FromRotation(angle, axisY);
+	mat4 exptected2 = mat4::RotationY(angle);
+	EXPECT_EQ(result2, exptected2);
+
+	mat4 result3 = mat4::FromRotation(angle, axisZ);
+	mat4 exptected3 = mat4::RotationZ(angle);
+	EXPECT_EQ(result3, exptected3);
+}
+
+TEST(MathlibMatrix4, FunctionPerspectiveProjection) {
+	const mat4 perspNormalizedRH = PerspectiveMatrix(std::atan(1.0f) * 2.0f, 1.0f, 0.0f, 1.0f, 1.0f);
+	const mat4 expected1(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, -1, -1,
+		0, 0, 0, 0);
+	EXPECT_EQ(perspNormalizedRH, expected1);
+
+	const mat4 perspNormalizedLH = PerspectiveMatrix(std::atan(1.0f) * 2.0f, 1.0f, 0.0f, 1.0f, -1.0f);
+	const mat4 expected2(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 1,
+		0, 0, 0, 0);
+	EXPECT_EQ(perspNormalizedLH, expected2);
+
+	const mat4 perspWideFOV = PerspectiveMatrix(std::atan(2.0f) * 2.0f, 1.0f, 0.0f, 1.0f, 1.0f);
+	const mat4 expected3(
+		0.5, 0, 0, 0,
+		0, 0.5, 0, 0,
+		0, 0, -1, -1,
+		0, 0, 0, 0);
+	EXPECT_EQ(perspWideFOV, expected3);
+
+	const mat4 perspNarrowFOV = PerspectiveMatrix(std::atan(0.1f) * 2.0f, 1.0f, 0.0f, 1.0f, 1.0f);
+	const mat4 expected4(
+		10, 0, 0, 0,
+		0, 10, 0, 0,
+		0, 0, -1, -1,
+		0, 0, 0, 0);
+	EXPECT_EQ(perspNarrowFOV, expected4);
+
+	const mat4 perspAspectRatio = PerspectiveMatrix(std::atan(1.0f) * 2.0f, 0.5f, 0.0f, 1.0f, 1.0f);
+	const mat4 expected5(
+		2, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, -1, -1,
+		0, 0, 0, 0);
+	EXPECT_EQ(perspAspectRatio, expected5);
+
+	const mat4 perspDeeperViewFrustum = PerspectiveMatrix(std::atan(1.0f) * 2.0f, 1.0f, -2.0f, 2.0f, 1.0f);
+	const mat4 expected6(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, -0.5, -1,
+		0, 0, 2, 0);
+	EXPECT_EQ(perspDeeperViewFrustum, expected6);
+}
+
+TEST(MathlibMatrix4, FunctionOrthoProjection) {
+	const mat4 orthoNormalized = OrthoMatrix(0.0f, 2.0f, 0.0f, 2.0f, 2.0f, 0.0f);
+	const mat4 expected1(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-1, -1, 1, 1);
+	EXPECT_EQ(orthoNormalized, expected1);
+
+	const mat4 orthoNormalizedRH = OrthoMatrix(0.0f, 2.0f, 0.0f, 2.0f, 2.0f, 0.0f, 1.0f);
+	const mat4 expected2(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-1, -1, 1, 1);
+	EXPECT_EQ(orthoNormalizedRH, expected2);
+
+	const mat4 orthoNarrowRH = OrthoMatrix(1.0f, 3.0f, 0.0f, 2.0f, 2.0f, 0.0f, 1.0f);
+	const mat4 expected3(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-2, -1, 1, 1);
+	EXPECT_EQ(orthoNarrowRH, expected3);
+
+	const mat4 orthoSquatRH = OrthoMatrix(0.0f, 2.0f, 1.0f, 3.0f, 2.0f, 0.0f, 1.0f);
+	const mat4 expected4(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-1, -2, 1, 1);
+	EXPECT_EQ(orthoSquatRH, expected4);
+
+	const mat4 orthoDeepRH = OrthoMatrix(0.0f, 2.0f, 0.0f, 2.0f, 3.0f, 1.0f, 1.0f);
+	const mat4 expected5(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-1, -1, 2, 1);
+	EXPECT_EQ(orthoDeepRH, expected5);
+
+	const mat4 orthoNormalizedLH = OrthoMatrix(0.0f, 2.0f, 0.0f, 2.0f, 2.0f, 0.0f, -1.0f);
+	const mat4 expected6(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, -1, 0,
+		-1, -1, 1, 1);
+	EXPECT_EQ(orthoNormalizedLH, expected6);
+
+	const mat4 orthoCanonicalLH = OrthoMatrix(1.0f, 3.0f, 1.0f, 3.0f, 1.0f, 3.0f, -1.0f);
+	const mat4 expected7(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-2, -2, -2, 1);
+	EXPECT_EQ(orthoCanonicalLH, expected7);
+}
+
+TEST(MathlibMatrix4, FunctionLookAt) {
+	const mat4 originAlongZ_1 = LookAt(vec3(0, 0, 1), vec3(0, 0, 0), vec3(0, 1, 0));
+	const mat4 expected1(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+	EXPECT_EQ(originAlongZ_1, expected1);
+
+	const mat4 originAlongDiagonal = LookAt(vec3(0, 0, 0), vec3(1, 1, 1), vec3(0, 1, 0));
+	const mat4 expected2(
+		-0.707106781f,            0,  0.707106781f,             0,
+		-0.408248290f, 0.816496580f, -0.408248290f,             0,
+		-0.577350269f, -0.577350269f, -0.577350269f, 1.732050808f,
+		            0,             0,             0,            1);
+	EXPECT_EQ(originAlongDiagonal, expected2);
+
+	const mat4 originAlongZ_2 = LookAt(vec3(0, 0, 2), vec3(0, 0, 0), vec3(0, 1, 0));
+	const mat4 expected3(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+	EXPECT_EQ(originAlongZ_2, expected3);
+
+	const mat4 originAlongX = LookAt(vec3(1, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0));
+	const mat4 expected4(
+		0, 0, -1, 0,
+		0, 1, 0, 0,
+		1, 0, 0, 0,
+		0, 0, 0, 1);
+	EXPECT_EQ(originAlongX, expected4);
+}

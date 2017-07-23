@@ -69,6 +69,7 @@ add_executable(tinygles-tests
 	tests/test_mathlib_vector4.cpp
 	tests/test_mathlib_matrix3.cpp
 	tests/test_mathlib_matrix4.cpp
+	tests/test_mathlib_angle.cpp
 	${TINYGLES_TESTS_INCLUDES})
 
 Enable_Cpp11()

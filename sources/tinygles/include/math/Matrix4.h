@@ -10,6 +10,7 @@
 #include "math/Array.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
+#include "math/Angle.h"
 
 namespace mathlib
 {
@@ -300,36 +301,112 @@ public:
 		);
 	}
 
-	static const Matrix4 FromRotation(const_value_type_ref angle, const Vector3<T>& axis) {
-		return Matrix4();
+	static const Matrix4 FromRotation(const Angle& angle, const Vector3<T>& axis) {
+		Vector3<T> na = axis.normalized();
+
+		double aCos = std::cos(angle.radians());
+		double aSin = std::sin(angle.radians());
+
+		double mCos = 1.0 - aCos;
+
+		T data[16];
+
+		data[ 0] = static_cast<T>((na.x() * na.x() * mCos) + (aCos));
+		data[ 1] = static_cast<T>((na.x() * na.y() * mCos) - (na.z() * aSin));
+		data[ 2] = static_cast<T>((na.x() * na.z() * mCos) + (na.y() * aSin));
+		data[ 3] = 0;
+
+		data[ 4] = static_cast<T>((na.y() * na.x() * mCos) + (na.z() * aSin));
+		data[ 5] = static_cast<T>((na.y() * na.y() * mCos) + (aCos));
+		data[ 6] = static_cast<T>((na.y() * na.z() * mCos) - (na.x() * aSin));
+		data[ 7] = 0;
+
+		data[ 8] = static_cast<T>((na.z() * na.x() * mCos) - (na.y() * aSin));
+		data[ 9] = static_cast<T>((na.z() * na.y() * mCos) + (na.x() * aSin));
+		data[10] = static_cast<T>((na.z() * na.z() * mCos) + (aCos));
+		data[11] = 0;
+
+		data[12] = 0; data[13] = 0; data[14] = 0; data[15] = 1;
+
+		return Matrix4(data);
 	}
 
-	static const Matrix4 RotationX(const_value_type_ref angle) {
-		return Matrix4();
+	static const Matrix4 RotationX(const Angle& angle) {
+		T data[16];
+
+		T aCos = static_cast<T>(std::cos(angle.radians()));
+		T aSin = static_cast<T>(std::sin(angle.radians()));
+
+		data[ 0] = 1;
+		data[ 1] = 0;
+		data[ 2] = 0;
+		data[ 3] = 0;
+
+		data[ 4] = 0;
+		data[ 5] = aCos;
+		data[ 6] = -aSin;
+		data[ 7] = 0;
+
+		data[ 8] = 0;
+		data[ 9] = aSin;
+		data[10] = aCos;
+		data[11] = 0;
+
+		data[12] = 0; data[13] = 0; data[14] = 0; data[15] = 1;
+
+		return Matrix4(data);
 	}
 
-	static const Matrix4 RotationY(const_value_type_ref angle) {
-		return Matrix4();
+	static const Matrix4 RotationY(const Angle& angle) {
+		T data[16];
+
+		T aCos = static_cast<T>(std::cos(angle.radians()));
+		T aSin = static_cast<T>(std::sin(angle.radians()));
+
+		data[0] = aCos;
+		data[1] = 0;
+		data[2] = aSin;
+		data[3] = 0;
+
+		data[4] = 0;
+		data[5] = 1;
+		data[6] = 0;
+		data[7] = 0;
+
+		data[8] = -aSin;
+		data[9] = 0;
+		data[10] = aCos;
+		data[11] = 0;
+
+		data[12] = 0; data[13] = 0; data[14] = 0; data[15] = 1;
+
+		return Matrix4(data);
 	}
 
-	static const Matrix4 RotationZ(const_value_type_ref angle) {
-		return Matrix4();
-	}
+	static const Matrix4 RotationZ(const Angle& angle) {
+		T data[16];
 
-	static const Matrix4 Perspective() {
-		return Matrix4();
-	}
+		T aCos = static_cast<T>(std::cos(angle.radians()));
+		T aSin = static_cast<T>(std::sin(angle.radians()));
 
-	static const Matrix4 Ortho() {
-		return Matrix4();
-	}
+		data[0] = aCos;
+		data[1] = -aSin;
+		data[2] = 0;
+		data[3] = 0;
 
-	static const Matrix4 LookAt() {
-		return Matrix4();
-	}
+		data[4] = aSin;
+		data[5] = aCos;
+		data[6] = 0;
+		data[7] = 0;
 
-	static const Matrix4 Unproject() {
-		return Matrix4();
+		data[8] = 0;
+		data[9] = 0;
+		data[10] = 1;
+		data[11] = 0;
+
+		data[12] = 0; data[13] = 0; data[14] = 0; data[15] = 1;
+
+		return Matrix4(data);
 	}
 
 private:
@@ -343,7 +420,7 @@ operator==(const Matrix4<T>& lhs, const Matrix4<T>& rhs) {
 	for (int32_t i = static_cast<int32_t>(Matrix4<T>::Size - 1); i >= 0 && result; i--) {
 		T a = lhs[i]; T b = rhs[i];
 		T e = std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b));
-		result &= (std::abs(a - b) <= 0.01f);
+		result &= (std::abs(a - b) <= e);
 	}
 	return result;
 }
@@ -363,6 +440,60 @@ bool operator!=(const Matrix4<T>& lhs, const Matrix4<T>& rhs) {
 	return !(lhs == rhs);
 }
 
+template<typename T>
+typename std::enable_if<std::is_floating_point<T>::value, const Matrix4<T>>::type
+PerspectiveMatrix(const T fovy, const T aspect, const T znear, const T zfar, T handedness = 1) {
+	const T y = 1 / std::tan(fovy * static_cast<T>(.5));
+	const T x = y / aspect;
+	const T zdist = (znear - zfar);
+	const T zfar_per_zdist = zfar / zdist;
+	return Matrix4<T>(
+		x, 0, 0, 0,
+		0, y, 0, 0,
+		0, 0, zfar_per_zdist * handedness, -1 * handedness,
+		0, 0, 2.0f * znear * zfar_per_zdist, 0);
+}
+
+template<typename T>
+typename std::enable_if<std::is_floating_point<T>::value, const Matrix4<T>>::type
+OrthoMatrix(const T left, const T right, const T bottom, const T top, const T znear, const T zfar, T handedness = 1) {
+	return Matrix4<T>(
+		static_cast<T>(2) / (right - left), 0, 0, 0,
+		0, static_cast<T>(2) / (top - bottom), 0, 0,
+		0, 0, -handedness * static_cast<T>(2) / (zfar - znear), 0,
+		-(right + left) / (right - left), -(top + bottom) / (top - bottom), -(zfar + znear) / (zfar - znear), static_cast<T>(1)
+	);
+}
+
+template<typename T>
+typename std::enable_if<std::is_floating_point<T>::value, const Matrix4<T>>::type
+LookAt(const Vector3<T>& at, const Vector3<T>& eye, const Vector3<T>& up, T handedness = -1) {
+	Vector3<T> axisZ = (at - eye).normalized();
+	Vector3<T> axisX = Vector3<T>::cross(up, axisZ).normalized();
+	Vector3<T> axisY = Vector3<T>::cross(axisZ, axisX);
+	T xx = handedness * Vector3<T>::dot(axisX, eye);
+	T yy = -Vector3<T>::dot(axisY, eye);
+	T zz = handedness * Vector3<T>::dot(axisZ, eye);
+	Vector3<T> point(xx, yy, zz);
+
+	axisX *= (-handedness);
+	axisZ *= (-handedness);
+
+	constexpr const T zero = static_cast<T>(0);
+	constexpr const T one = static_cast<T>(1);
+	return Matrix4<T>(
+		axisX.x(), axisX.y(), axisX.z(), point.x(),
+		axisY.x(), axisY.y(), axisY.z(), point.y(),
+		axisZ.x(), axisZ.y(), axisZ.z(), point.z(),
+		     zero,      zero,      zero,       one
+	);
+}
+
+template<typename T>
+typename std::enable_if<std::is_floating_point<T>::value, const Matrix4<T>>::type
+Unproject() {
+	return Matrix4<T>();
+}
 
 typedef Matrix4<int32_t> mat4i;
 typedef Matrix4<float> mat4;
