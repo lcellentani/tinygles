@@ -12,7 +12,6 @@ include(${PROJECT_SOURCE_DIR}/sources/CMakeCommon.cmake)
 #)
 
 file(GLOB TINYGLES_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h*")
-file(GLOB TINYGLES_MATH_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/math/*.h*")
 
 file(GLOB TINYGLES_PRIVATE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h*")
 
@@ -37,7 +36,6 @@ add_library(tinygles
 
 if(MSVC)
 	source_group("Header Files\\" FILES ${TINYGLES_INCLUDES}) 
-	source_group("Header Files\\math" FILES ${TINYGLES_MATH_INCLUDES})
 	source_group("Source Files\\" FILES ${TINYGLES_PRIVATE_INCLUDES})
 endif()
 
@@ -56,32 +54,3 @@ target_link_libraries(tinygles
 	libGLESv2
 )
 
-#//===================================================================================================================
-
-file(GLOB TINYGLES_TESTS_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-
-link_directories("${PROJECT_SOURCE_DIR}/3rdparty/gtest/lib")
-
-add_executable(tinygles-tests
-	tests/main.cpp
-	tests/test_mathlib_array.cpp
-	tests/test_mathlib_vector2.cpp
-	tests/test_mathlib_vector3.cpp
-	tests/test_mathlib_vector4.cpp
-	tests/test_mathlib_matrix3.cpp
-	tests/test_mathlib_matrix4.cpp
-	tests/test_mathlib_angle.cpp
-	${TINYGLES_TESTS_INCLUDES})
-
-Enable_Cpp11()
-
-target_compile_options(tinygles-tests PUBLIC "/MT")
-target_compile_definitions(tinygles-tests PUBLIC _VARIADIC_MAX=10)
-
-target_include_directories(tinygles-tests
-	PRIVATE
-		"${PROJECT_SOURCE_DIR}/3rdparty/gtest/include"
-		"${CMAKE_CURRENT_SOURCE_DIR}/include"
-)
-
-target_link_libraries(tinygles-tests gtest)
