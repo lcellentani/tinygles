@@ -223,7 +223,7 @@ public:
 
 	const Vector4<T> operator*(const Vector4<T>& other) const {
 		Vector4<T> result;
-
+		// da sistemare!!! perche sara v * M
 		result.x() = other.x() * mData[ 0] + other.y() * mData[ 1] + other.z() * mData[ 2] + other.w() * mData[ 3];
 		result.y() = other.x() * mData[ 4] + other.y() * mData[ 5] + other.z() * mData[ 6] + other.w() * mData[ 7];
 		result.z() = other.x() * mData[ 8] + other.y() * mData[ 9] + other.z() * mData[10] + other.w() * mData[11];
@@ -267,19 +267,19 @@ public:
 
 	static const Matrix4 FromTranslationVector(const Vector3<T>& translation) {
 		return Matrix4(
-			1, 0, 0, translation.x(),
-			0, 1, 0, translation.y(),
-			0, 0, 1, translation.z(),
-			0, 0, 0, 1
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			translation.x(), translation.y(), translation.z(), 1
 		);
 	}
 
 	static const Matrix4 FromTranslationVector(const_value_type_ref x, const_value_type_ref y, const_value_type_ref z) {
 		return Matrix4(
-			1, 0, 0, x,
-			0, 1, 0, y,
-			0, 0, 1, z,
-			0, 0, 0, 1
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			x, y, z, 1
 		);
 	}
 

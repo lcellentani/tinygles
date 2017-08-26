@@ -1,6 +1,8 @@
 #include "Application.h"
-//#include "Shapes.h"
-//#include "Mathlib.h"
+#include "Shapes.h"
+
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
@@ -31,38 +33,48 @@ public:
 	}
 
 	void InitView() override {
-		//mNumIndexes = tinygles::GenerateCube(1.0f, &mVertices, nullptr, nullptr, &mIndices);
+		mNumIndexes = tinygles::GenerateCube(1.0f, &mVertices, nullptr, nullptr, &mIndices);
 
-		//initializeShaders(mFragmentShader, mVertexShader, mShaderProgram);
+		initializeShaders(mFragmentShader, mVertexShader, mShaderProgram);
 	}
 
 	void RenderFrame() override {
-		/*mat4 P = mathlib::Matrix<float, 4>::Perspective(60.0f, mAspect, 1.0f, 10.0f);
-		mat4 T = mat4::FromTranslationVector(vec3(0.0f, 0.0f, -2.0f));
+		mAngle += 1.0f;
+		if (mAngle > 360.0f) {
+			mAngle -= 360.0f;
+		}
 
-		mat4 MVP = T * P;
+		glm::mat4 P = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
+		glm::mat4 V = glm::lookAt(glm::vec3(-5.0f, 2.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 M = glm::rotate(glm::mat4(1.0f), glm::radians(mAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		//vec4 v(1.0f, 2.0f, 3.0f, 4.0f);
-		//float a[4] = new float[4];
-		//a = vec4::template ToType<float*>(v);
+		glm::mat4 MVP = P * V * M;
 
-		//GLenum lastError;
+		GLenum lastError;
 
 		glClearColor(0.36f, 0.36f, 0.36f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//int matrixLocation = glGetUniformLocation(mShaderProgram, "u_mvpMatrix");
-		//glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, MVP);
-		//lastError = glGetError();
-		//if (lastError != GL_NO_ERROR) { return; }
+		glUniformMatrix4fv(mMVPUniformPos, 1, GL_FALSE, &MVP[0][0]);
+		lastError = glGetError();
+		if (lastError != GL_NO_ERROR) { return; }
 
-		glFinish();*/
+		glVertexAttribPointer(mPositionAttributPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), mVertices);
+		glEnableVertexAttribArray(mPositionAttributPos);
+		lastError = glGetError();
+		if (lastError != GL_NO_ERROR) { return; }
+
+		glDrawElements(GL_TRIANGLES, mNumIndexes, GL_UNSIGNED_INT, mIndices);
+		lastError = glGetError();
+		if (lastError != GL_NO_ERROR) { return; }
+
+		glFinish();
 	}
 
 	void ReleaseView() override {
-		//glDeleteShader(mFragmentShader);
-		//glDeleteShader(mVertexShader);
-		//glDeleteProgram(mShaderProgram);
+		glDeleteShader(mFragmentShader);
+		glDeleteShader(mVertexShader);
+		glDeleteProgram(mShaderProgram);
 
 		//glDeleteBuffers(1, &mVertexBuffer);
 	}
@@ -79,7 +91,7 @@ public:
 	}
 
 private:
-	/*bool initializeShaders(GLuint& fragmentShader, GLuint& vertexShader, GLuint& shaderProgram) {
+	bool initializeShaders(GLuint& fragmentShader, GLuint& vertexShader, GLuint& shaderProgram) {
 		const char* const fragmentShaderSource = "\
 											 void main (void)\
 											 {\
@@ -152,9 +164,6 @@ private:
 		glAttachShader(shaderProgram, fragmentShader);
 		glAttachShader(shaderProgram, vertexShader);
 
-		// Bind the vertex attribute "myVertex" to location VERTEX_ARRAY (0)
-		glBindAttribLocation(shaderProgram, mVertexArray, "a_position");
-
 		// Link the program
 		glLinkProgram(shaderProgram);
 
@@ -178,8 +187,11 @@ private:
 		GLenum lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return false; }
 
+		mPositionAttributPos = glGetAttribLocation(shaderProgram, "a_position");
+		mMVPUniformPos = glGetUniformLocation(shaderProgram, "u_mvpMatrix");
+
 		return true;
-	}*/
+	}
 
 private:
 	uint32_t mWindowWidth;
@@ -193,7 +205,11 @@ private:
 	GLuint mFragmentShader = 0;
 	GLuint mVertexShader = 0;
 	GLuint mShaderProgram = 0;
-	GLuint mVertexArray = 0;
+
+	GLuint mPositionAttributPos = 0;
+	GLuint mMVPUniformPos = 0;
+
+	float mAngle = 0;
 };
 
 
