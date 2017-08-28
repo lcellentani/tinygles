@@ -1,8 +1,8 @@
 #include "Application.h"
 #include "Shapes.h"
 
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
@@ -47,7 +47,6 @@ public:
 		glm::mat4 P = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
 		glm::mat4 V = glm::lookAt(glm::vec3(-5.0f, 2.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 M = glm::rotate(glm::mat4(1.0f), glm::radians(mAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-
 		glm::mat4 MVP = P * V * M;
 
 		GLenum lastError;
@@ -75,8 +74,6 @@ public:
 		glDeleteShader(mFragmentShader);
 		glDeleteShader(mVertexShader);
 		glDeleteProgram(mShaderProgram);
-
-		//glDeleteBuffers(1, &mVertexBuffer);
 	}
 
 	void ReleaseApplication() override {

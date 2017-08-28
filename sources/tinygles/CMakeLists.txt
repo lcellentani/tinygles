@@ -13,16 +13,22 @@ include(${PROJECT_SOURCE_DIR}/sources/CMakeCommon.cmake)
 
 file(GLOB TINYGLES_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h*")
 
+file(GLOB TINYGLES_IMGUI_INCLUDES "${PROJECT_SOURCE_DIR}/3rdparty/imgui/*.h*")
+file(GLOB TINYGLES_IMGUI_SOURCES "${PROJECT_SOURCE_DIR}/3rdparty/imgui/*.c*")
+
 file(GLOB TINYGLES_PRIVATE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h*")
 
 if(MSVC) 
 	list(APPEND TINYGLES_ALL_INCLUDES ${TINYGLES_INCLUDES}) 
-	list(APPEND TINYGLES_ALL_INCLUDES ${TINYGLES_MATH_INCLUDES}) 
+	list(APPEND TINYGLES_ALL_INCLUDES ${TINYGLES_IMGUI_INCLUDES}) 
 endif()
 
 add_library(tinygles
 	${TINYGLES_ALL_INCLUDES}
 	${TINYGLES_PRIVATE_INCLUDES}
+	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_demo.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_draw.cpp
 	src/main.cpp
 	src/Application.cpp
 	src/DynLibLoader.cpp
@@ -37,6 +43,8 @@ add_library(tinygles
 if(MSVC)
 	source_group("Header Files\\" FILES ${TINYGLES_INCLUDES}) 
 	source_group("Source Files\\" FILES ${TINYGLES_PRIVATE_INCLUDES})
+	source_group("Header Files\\imgui" FILES ${TINYGLES_IMGUI_INCLUDES})
+	source_group("Source Files\\imgui" FILES ${TINYGLES_IMGUI_SOURCES})
 endif()
 
 Enable_Cpp11()

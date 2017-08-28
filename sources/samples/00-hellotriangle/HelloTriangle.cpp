@@ -192,7 +192,7 @@ private:
 		glAttachShader(shaderProgram, fragmentShader);
 		glAttachShader(shaderProgram, vertexShader);
 
-		// Bind the vertex attribute "myVertex" to location VERTEX_ARRAY (0)
+		// Bind the vertex attribute "a_position" to location mVertexArray (0)
 		glBindAttribLocation(shaderProgram, mVertexArray, "a_position");
 
 		// Link the program
