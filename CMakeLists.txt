@@ -15,9 +15,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
 
 include_directories("${PROJECT_SOURCE_DIR}/3rdparty/khronos/include")
-link_directories("${PROJECT_SOURCE_DIR}/3rdparty/khronos/lib")
-
 include_directories("${PROJECT_SOURCE_DIR}/3rdparty/glm")
+include_directories("${PROJECT_SOURCE_DIR}/3rdparty/imgui")
+include_directories("${PROJECT_SOURCE_DIR}/3rdparty/stb")
+
+link_directories("${PROJECT_SOURCE_DIR}/3rdparty/gles/angle/lib")
 
 add_subdirectory(sources/tinygles)
 add_subdirectory(sources/samples/00-hellotriangle)

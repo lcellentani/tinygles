@@ -42,7 +42,10 @@ Release/
 media
 sources/Config.h
 
-!/3rdparty/khronos/lib/**
+!/3rdparty/gles/angle/lib/**
+!/3rdparty/gles/angle/dll/**
+!/3rdparty/gles/imgtech/lib/**
+!/3rdparty/gles/imgtech/dll/**
 !/bin/libEGL.dll
 !/bin/libGLES_CM.dll
 !/bin/libGLESv2.dll
