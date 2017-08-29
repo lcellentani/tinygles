@@ -1,11 +1,9 @@
 #include "Application.h"
-#include "Shapes.h"
+#include "GeometryUtil.h"
+#include "ShadersUtil.h"
 
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-
-#define GL_GLEXT_PROTOTYPES
-#include <GLES2/gl2.h>
 
 class VertexShader : public tinygles::Application {
 public:
@@ -45,7 +43,7 @@ public:
 		}
 
 		glm::mat4 P = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
-		glm::mat4 V = glm::lookAt(glm::vec3(-5.0f, 2.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 V = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 M = glm::rotate(glm::mat4(1.0f), glm::radians(mAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 MVP = P * V * M;
 
@@ -89,70 +87,28 @@ public:
 
 private:
 	bool initializeShaders(GLuint& fragmentShader, GLuint& vertexShader, GLuint& shaderProgram) {
-		const char* const fragmentShaderSource = "\
-											 void main (void)\
-											 {\
-											 gl_FragColor = vec4(1.0, 0.0, 0.0 ,1.0);\
-											 }";
+		const char* fragmentShaderSource = SHADER_SOURCE
+		(
+			void main (void)
+			{
+				gl_FragColor = vec4(1.0, 0.0, 0.0 ,1.0);
+			}
+		);
+		std::string fsErrorLog;
+		fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource, fsErrorLog);
 
-		// Create a fragment shader object
-		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-		// Load the source code into it
-		glShaderSource(fragmentShader, 1, (const char**)&fragmentShaderSource, (const GLint*)0);
-
-		// Compile the source code
-		glCompileShader(fragmentShader);
-
-		// Check that the shader compiled
-		GLint isShaderCompiled;
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isShaderCompiled);
-		if (!isShaderCompiled) {
-			// If an error happened, first retrieve the length of the log message
-			int infoLogLength, charactersWritten;
-			glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-			// Allocate enough space for the message and retrieve it
-			char* infoLog = new char[infoLogLength];
-			glGetShaderInfoLog(fragmentShader, infoLogLength, &charactersWritten, infoLog);
-			delete[] infoLog;
-
-			return false;
-		}
-
-		// Vertex shader code
-		const char* const vertexShaderSource = "\
-										   attribute highp vec4	a_position;\
-										   uniform mediump mat4	u_mvpMatrix;\
-										   void main(void)\
-										   {\
-										   gl_Position = u_mvpMatrix * a_position;\
-										   }";
-
-		// Create a vertex shader object
-		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-		// Load the source code into the shader
-		glShaderSource(vertexShader, 1, (const char**)&vertexShaderSource, (const GLint*)0);
-
-		// Compile the shader
-		glCompileShader(vertexShader);
-
-		// Check the shader has compiled
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isShaderCompiled);
-		if (!isShaderCompiled) {
-			// If an error happened, first retrieve the length of the log message
-			int infoLogLength, charactersWritten;
-			glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-			// Allocate enough space for the message and retrieve it
-			char* infoLog = new char[infoLogLength];
-			glGetShaderInfoLog(vertexShader, infoLogLength, &charactersWritten, infoLog);
-
-			// Display the error in a dialog box
-			delete[] infoLog;
-			return false;
-		}
+		const char* vertexShaderSource = SHADER_SOURCE
+		(
+			attribute highp vec4 a_position;
+			uniform mediump mat4 u_mvpMatrix;
+			void main(void)
+			{
+				gl_Position = u_mvpMatrix * a_position;
+			}
+		);
+		std::string vsErrorLog;
+		vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShaderSource, vsErrorLog);
 
 		// Create the shader program
 		shaderProgram = glCreateProgram();

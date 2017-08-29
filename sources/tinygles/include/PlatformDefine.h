@@ -3,6 +3,9 @@
 #include <cstddef>
 #include <cstdint>
 
+#define GL_GLEXT_PROTOTYPES
+#include <GLES2/gl2.h>
+
 #ifndef __has_feature
 #define __has_feature(x) 0 // Compatibility with non-clang compilers.
 #endif

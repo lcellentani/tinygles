@@ -36,7 +36,8 @@ add_library(tinygles
 	src/Log.cpp
 	src/EGLPlatformContext.cpp
 	src/PlatformBridge.cpp
-	src/Shapes.cpp
+	src/GeometryUtil.cpp
+	src/ShadersUtil.cpp
 	src/StringUtils.cpp
 )
 
