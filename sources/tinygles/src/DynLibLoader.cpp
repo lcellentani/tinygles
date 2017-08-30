@@ -87,11 +87,11 @@ DynLibLoader::DynLibLoader(const std::string& libraryPath) : mImpl(std::unique_p
 
 	mImpl->mLastError = false;
 	if (mImpl->mLibraryHandle == nullptr) {
-		//Log(Log.Critical, "Could not load host library '%s'", LibPath.c_str());
+		//Log(Logger.Critical, "Could not load host library '%s'", LibPath.c_str());
 		mImpl->mLastError = true;
 	}
 	else {
-		//Log(Log.Debug, "Host library '%s' loaded", LibPath.c_str());
+		//Log(Logger.Debug, "Host library '%s' loaded", LibPath.c_str());
 	}
 }
 

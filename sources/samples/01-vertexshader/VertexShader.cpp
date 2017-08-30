@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "GeometryUtil.h"
 #include "ShadersUtil.h"
+#include "Log.h"
 
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -33,7 +34,7 @@ public:
 	void InitView() override {
 		mNumIndexes = tinygles::GenerateCube(1.0f, &mVertices, nullptr, nullptr, &mIndices);
 
-		initializeShaders(mFragmentShader, mVertexShader, mShaderProgram);
+		initializeShaders(mShaderProgram);
 	}
 
 	void RenderFrame() override {
@@ -69,8 +70,6 @@ public:
 	}
 
 	void ReleaseView() override {
-		glDeleteShader(mFragmentShader);
-		glDeleteShader(mVertexShader);
 		glDeleteProgram(mShaderProgram);
 	}
 
@@ -86,7 +85,7 @@ public:
 	}
 
 private:
-	bool initializeShaders(GLuint& fragmentShader, GLuint& vertexShader, GLuint& shaderProgram) {
+	bool initializeShaders(GLuint& shaderProgram) {
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
 			void main (void)
@@ -94,10 +93,6 @@ private:
 				gl_FragColor = vec4(1.0, 0.0, 0.0 ,1.0);
 			}
 		);
-		std::string fsErrorLog;
-		fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource, fsErrorLog);
-
-
 		const char* vertexShaderSource = SHADER_SOURCE
 		(
 			attribute highp vec4 a_position;
@@ -107,19 +102,27 @@ private:
 				gl_Position = u_mvpMatrix * a_position;
 			}
 		);
-		std::string vsErrorLog;
-		vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShaderSource, vsErrorLog);
-
+		
 		// Create the shader program
-		shaderProgram = glCreateProgram();
+		shaderProgram = tinygles::CompileProgram(vertexShaderSource, fragmentShaderSource, [](GLenum type, const char * errorMessage) {
+			if (errorMessage) {
+				if (type == GL_VERTEX_SHADER) {
+					Log(tinygles::Logger::Error, "Failed compile vertex shader : %s", errorMessage);
+				}
+				else if (type == GL_FRAGMENT_SHADER) {
+					Log(tinygles::Logger::Error, "Failed compile fragment shader : %s", errorMessage);
+				}
+				else {
+					Log(tinygles::Logger::Error, "Failed compile ling program : %s", errorMessage);
+				}
+			}
+		}); 
 
-		// Attach the fragment and vertex shaders to it
-		glAttachShader(shaderProgram, fragmentShader);
-		glAttachShader(shaderProgram, vertexShader);
+		if (shaderProgram == 0) {
+			return false;
+		}
 
-		// Link the program
-		glLinkProgram(shaderProgram);
-
+		/*
 		// Check if linking succeeded in the same way we checked for compilation success
 		GLint isLinked;
 		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &isLinked);
@@ -135,6 +138,7 @@ private:
 
 			return false;
 		}
+		*/
 
 		glUseProgram(shaderProgram);
 		GLenum lastError = glGetError();
@@ -155,8 +159,6 @@ private:
 	uint32_t* mIndices = nullptr;
 	uint32_t mNumIndexes = 0;
 
-	GLuint mFragmentShader = 0;
-	GLuint mVertexShader = 0;
 	GLuint mShaderProgram = 0;
 
 	GLuint mPositionAttributPos = 0;

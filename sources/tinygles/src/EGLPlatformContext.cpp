@@ -53,14 +53,14 @@ Result EGLPlatformContext::Initialize() {
 	//	}
 	//	else
 	//	{
-	//		Log(Log.Warning, "sRGB window backbuffer requested, but EGL_KHR_gl_colorspace is not supported. Creating linear RGB backbuffer.");
+	//		Log(tinygles::Logger::Warning, "sRGB window backbuffer requested, but EGL_KHR_gl_colorspace is not supported. Creating linear RGB backbuffer.");
 	//		m_OSManager.getDisplayAttributes().frameBufferSrgb = false;
 	//	}
 	//}
 
 	mEGLSurface = egl::CreateWindowSurface(mEGLDisplay, config, mWindowHandle.mNativeWindow, eglattribs);
 	if (mEGLSurface == EGL_NO_SURFACE) {
-		Log(Log.Error, "Context creation failed\n");
+		Log(tinygles::Logger::Error, "Context creation failed\n");
 		return Result::InvalidArgument;
 	}
 
@@ -73,7 +73,7 @@ Result EGLPlatformContext::Initialize() {
 		return Result::InvalidArgument;
 	}
 
-	Log(Log.Information, "%s", GetInfo().c_str());
+	Log(tinygles::Logger::Information, "%s", GetInfo().c_str());
 
 	return Result::Success;
 }
@@ -217,7 +217,7 @@ Result EGLPlatformContext::InitializeBinding() {
 
 	}
 	else {
-		Log(Log.Information, "Forcing specific API level: %s", GetApiName(targetApi));
+		Log(tinygles::Logger::Information, "Forcing specific API level: %s", GetApiName(targetApi));
 	}
 
 	return Result::Success;
@@ -246,23 +246,23 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 
 	bool createContextSupported = egl::isEglExtensionSupported(mEGLDisplay, "EGL_KHR_create_context");
 	if (createContextSupported) {
-		Log(Log.Information, "EGL context creation: EGL_KHR_create_context supported...");
+		Log(tinygles::Logger::Information, "EGL context creation: EGL_KHR_create_context supported...");
 	}
 	else {
-		Log(requestedMinorVersion ? Log.Warning : Log.Information, "EGL context creation: EGL_KHR_create_context not supported. Minor version will be discarded, and debug disabled.");
+		Log(requestedMinorVersion ? tinygles::Logger::Warning : tinygles::Logger::Information, "EGL context creation: EGL_KHR_create_context not supported. Minor version will be discarded, and debug disabled.");
 		requestedMinorVersion = 0;
 	}
 
 	bool contextPrioritySupported = egl::isEglExtensionSupported(mEGLDisplay, "EGL_IMG_context_priority");
 	if (contextPrioritySupported) {
 		switch (mAttributes.mContextPriority) {
-		case 0: Log(Log.Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context LOW priority..."); break;
-		case 1: Log(Log.Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context MEDIUM priority..."); break;
-		default: Log(Log.Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context HIGH priority (default)..."); break;
+		case 0: Log(tinygles::Logger::Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context LOW priority..."); break;
+		case 1: Log(tinygles::Logger::Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context MEDIUM priority..."); break;
+		default: Log(tinygles::Logger::Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context HIGH priority (default)..."); break;
 		}
 	}
 	else {
-		Log(Log.Information, "EGL context creation: EGL_IMG_context_priority not supported. Ignoring context Priority attribute.");
+		Log(tinygles::Logger::Information, "EGL context creation: EGL_IMG_context_priority not supported. Ignoring context Priority attribute.");
 	}
 
 	EGLint configAttributes[32]{ 0 };
@@ -271,14 +271,14 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 	debugBit = true;
 #endif
 	uint32_t i = 0;
-	Log(Log.Debug, "Attempting to create context with:");
-	Log(Log.Debug, "\tDebugbit: %s", debugBit ? "true" : "false");
-	Log(Log.Debug, "\tRedBits: %d", mAttributes.mRedBits);
-	Log(Log.Debug, "\tGreenBits: %d", mAttributes.mGreenBits);
-	Log(Log.Debug, "\tBlueBits: %d", mAttributes.mBlueBits);
-	Log(Log.Debug, "\tAlphaBits: %d", mAttributes.mAlphaBits);
-	Log(Log.Debug, "\tDepthBits: %d", mAttributes.mDepthBPP);
-	Log(Log.Debug, "\tStencilBits: %d", mAttributes.mStencilBPP);
+	Log(tinygles::Logger::Debug, "Attempting to create context with:");
+	Log(tinygles::Logger::Debug, "\tDebugbit: %s", debugBit ? "true" : "false");
+	Log(tinygles::Logger::Debug, "\tRedBits: %d", mAttributes.mRedBits);
+	Log(tinygles::Logger::Debug, "\tGreenBits: %d", mAttributes.mGreenBits);
+	Log(tinygles::Logger::Debug, "\tBlueBits: %d", mAttributes.mBlueBits);
+	Log(tinygles::Logger::Debug, "\tAlphaBits: %d", mAttributes.mAlphaBits);
+	Log(tinygles::Logger::Debug, "\tDepthBits: %d", mAttributes.mDepthBPP);
+	Log(tinygles::Logger::Debug, "\tStencilBits: %d", mAttributes.mStencilBPP);
 
 	//if (mAttributes.configID > 0)
 	//{
@@ -313,13 +313,13 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 
 		switch (mAttributes.mRequiredApi) {
 		case Api::OpenGLES2:
-			Log(Log.Debug, "EGL context creation: Setting EGL_OPENGL_ES2_BIT");
+			Log(tinygles::Logger::Debug, "EGL context creation: Setting EGL_OPENGL_ES2_BIT");
 			configAttributes[i++] = EGL_RENDERABLE_TYPE;
 			configAttributes[i++] = EGL_OPENGL_ES2_BIT;
 			break;
 		case Api::OpenGLES3:
 		case Api::OpenGLES31:
-			Log(Log.Debug, "EGL context creation: EGL_OPENGL_ES3_BIT");
+			Log(tinygles::Logger::Debug, "EGL context creation: EGL_OPENGL_ES3_BIT");
 			configAttributes[i++] = EGL_RENDERABLE_TYPE;
 			configAttributes[i++] = EGL_OPENGL_ES3_BIT_KHR;
 			break;
@@ -329,8 +329,8 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 		}
 
 		if (mAttributes.mSamplesAA > 0) {
-			Log(Log.Debug, "EGL context creation: EGL_SAMPLE_BUFFERS 1");
-			Log(Log.Debug, "EGL context creation: EGL_SAMPLES %d", mAttributes.mSamplesAA);
+			Log(tinygles::Logger::Debug, "EGL context creation: EGL_SAMPLE_BUFFERS 1");
+			Log(tinygles::Logger::Debug, "EGL context creation: EGL_SAMPLES %d", mAttributes.mSamplesAA);
 			configAttributes[i++] = EGL_SAMPLE_BUFFERS;
 			configAttributes[i++] = 1;
 			configAttributes[i++] = EGL_SAMPLES;
@@ -367,13 +367,13 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 			return Result::UnsupportedRequest;
 		}
 	}
-	Log(Log.Information, "EGL context creation: Number of EGL Configs found: %d", configsSize);
+	Log(tinygles::Logger::Information, "EGL context creation: Number of EGL Configs found: %d", configsSize);
 
 	if (numConfigs > 0) {
 		EGLint configIdx = 0;
 		//if (attributes.forceColorBPP)
 		//{
-		//	Log(Log.Information, "EGL context creation: Trying to find a for forced BPP compatible context support...");
+		//	Log(tinygles::Logger::Information, "EGL context creation: Trying to find a for forced BPP compatible context support...");
 		//	EGLint value;
 		//
 		//	for (; configIdx < configsSize; ++configIdx)
@@ -429,10 +429,10 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 		}
 		contextAttributes[i] = EGL_NONE;
 
-		Log(Log.Information, "Creating EGL context...");
+		Log(tinygles::Logger::Information, "Creating EGL context...");
 		mEGLContext = egl::CreateContext(mEGLDisplay, config, NULL, contextAttributes);
 		if (mEGLContext != EGL_NO_CONTEXT) {
-			Log(Log.Debug, "EGL context successfully created! Updating Config Attributes to reflect actual context parameters...");
+			Log(tinygles::Logger::Debug, "EGL context successfully created! Updating Config Attributes to reflect actual context parameters...");
 
 			egl::GetConfigAttrib(mEGLDisplay, config, EGL_RED_SIZE, (EGLint*)&mAttributes.mRedBits);
 			egl::GetConfigAttrib(mEGLDisplay, config, EGL_GREEN_SIZE, (EGLint*)&mAttributes.mGreenBits);
@@ -440,13 +440,13 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 			egl::GetConfigAttrib(mEGLDisplay, config, EGL_ALPHA_SIZE, (EGLint*)&mAttributes.mAlphaBits);
 			egl::GetConfigAttrib(mEGLDisplay, config, EGL_DEPTH_SIZE, (EGLint*)&mAttributes.mDepthBPP);
 			egl::GetConfigAttrib(mEGLDisplay, config, EGL_STENCIL_SIZE, (EGLint*)&mAttributes.mStencilBPP);
-			Log(Log.Information, "EGL Initialized Successfully");
+			Log(tinygles::Logger::Information, "EGL Initialized Successfully");
 			return Result::Success;
 		}
 	}
 	eglerror = egl::GetError();
 	if (eglerror != EGL_SUCCESS) {
-		Log(Log.Debug, "Context not created yet. Clearing EGL errors.");
+		Log(tinygles::Logger::Debug, "Context not created yet. Clearing EGL errors.");
 	}
 	return Result::NotInitialized;
 }
