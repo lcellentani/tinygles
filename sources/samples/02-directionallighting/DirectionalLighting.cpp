@@ -72,8 +72,8 @@ public:
 		lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return; }
 
-		glVertexAttribPointer(mPositionAttributPos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void*)&mCube.positions[0]);
-		glEnableVertexAttribArray(mPositionAttributPos);
+		glVertexAttribPointer(mPositionAttributePos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void*)&mCube.positions[0]);
+		glEnableVertexAttribArray(mPositionAttributePos);
 		lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return; }
 		glVertexAttribPointer(mNormalAttributePos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void*)&mCube.normals[0]);
@@ -159,7 +159,7 @@ private:
 		glUseProgram(shaderProgram);
 		GLenum lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return false; }
-		mPositionAttributPos = glGetAttribLocation(shaderProgram, "a_position");
+		mPositionAttributePos = glGetAttribLocation(shaderProgram, "a_position");
 		mColorAttributePos = glGetAttribLocation(shaderProgram, "a_color");
 		mNormalAttributePos = glGetAttribLocation(shaderProgram, "a_normal");
 		mMVPUniformPos = glGetUniformLocation(shaderProgram, "u_mvpMatrix");
@@ -181,7 +181,7 @@ private:
 
 	GLuint mShaderProgram = 0;
 
-	GLuint mPositionAttributPos = 0;
+	GLuint mPositionAttributePos = 0;
 	GLuint mColorAttributePos = 0;
 	GLuint mNormalAttributePos = 0;
 	GLuint mMVPUniformPos = 0;
