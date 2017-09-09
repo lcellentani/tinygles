@@ -39,6 +39,8 @@ add_library(tinygles
 	src/GeometryUtil.cpp
 	src/ShadersUtil.cpp
 	src/StringUtils.cpp
+	src/Renderer.cpp
+	src/TransformHelper.cpp
 )
 
 if(MSVC)

@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <memory>
+
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 
@@ -28,3 +30,30 @@ namespace tinygles { namespace detail {
 #else
 TINYGLES_COUNTOF(arr) sizeof(arr) / sizeof(arr[0])
 #endif
+
+namespace tinygles
+{
+
+struct Color
+{
+	static constexpr Color Red() { return Color(255, 0, 0); }
+	static constexpr Color Green() { return Color(0, 255, 0); }
+	static constexpr Color Blue() { return Color(0, 0, 255); }
+	static constexpr Color Black() { return Color(0, 0, 0); }
+	static constexpr Color White() { return Color(255, 255, 255); }
+
+	constexpr Color() : r(0), g(0), b(0), a(255) {}
+	constexpr Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) : r(r), g(g), b(b), a(a) {}
+
+	constexpr const float red() const { return static_cast<float>(r / 256.0f); }
+	constexpr const float green() const { return static_cast<float>(g / 256.0f); }
+	constexpr const float blue() const { return static_cast<float>(b / 256.0f); }
+	constexpr const float alpha() const { return static_cast<float>(a / 256.0f); }
+
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t a;
+};
+
+} // namespace tinygles
