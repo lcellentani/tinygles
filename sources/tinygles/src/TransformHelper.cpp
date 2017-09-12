@@ -1,8 +1,9 @@
 #include "TransformHelper.h"
-
 #include "PlatformDefine.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include <string>
+#include <memory>
 
 namespace tinygles
 {
@@ -22,7 +23,7 @@ struct TransformHelper::Impl {
 
 	glm::mat4 mModelMatrix[cMaxModelMatrix];
 	glm::mat4 mViewMatrix[cMaxViewMatrix];
-	glm::mat4 mProjectionMatrox[cMaxProjectionMatrix];
+	glm::mat4 mProjectionMatrix[cMaxProjectionMatrix];
 	glm::mat4 mTextureMatrix[cMaxTextureMatrix];
 
 	glm::mat4 mMoldeViewMatrix;
@@ -62,6 +63,14 @@ void TransformHelper::Reset() {
 	mImpl->mViewMatrixIndex = 0;
 	mImpl->mProjectionMatrixIndex = 0;
 	mImpl->mTextureMatrixIndex = 0;
+	SetMatrixMode(MatrixMode::Model);
+	LoadIdentity();
+	SetMatrixMode(MatrixMode::View);
+	LoadIdentity();
+	SetMatrixMode(MatrixMode::Projection);
+	LoadIdentity();
+	SetMatrixMode(MatrixMode::Texture);
+	LoadIdentity();
 }
 
 void TransformHelper::SetMatrixMode(MatrixMode mode) {
@@ -72,68 +81,231 @@ void TransformHelper::LoadIdentity() {
 	MatrixMode mode = mImpl->mMode;
 	if (mode == MatrixMode::Model) {
 		glm::mat4& m = GetModelMatrix();
-		std::memset((void*)&m[0], 0, sizeof(glm::mat4));
-		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0;
+		std::memset((void*)std::addressof(m), 0, sizeof(glm::mat4));
+		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0; m[3][3] = 1.0;
 		return;
 	}
 	if (mode == MatrixMode::View) {
 		glm::mat4& m = GetViewMatrix();
-		std::memset((void*)&m[0], 0, sizeof(glm::mat4));
-		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0;
+		std::memset((void*)std::addressof(m), 0, sizeof(glm::mat4));
+		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0; m[3][3] = 1.0;
 		return;
 	}
 	if (mode == MatrixMode::Projection) {
 		glm::mat4& m = GetProjectionMatrix();
-		std::memset((void*)&m[0], 0, sizeof(glm::mat4));
-		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0;
+		std::memset((void*)std::addressof(m), 0, sizeof(glm::mat4));
+		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0; m[3][3] = 1.0;
 		return;
 	}
 	if (mode == MatrixMode::Texture) {
 		glm::mat4& m = GetTextureMatrix();
-		std::memset((void*)&m[0], 0, sizeof(glm::mat4));
-		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0;
+		std::memset((void*)std::addressof(m), 0, sizeof(glm::mat4));
+		m[0][0] = 1.0f; m[1][1] = 1.0f; m[2][2] = 1.0; m[3][3] = 1.0;
 		return;
 	}
 }
 
 void TransformHelper::LoadMatrix(glm::mat4& matrix) {
-	TINYGLES_UNUSED(matrix);
+	MatrixMode mode = mImpl->mMode;
+	if (mode == MatrixMode::Model) {
+		glm::mat4& m = GetModelMatrix();
+		std::memcpy((void*)std::addressof(m), (const void*)std::addressof(matrix), sizeof(glm::mat4));
+		return;
+	}
+	if (mode == MatrixMode::View) {
+		glm::mat4& m = GetViewMatrix();
+		std::memcpy((void*)std::addressof(m), (const void*)std::addressof(matrix), sizeof(glm::mat4));
+		return;
+	}
+	if (mode == MatrixMode::Projection) {
+		glm::mat4& m = GetProjectionMatrix();
+		std::memcpy((void*)std::addressof(m), (const void*)std::addressof(matrix), sizeof(glm::mat4));
+		return;
+	}
+	if (mode == MatrixMode::Texture) {
+		glm::mat4& m = GetTextureMatrix();
+		std::memcpy((void*)std::addressof(m), (const void*)std::addressof(matrix), sizeof(glm::mat4));
+		return;
+	}
 }
 
 void TransformHelper::MultiplyMatrix(glm::mat4& matrix) {
-	TINYGLES_UNUSED(matrix);
+	MatrixMode mode = mImpl->mMode;
+	if (mode == MatrixMode::Model) {
+		glm::mat4& m = GetModelMatrix();
+		m *= matrix;
+		return;
+	}
+	if (mode == MatrixMode::View) {
+		glm::mat4& m = GetViewMatrix();
+		m *= matrix;
+		return;
+	}
+	if (mode == MatrixMode::Projection) {
+		glm::mat4& m = GetProjectionMatrix();
+		m *= matrix;
+		return;
+	}
+	if (mode == MatrixMode::Texture) {
+		glm::mat4& m = GetTextureMatrix();
+		m *= matrix;
+		return;
+	}
 }
 
 void TransformHelper::Translate(glm::vec3& translation) {
-	TINYGLES_UNUSED(translation);
+	MatrixMode mode = mImpl->mMode;
+	if (mode == MatrixMode::Model) {
+		glm::mat4& m = GetModelMatrix();
+		m = glm::translate(m, translation);
+		return;
+	}
+	if (mode == MatrixMode::View) {
+		glm::mat4& m = GetViewMatrix();
+		m = glm::translate(m, translation);
+		return;
+	}
+	if (mode == MatrixMode::Projection) {
+		glm::mat4& m = GetProjectionMatrix();
+		m = glm::translate(m, translation);
+		return;
+	}
+	if (mode == MatrixMode::Texture) {
+		glm::mat4& m = GetTextureMatrix();
+		m = glm::translate(m, translation);
+		return;
+	}
 }
 
 void TransformHelper::Translate(float tx, float ty, float tz) {
-	TINYGLES_UNUSED(tx); TINYGLES_UNUSED(ty); TINYGLES_UNUSED(tz);
+	glm::vec3 t(tx, ty, tz);
+	Translate(t);
 }
 
 void TransformHelper::Rotate(float angle_in_degree, glm::vec3& axis) {
-	TINYGLES_UNUSED(angle_in_degree); TINYGLES_UNUSED(axis);
+	MatrixMode mode = mImpl->mMode;
+	if (mode == MatrixMode::Model) {
+		glm::mat4& m = GetModelMatrix();
+		m = glm::rotate(m, angle_in_degree, axis);
+		return;
+	}
+	if (mode == MatrixMode::View) {
+		glm::mat4& m = GetViewMatrix();
+		m = glm::rotate(m, angle_in_degree, axis);
+		return;
+	}
+	if (mode == MatrixMode::Projection) {
+		glm::mat4& m = GetProjectionMatrix();
+		m = glm::rotate(m, angle_in_degree, axis);
+		return;
+	}
+	if (mode == MatrixMode::Texture) {
+		glm::mat4& m = GetTextureMatrix();
+		m = glm::rotate(m, angle_in_degree, axis);
+		return;
+	}
 }
 
 void TransformHelper::Rotate(float angle_in_degree, float ax, float ay, float az) {
-	TINYGLES_UNUSED(angle_in_degree); TINYGLES_UNUSED(ax); TINYGLES_UNUSED(ay); TINYGLES_UNUSED(az);
+	glm::vec3 axis(ax, ay, az);
+	Rotate(angle_in_degree, axis);
 }
 
 void TransformHelper::Scale(glm::vec3& scale) {
-	TINYGLES_UNUSED(scale);
+	MatrixMode mode = mImpl->mMode;
+	if (mode == MatrixMode::Model) {
+		glm::mat4& m = GetModelMatrix();
+		m = glm::scale(m, scale);
+		return;
+	}
+	if (mode == MatrixMode::View) {
+		glm::mat4& m = GetViewMatrix();
+		m = glm::scale(m, scale);
+		return;
+	}
+	if (mode == MatrixMode::Projection) {
+		glm::mat4& m = GetProjectionMatrix();
+		m = glm::scale(m, scale);
+		return;
+	}
+	if (mode == MatrixMode::Texture) {
+		glm::mat4& m = GetTextureMatrix();
+		m = glm::scale(m, scale);
+		return;
+	}
 }
 
 void TransformHelper::Scale(float sx, float sy, float sz) {
-	TINYGLES_UNUSED(sx); TINYGLES_UNUSED(sy); TINYGLES_UNUSED(sz);
+	glm::vec3 s(sx, sy, sz);
+	Scale(s);
 }
 
 void TransformHelper::PushMatrix() {
-
+	MatrixMode mode = mImpl->mMode;
+	if (mode == MatrixMode::Model) {
+		if (mImpl->mModelMatrixIndex >= cMaxModelMatrix) {
+			return;
+		}
+		std::memcpy((void*)std::addressof(mImpl->mModelMatrix[mImpl->mModelMatrixIndex + 1]), (const void*)std::addressof(mImpl->mModelMatrix[mImpl->mModelMatrixIndex]), sizeof(glm::mat4));
+		mImpl->mModelMatrixIndex++;
+		return;
+	}
+	if (mode == MatrixMode::View) {
+		if (mImpl->mViewMatrixIndex >= cMaxViewMatrix) {
+			return;
+		}
+		std::memcpy((void*)std::addressof(mImpl->mViewMatrix[mImpl->mViewMatrixIndex + 1]), (const void*)std::addressof(mImpl->mViewMatrix[mImpl->mViewMatrixIndex]), sizeof(glm::mat4));
+		mImpl->mViewMatrixIndex++;
+		return;
+	}
+	if (mode == MatrixMode::Projection) {
+		if (mImpl->mProjectionMatrixIndex >= cMaxProjectionMatrix) {
+			return;
+		}
+		std::memcpy((void*)std::addressof(mImpl->mProjectionMatrix[mImpl->mProjectionMatrixIndex + 1]), (const void*)std::addressof(mImpl->mProjectionMatrix[mImpl->mProjectionMatrixIndex]), sizeof(glm::mat4));
+		mImpl->mProjectionMatrixIndex++;
+		return;
+	}
+	if (mode == MatrixMode::Texture) {
+		if (mImpl->mTextureMatrixIndex >= cMaxTextureMatrix) {
+			return;
+		}
+		std::memcpy((void*)std::addressof(mImpl->mTextureMatrix[mImpl->mTextureMatrixIndex + 1]), (const void*)std::addressof(mImpl->mTextureMatrix[mImpl->mTextureMatrixIndex]), sizeof(glm::mat4));
+		mImpl->mTextureMatrixIndex++;
+		return;
+	}
 }
 
 void TransformHelper::PopMatrix() {
-
+	MatrixMode mode = mImpl->mMode;
+	if (mode == MatrixMode::Model) {
+		if (mImpl->mModelMatrixIndex == 0) {
+			return;
+		}
+		mImpl->mModelMatrixIndex--;
+		return;
+	}
+	if (mode == MatrixMode::View) {
+		if (mImpl->mViewMatrixIndex == 0) {
+			return;
+		}
+		mImpl->mViewMatrixIndex--;
+		return;
+	}
+	if (mode == MatrixMode::Projection) {
+		if (mImpl->mProjectionMatrixIndex == 0) {
+			return;
+		}
+		mImpl->mProjectionMatrixIndex--;
+		return;
+	}
+	if (mode == MatrixMode::Texture) {
+		if (mImpl->mTextureMatrixIndex == 0) {
+			return;
+		}
+		mImpl->mTextureMatrixIndex--;
+		return;
+	}
 }
 
 glm::mat4& TransformHelper::GetModelMatrix() {
@@ -153,11 +325,11 @@ const glm::mat4& TransformHelper::GetViewMatrix() const {
 }
 
 glm::mat4& TransformHelper::GetProjectionMatrix() {
-	return mImpl->mProjectionMatrox[mImpl->mProjectionMatrixIndex];
+	return mImpl->mProjectionMatrix[mImpl->mProjectionMatrixIndex];
 }
 
 const glm::mat4& TransformHelper::GetProjectionMatrix() const {
-	return mImpl->mProjectionMatrox[mImpl->mProjectionMatrixIndex];
+	return mImpl->mProjectionMatrix[mImpl->mProjectionMatrixIndex];
 }
 
 glm::mat4& TransformHelper::GetTextureMatrix() {
@@ -168,5 +340,15 @@ const glm::mat4& TransformHelper::GetTextureMatrix() const {
 	return mImpl->mTextureMatrix[mImpl->mTextureMatrixIndex];
 }
 
+const glm::mat4& TransformHelper::GetModelViewMatrix() const {
+	mImpl->mMoldeViewMatrix = GetViewMatrix() * GetModelMatrix();
+	return mImpl->mMoldeViewMatrix;
+}
+
+const glm::mat4& TransformHelper::GetModelViewProjectionMatrix() const {
+	mImpl->mModelViewProjectionMatrix = GetProjectionMatrix() * GetViewMatrix() * GetModelMatrix();
+	return mImpl->mModelViewProjectionMatrix;
+
+}
 
 } // namespace tinygles

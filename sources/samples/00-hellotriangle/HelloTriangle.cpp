@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Renderer.h"
+#include "TransformHelper.h"
 #include "Log.h"
 
 #define GL_GLEXT_PROTOTYPES
@@ -43,13 +44,7 @@ public:
 	}
 
 	void RenderFrame() override {
-		// Matrix used to specify the orientation of the triangle on screen.
-		static const float transformationMatrix[] = {
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f
-		};
+		glm::mat4 MVP = mTransformHelper.GetModelViewProjectionMatrix();
 
 		GLenum lastError;
 
@@ -59,10 +54,8 @@ public:
 
 		renderer->BeginFrame();
 
-		// Get the location of the transformation matrix in the shader using its name
 		int matrixLocation = glGetUniformLocation(mProgramHandle.mHandle, "u_mvpMatrix");
-		// Pass the transformationMatrix to the shader using its location
-		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, transformationMatrix);
+		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, &MVP[0][0]);
 		lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return; }
 
@@ -163,6 +156,8 @@ private:
 	ProgramHandle mProgramHandle;
 
 	GLuint mPositionAttributePos = 0;
+
+	TransformHelper mTransformHelper;
 
 	uint32_t mWindowWidth = 0;
 	uint32_t mWindowHeight = 0;

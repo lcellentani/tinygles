@@ -50,6 +50,9 @@ public:
 	glm::mat4& GetTextureMatrix();
 	const glm::mat4& GetTextureMatrix() const;
 
+	const glm::mat4& GetModelViewMatrix() const;
+	const glm::mat4& GetModelViewProjectionMatrix() const;
+
 public:
 	TransformHelper();
 	~TransformHelper();
