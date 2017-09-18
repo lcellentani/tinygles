@@ -37,10 +37,39 @@ public:
 
 	void InitView() override {
 		Renderer* renderer = Renderer::GetRenderer();
+
 		renderer->SetViewClear(ClearFlags::Color, Color(92, 92, 92));
 
-		initializeBuffer(mVertexBuffer);
-		initializeShaders();
+		GLfloat vertexData[] = {
+			-0.4f, -0.4f, 0.0f, // Bottom Left
+			0.4f, -0.4f, 0.0f, // Bottom Right
+			0.0f, 0.4f, 0.0f // Top Middle
+		};
+		mVertexBufferHandle = renderer->CreateVertexBuffer(vertexData, sizeof(vertexData));
+		
+		const char* fragmentShaderSource = SHADER_SOURCE
+		(
+			void main(void)
+			{
+				gl_FragColor = vec4(1.0, 1.0, 0.66, 1.0);
+			}
+		);
+		const char* vertexShaderSource = SHADER_SOURCE
+		(
+			attribute highp vec4 a_position;
+		uniform mediump mat4 u_mvpMatrix;
+		void main(void)
+		{
+			gl_Position = u_mvpMatrix * a_position;
+		}
+		);
+
+		ShaderHandle fsHandle = renderer->CreateShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+		ShaderHandle vsHandle = renderer->CreateShader(GL_VERTEX_SHADER, vertexShaderSource);
+		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
+
+		renderer->SetProgram(mProgramHandle);
+		glBindAttribLocation(mProgramHandle.mHandle, mPositionAttributePos, "a_position");
 	}
 
 	void RenderFrame() override {
@@ -54,6 +83,10 @@ public:
 
 		renderer->BeginFrame();
 
+		renderer->SetProgram(mProgramHandle);
+
+
+		//@note: ProgramHandle is now a "internal id", so all this logic needs to be moved internally to the Renderer
 		int matrixLocation = glGetUniformLocation(mProgramHandle.mHandle, "u_mvpMatrix");
 		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, &MVP[0][0]);
 		lastError = glGetError();
@@ -64,15 +97,18 @@ public:
 		lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return; }
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		//lastError = glGetError();
+		//if (lastError != GL_NO_ERROR) { return; }
+
+		
+		renderer->SetVertexBuffer(mVertexBufferHandle);
+		renderer->DrawArray(0, 3);
 
 		renderer->EndFrame();
 	}
 
 	void ReleaseView() override {
-		glDeleteBuffers(1, &mVertexBuffer);
 	}
 
 	void ReleaseApplication() override {
@@ -86,74 +122,8 @@ public:
 	}
 
 private:
-	bool initializeBuffer(GLuint& vertexBuffer) {
-		// Vertex data containing the positions of each point of the triangle
-		GLfloat vertexData[] = {
-			-0.4f, -0.4f, 0.0f, // Bottom Left
-			0.4f, -0.4f, 0.0f, // Bottom Right
-			0.0f, 0.4f, 0.0f // Top Middle
-		};
-
-		// Generate a buffer object
-		glGenBuffers(1, &vertexBuffer);
-
-		// Bind buffer as an vertex buffer so we can fill it with data
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
-		//	Set the buffer's size, data and usage
-		//	Note the last argument - GL_STATIC_DRAW. This tells the driver that we intend to read from the buffer on the GPU, and don't intend
-		//	to modify the data until we're done with it.
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
-
-		GLenum lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return false; }
-
-		return true;
-	}
-
-	bool initializeShaders() {
-		Renderer* renderer = Renderer::GetRenderer();
-		
-		const char* fragmentShaderSource = SHADER_SOURCE
-		(
-			void main (void)
-			{
-				gl_FragColor = vec4(1.0, 1.0, 0.66 ,1.0);
-			}
-		);	
-		const char* vertexShaderSource = SHADER_SOURCE
-		(
-			attribute highp vec4 a_position;
-			uniform mediump mat4 u_mvpMatrix;
-			void main(void)
-			{
-				gl_Position = u_mvpMatrix * a_position;
-			}
-		);
-		
-		mProgramHandle = renderer->CreateProgram(vertexShaderSource, fragmentShaderSource, [](uint32_t type, const char * errorMessage) {
-			if (errorMessage) {
-				if (type == GL_VERTEX_SHADER) {
-					Log(tinygles::Logger::Error, "Failed compile vertex shader : %s", errorMessage);
-				}
-				else if (type == GL_FRAGMENT_SHADER) {
-					Log(tinygles::Logger::Error, "Failed compile fragment shader : %s", errorMessage);
-				}
-				else {
-					Log(tinygles::Logger::Error, "Failed compile ling program : %s", errorMessage);
-				}
-			}
-		});
-
-		glBindAttribLocation(mProgramHandle.mHandle, mPositionAttributePos, "a_position");
-		glUseProgram(mProgramHandle.mHandle);
-		
-		return true;
-	}
-
-private:
-	GLuint mVertexBuffer = 0;
 	ProgramHandle mProgramHandle;
+	VertexBufferHandle mVertexBufferHandle;
 
 	GLuint mPositionAttributePos = 0;
 

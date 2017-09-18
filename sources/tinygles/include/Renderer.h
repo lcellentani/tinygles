@@ -56,6 +56,7 @@ struct ResourceHandle {
 
 using ShaderHandle = ResourceHandle;
 using ProgramHandle = ResourceHandle;
+using VertexBufferHandle = ResourceHandle;
 
 class Renderer {
 public:
@@ -78,8 +79,17 @@ public:
 	void SetViewClear(ClearFlags flags, Color rgba, float depth = 1.0f, uint8_t stencil = 0);
 	void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 
-	ShaderHandle CreateShader(uint32_t type, const char* source, std::function<void(uint32_t, const char*)> func);
-	ProgramHandle CreateProgram(const char* vsSource, const char* fsSource, std::function<void(uint32_t, const char*)> func);
+	ShaderHandle CreateShader(uint32_t type, const char* source);
+	ProgramHandle CreateProgram(const ShaderHandle& vsh, const ShaderHandle& fsh, bool destroyShaders);
+	
+	void SetProgramUniform(const ProgramHandle& handle);
+
+	VertexBufferHandle CreateVertexBuffer(const void* data, uint32_t size);
+
+	void SetProgram(const ProgramHandle& handle);
+	void SetVertexBuffer(const VertexBufferHandle& handle);
+
+	void DrawArray(uint32_t first, uint32_t count);
 
 private:
 	struct Impl;
