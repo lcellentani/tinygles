@@ -3,17 +3,19 @@
 #include "ShadersUtil.h"
 #include "Log.h"
 
-class SimpleMinmapping : public tinygles::Application {
+using namespace tinygles;
+
+class SimpleMinmapping : public Application {
 public:
 	SimpleMinmapping() = default;
 	virtual ~SimpleMinmapping() {
 
 	}
 
-	tinygles::ContextAttribs& GetContextAttribs() override {
-		static tinygles::ContextAttribs sAttributes;
+	ContextAttribs& GetContextAttribs() override {
+		static ContextAttribs sAttributes;
 
-		sAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
+		sAttributes.mRequiredApi = Api::OpenGLES2;
 		sAttributes.mDepthBPP = 32;
 		sAttributes.mStencilBPP = 0;
 		sAttributes.mRedBits = 8;
@@ -28,13 +30,17 @@ public:
 
 	}
 
-	void InitView() override {
+	void InitView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
+
 		InitializeShaders();
 
 		CreateTexture(256, 256);
 	}
 
-	void RenderFrame() override {
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
+
 		const GLfloat vertices[]{
 			-0.5f, 0.5f, 0.0f, 2.0f,
 			0.0f, 0.0f,
@@ -96,7 +102,8 @@ public:
 		glFinish();
 	}
 
-	void ReleaseView() override {
+	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
 		glDeleteProgram(mShaderProgram);
 		glDeleteTextures(1, &mTextureId);
 	}

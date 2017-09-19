@@ -56,4 +56,20 @@ struct Color
 	uint8_t a;
 };
 
+struct ResourceHandle {
+	ResourceHandle() = default;
+	ResourceHandle(uint32_t handle) : mHandle(handle) {}
+
+	ResourceHandle& operator=(const ResourceHandle&) = default;
+
+	inline const bool IsValid() const { return mHandle != 0; }
+
+	uint32_t mHandle = 0;
+};
+
+using ShaderHandle = ResourceHandle;
+using ProgramHandle = ResourceHandle;
+using VertexBufferHandle = ResourceHandle;
+using IndexBufferHandle = ResourceHandle;
+
 } // namespace tinygles

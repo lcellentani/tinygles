@@ -1,5 +1,5 @@
-function(Enable_Cpp11)
-	set_target_properties(tinygles PROPERTIES
+function(Enable_Cpp11 target)
+	set_target_properties(${target} PROPERTIES
 		CXX_STANDARD 11
 		CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS OFF

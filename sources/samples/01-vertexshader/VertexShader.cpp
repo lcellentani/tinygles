@@ -6,17 +6,19 @@
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-class VertexShader : public tinygles::Application {
+using namespace tinygles;
+
+class VertexShader : public Application {
 public:
 	VertexShader() = default;
 	virtual ~VertexShader() {
 
 	}
 
-	tinygles::ContextAttribs& GetContextAttribs() override {
-		static tinygles::ContextAttribs sAttributes;
+	ContextAttribs& GetContextAttribs() override {
+		static ContextAttribs sAttributes;
 
-		sAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
+		sAttributes.mRequiredApi = Api::OpenGLES2;
 		sAttributes.mDepthBPP = 32;
 		sAttributes.mStencilBPP = 0;
 		sAttributes.mRedBits = 8;
@@ -31,13 +33,17 @@ public:
 
 	}
 
-	void InitView() override {
-		tinygles::GenerateCube(1.0f, mCube);
+	void InitView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
+
+		GenerateCube(1.0f, mCube);
 
 		initializeShaders(mShaderProgram);
 	}
 
-	void RenderFrame() override {
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
+
 		mAngle += 1.0f;
 		if (mAngle > 360.0f) {
 			mAngle -= 360.0f;
@@ -69,7 +75,8 @@ public:
 		glFinish();
 	}
 
-	void ReleaseView() override {
+	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
 		glDeleteProgram(mShaderProgram);
 	}
 

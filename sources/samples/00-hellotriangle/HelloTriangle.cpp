@@ -1,10 +1,6 @@
 #include "Application.h"
-#include "Renderer.h"
 #include "TransformHelper.h"
 #include "Log.h"
-
-#define GL_GLEXT_PROTOTYPES
-#include <GLES2/gl2.h>
 
 using namespace tinygles;
 
@@ -35,8 +31,10 @@ public:
 
 	}
 
-	void InitView() override {
-		Renderer* renderer = Renderer::GetRenderer();
+	void InitView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
+
+		/*Renderer* renderer = Renderer::GetRenderer();
 
 		renderer->SetViewClear(ClearFlags::Color, Color(92, 92, 92));
 
@@ -69,21 +67,20 @@ public:
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
 
 		renderer->SetProgram(mProgramHandle);
-		glBindAttribLocation(mProgramHandle.mHandle, mPositionAttributePos, "a_position");
+		glBindAttribLocation(mProgramHandle.mHandle, mPositionAttributePos, "a_position");*/
 	}
 
-	void RenderFrame() override {
-		glm::mat4 MVP = mTransformHelper.GetModelViewProjectionMatrix();
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
 
-		GLenum lastError;
+		//glm::mat4 MVP = mTransformHelper.GetModelViewProjectionMatrix();
 
-		Renderer* renderer = Renderer::GetRenderer();
-		
+		//GLenum lastError;
+
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
+		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
-		renderer->BeginFrame();
-
-		renderer->SetProgram(mProgramHandle);
+		/*renderer->SetProgram(mProgramHandle);
 
 
 		//@note: ProgramHandle is now a "internal id", so all this logic needs to be moved internally to the Renderer
@@ -105,10 +102,11 @@ public:
 		renderer->SetVertexBuffer(mVertexBufferHandle);
 		renderer->DrawArray(0, 3);
 
-		renderer->EndFrame();
+		renderer->EndFrame();*/
 	}
 
-	void ReleaseView() override {
+	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
 	}
 
 	void ReleaseApplication() override {
@@ -122,10 +120,10 @@ public:
 	}
 
 private:
-	ProgramHandle mProgramHandle;
-	VertexBufferHandle mVertexBufferHandle;
+	//ProgramHandle mProgramHandle;
+	//VertexBufferHandle mVertexBufferHandle;
 
-	GLuint mPositionAttributePos = 0;
+	//GLuint mPositionAttributePos = 0;
 
 	TransformHelper mTransformHelper;
 

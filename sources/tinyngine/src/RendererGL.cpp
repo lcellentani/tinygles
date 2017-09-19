@@ -1,10 +1,41 @@
-#include "Renderer.h"
+#include "RendererGL.h"
 
 #include <vector>
+
+#define GL_GLEXT_PROTOTYPES
+#include <GLES2/gl2.h>
 
 namespace tinygles
 {
 
+RendererGL::RendererGL() {
+
+}
+
+RendererGL::~RendererGL() {
+
+}
+
+void RendererGL::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+	glViewport(x, y, width, height);
+}
+
+void RendererGL::Clear(ClearFlags flags, Color color, float depth, uint8_t stencil) {
+	if (flags & ClearFlags::ColorBuffer) {
+		glClearColor(color.red(), color.green(), color.blue(),color.alpha());
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	if (flags & ClearFlags::DepthBuffer) {
+		glClearDepthf(depth);
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+	if (flags & ClearFlags::StencilBuffer) {
+		glClearStencil(stencil);
+		glClear(GL_STENCIL_BUFFER_BIT);
+	}
+}
+
+/*
 static constexpr uint32_t cMaxShaderHandles = (1 << 6);
 static constexpr uint32_t cMaxProgramHandles = (1 << 6);
 static constexpr uint32_t cMaxVertexBufferHandles = (1 << 10);
@@ -235,6 +266,7 @@ ProgramHandle Renderer::CreateProgram(const ShaderHandle& vsh, const ShaderHandl
 }
 
 void Renderer::SetProgramUniform(const ProgramHandle& handle) {
+	TINYGLES_UNUSED(handle);
 
 }
 
@@ -264,5 +296,6 @@ void Renderer::DrawArray(uint32_t first, uint32_t count) {
 	glBindBuffer(GL_ARRAY_BUFFER, vb.mId);
 	glDrawArrays(GL_TRIANGLES, first, count);
 }
+*/
 
 }

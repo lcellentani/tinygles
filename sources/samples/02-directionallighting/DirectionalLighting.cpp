@@ -6,20 +6,19 @@
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#define GL_GLEXT_PROTOTYPES
-#include <GLES2/gl2.h>
+using namespace tinygles;
 
-class DirectionalLighting : public tinygles::Application {
+class DirectionalLighting : public Application {
 public:
 	DirectionalLighting() = default;
 	virtual ~DirectionalLighting() {
 
 	}
 
-	tinygles::ContextAttribs& GetContextAttribs() override {
-		static tinygles::ContextAttribs sAttributes;
+	ContextAttribs& GetContextAttribs() override {
+		static ContextAttribs sAttributes;
 
-		sAttributes.mRequiredApi = tinygles::Api::OpenGLES2;
+		sAttributes.mRequiredApi = Api::OpenGLES2;
 		sAttributes.mDepthBPP = 32;
 		sAttributes.mStencilBPP = 0;
 		sAttributes.mRedBits = 8;
@@ -34,8 +33,10 @@ public:
 
 	}
 
-	void InitView() override {
-		tinygles::GenerateCube(1.0f, mCube);
+	void InitView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
+
+		GenerateCube(1.0f, mCube);
 
 		mColors.reserve(mCube.numVertices);
 		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
@@ -48,7 +49,9 @@ public:
 		initializeShaders(mShaderProgram);
 	}
 
-	void RenderFrame() override {
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
+
 		mAngle += 1.0f;
 		if (mAngle > 360.0f) {
 			mAngle -= 360.0f;
@@ -92,7 +95,8 @@ public:
 		glFinish();
 	}
 
-	void ReleaseView() override {
+	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
+		TINYGLES_UNUSED(renderer);
 		glDeleteProgram(mShaderProgram);
 	}
 

@@ -4,7 +4,7 @@ add_executable(00-hellotriangle
 )
 
 target_link_libraries(00-hellotriangle
-    tinygles
+    tinyngine
 )
 
 set_target_properties(00-hellotriangle
@@ -12,7 +12,7 @@ set_target_properties(00-hellotriangle
         VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/media"
 )
 
-Enable_Cpp11()
+Enable_Cpp11(00-hellotriangle)
 AddCompilerFlags(00-hellotriangle)
 
 SetLinkerSubsystem(00-hellotriangle)

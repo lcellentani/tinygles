@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.2 FATAL_ERROR)
-project (tinygles VERSION 0.1 LANGUAGES CXX)
+project (tinyngine VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_SUPPRESS_REGENERATION true)
 # explicitely specify which configurations we want
@@ -21,7 +21,7 @@ include_directories("${PROJECT_SOURCE_DIR}/3rdparty/stb")
 
 link_directories("${PROJECT_SOURCE_DIR}/3rdparty/gles/angle/lib")
 
-add_subdirectory(sources/tinygles)
+add_subdirectory(sources/tinyngine)
 add_subdirectory(sources/samples/00-hellotriangle)
 add_subdirectory(sources/samples/01-vertexshader)
 add_subdirectory(sources/samples/02-directionallighting)
@@ -29,5 +29,5 @@ add_subdirectory(sources/samples/03-simpletexture)
 add_subdirectory(sources/samples/04-simplemipmapping)
 
 if (MSVC)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT 04-simplemipmapping)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT 00-hellotriangle)
 endif()

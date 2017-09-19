@@ -1,14 +1,21 @@
 #pragma once
 
-#include "PlatformDefine.h"
-
-#include <functional>
-
-#define SHADER_SOURCE(...) #__VA_ARGS__
+#include "Renderer.h"
 
 namespace tinygles
 {
 
+class RendererGL : public Renderer {
+public:
+	RendererGL();
+	virtual ~RendererGL();
+
+	virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+
+	virtual void Clear(ClearFlags flags, Color color, float depth = 1.0f, uint8_t stencil = 0) override;
+};
+
+/*
 enum class ClearFlags : uint8_t {
 	None = 0,
 	Color = 1 << 0,
@@ -95,5 +102,5 @@ private:
 	struct Impl;
 	std::unique_ptr<Impl> mImpl;
 };
-
+*/
 } // tinygles

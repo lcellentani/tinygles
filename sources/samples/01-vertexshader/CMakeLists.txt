@@ -4,7 +4,7 @@ add_executable(01-vertexshader
 )
 
 target_link_libraries(01-vertexshader
-    tinygles
+    tinyngine
 )
 
 set_target_properties(01-vertexshader
@@ -12,7 +12,7 @@ set_target_properties(01-vertexshader
         VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/media"
 )
 
-Enable_Cpp11()
+Enable_Cpp11(01-vertexshader)
 AddCompilerFlags(01-vertexshader)
 
 SetLinkerSubsystem(01-vertexshader)

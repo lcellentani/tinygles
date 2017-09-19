@@ -4,7 +4,7 @@ add_executable(04-simplemipmapping
 )
 
 target_link_libraries(04-simplemipmapping
-    tinygles
+    tinyngine
 )
 
 set_target_properties(04-simplemipmapping
@@ -12,7 +12,7 @@ set_target_properties(04-simplemipmapping
         VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/media"
 )
 
-Enable_Cpp11()
+Enable_Cpp11(04-simplemipmapping)
 AddCompilerFlags(04-simplemipmapping)
 
 SetLinkerSubsystem(04-simplemipmapping)
