@@ -3,7 +3,7 @@
 #include "ShadersUtil.h"
 #include "Log.h"
 
-using namespace tinygles;
+using namespace tinyngine;
 
 class SimpleMinmapping : public Application {
 public:
@@ -31,17 +31,17 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		TINYGLES_UNUSED(renderer);
+		TINYNGINE_UNUSED(renderer);
 
-		InitializeShaders();
+		//InitializeShaders();
 
-		CreateTexture(256, 256);
+		//CreateTexture(256, 256);
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
-		TINYGLES_UNUSED(renderer);
+		TINYNGINE_UNUSED(renderer);
 
-		const GLfloat vertices[]{
+		/*const GLfloat vertices[]{
 			-0.5f, 0.5f, 0.0f, 2.0f,
 			0.0f, 0.0f,
 			-0.5f, -0.5f, 0.0f, 1.25f,
@@ -99,13 +99,13 @@ public:
 		lastError = glGetError();
 		if (lastError != GL_NO_ERROR) { return; }
 
-		glFinish();
+		glFinish();*/
 	}
 
 	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
-		TINYGLES_UNUSED(renderer);
-		glDeleteProgram(mShaderProgram);
-		glDeleteTextures(1, &mTextureId);
+		TINYNGINE_UNUSED(renderer);
+		//glDeleteProgram(mShaderProgram);
+		//glDeleteTextures(1, &mTextureId);
 	}
 
 	void ReleaseApplication() override {
@@ -113,14 +113,14 @@ public:
 	}
 
 	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
-		TINYGLES_UNUSED(x); TINYGLES_UNUSED(y);
+		TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y);
 		mWindowWidth = width;
 		mWindowHeight = height;
 		mAspect = (float)mWindowWidth / (float)mWindowHeight;
 	}
 
 private:
-	bool GenMipmap2D(const std::vector<GLubyte>& src, std::vector<GLubyte>& dst, const uint32_t srcWidth, const uint32_t srcHeight, uint32_t& dstWidth, uint32_t& dstHeight) {
+	/*bool GenMipmap2D(const std::vector<GLubyte>& src, std::vector<GLubyte>& dst, const uint32_t srcWidth, const uint32_t srcHeight, uint32_t& dstWidth, uint32_t& dstHeight) {
 		constexpr int32_t texelSize = 3;
 
 		dstWidth = srcWidth / 2;
@@ -245,16 +245,16 @@ private:
 				v_texcoord = a_texcoord;
 			}
 		);
-		mShaderProgram = tinygles::CompileProgram(vertexShaderSource, fragmentShaderSource, [](GLenum type, const char * errorMessage) {
+		mShaderProgram = CompileProgram(vertexShaderSource, fragmentShaderSource, [](GLenum type, const char * errorMessage) {
 			if (errorMessage) {
 				if (type == GL_VERTEX_SHADER) {
-					Log(tinygles::Logger::Error, "Failed compile vertex shader : %s", errorMessage);
+					Log(Logger::Error, "Failed compile vertex shader : %s", errorMessage);
 				}
 				else if (type == GL_FRAGMENT_SHADER) {
-					Log(tinygles::Logger::Error, "Failed compile fragment shader : %s", errorMessage);
+					Log(Logger::Error, "Failed compile fragment shader : %s", errorMessage);
 				}
 				else {
-					Log(tinygles::Logger::Error, "Failed compile ling program : %s", errorMessage);
+					Log(Logger::Error, "Failed compile ling program : %s", errorMessage);
 				}
 			}
 		}); 
@@ -271,26 +271,26 @@ private:
 		mSamplerPos = glGetUniformLocation(mShaderProgram, "s_texture");
 
 		return true;
-	}
+	}*/
 
 private:
 	uint32_t mWindowWidth;
 	uint32_t mWindowHeight;
 	float mAspect;
 
-	tinygles::CubeGeometry mCube;
+	CubeGeometry mCube;
 
-	GLuint mShaderProgram = 0;
+	//GLuint mShaderProgram = 0;
 
-	GLuint mPositionAttributePos = 0;
-	GLuint mTexcoordAttributePos = 0;
-	GLuint mSamplerPos = 0;
-	GLuint mOffsetPos = 0;
+	//GLuint mPositionAttributePos = 0;
+	//GLuint mTexcoordAttributePos = 0;
+	//GLuint mSamplerPos = 0;
+	//GLuint mOffsetPos = 0;
 
-	GLuint mTextureId;
+	//GLuint mTextureId;
 };
 
 
-extern "C" tinygles::Application * CreateApplication() {
+extern "C" tinyngine::Application * CreateApplication() {
 	return new SimpleMinmapping();
 }

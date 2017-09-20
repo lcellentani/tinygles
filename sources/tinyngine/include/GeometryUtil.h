@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace tinygles
+namespace tinyngine
 {
 
 struct CubeGeometry {
@@ -18,4 +18,4 @@ struct CubeGeometry {
 
 void GenerateCube(float scale, CubeGeometry& result);
 
-} // namespace tinygles
+} // namespace tinyngine

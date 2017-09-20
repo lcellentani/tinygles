@@ -2,7 +2,7 @@
 
 #include "PlatformDefine.h"
 
-namespace tinygles
+namespace tinyngine
 {
 
 enum class Api
@@ -93,4 +93,4 @@ struct ContextAttribs {
 	uint32_t mContextPriority;
 };
 
-} // namespace tinygles
+} // namespace tinyngine

@@ -7,10 +7,10 @@
 #define NOMINMAX
 #include <Windows.h>
 
-namespace tinygles { class IPlatformContext;  }
-namespace tinygles { class Application; }
+namespace tinyngine { class IPlatformContext;  }
+namespace tinyngine { class Application; }
 
-namespace tinygles
+namespace tinyngine
 {
 class PlatformBridgeWin32 : public IPlatformBridge {
 public:
@@ -42,4 +42,4 @@ private:
 	uint32_t mWindowWidth;
 	uint32_t mWindowHeight;
 };
-} // namespace tinygles
+} // namespace tinyngine

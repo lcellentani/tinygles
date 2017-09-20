@@ -3,7 +3,7 @@
 #include "PlatformTypes.h"
 #include <string>
 
-namespace tinygles
+namespace tinyngine
 {
 class IPlatformContext {
 public:
@@ -20,4 +20,4 @@ public:
 
 extern "C" IPlatformContext* CreatePlatformContext(void* windowHandle, const ContextAttribs& attributes);
 
-} // namespace tinygles
+} // namespace tinyngine

@@ -11,7 +11,7 @@ static constexpr uint32_t cDefaultHeight = 600;
 
 }
 
-namespace tinygles
+namespace tinyngine
 {
 
 int16_t PlatformBridgeWin32::Run() {
@@ -184,4 +184,4 @@ LRESULT CALLBACK PlatformBridgeWin32::WndProc(HWND hwnd, UINT id, WPARAM wparam,
 	return ::DefWindowProc(hwnd, id, wparam, lparam);
 }
 
-} // namespace tinygles
+} // namespace tinyngine

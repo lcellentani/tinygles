@@ -2,7 +2,7 @@
 #include "TransformHelper.h"
 #include "Log.h"
 
-using namespace tinygles;
+using namespace tinyngine;
 
 class HelloTriangle : public Application {
 public:
@@ -13,7 +13,7 @@ public:
 
 	}
 
-	tinygles::ContextAttribs& GetContextAttribs() override {
+	ContextAttribs& GetContextAttribs() override {
 		static ContextAttribs sAttributes;
 
 		sAttributes.mRequiredApi = Api::OpenGLES2;
@@ -32,7 +32,7 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		TINYGLES_UNUSED(renderer);
+		TINYNGINE_UNUSED(renderer);
 
 		/*Renderer* renderer = Renderer::GetRenderer();
 
@@ -71,7 +71,7 @@ public:
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
-		TINYGLES_UNUSED(renderer);
+		TINYNGINE_UNUSED(renderer);
 
 		//glm::mat4 MVP = mTransformHelper.GetModelViewProjectionMatrix();
 
@@ -106,7 +106,7 @@ public:
 	}
 
 	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
-		TINYGLES_UNUSED(renderer);
+		TINYNGINE_UNUSED(renderer);
 	}
 
 	void ReleaseApplication() override {
@@ -114,7 +114,7 @@ public:
 	}
 
 	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
-		TINYGLES_UNUSED(x); TINYGLES_UNUSED(y);
+		TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y);
 		mWindowWidth = width;
 		mWindowHeight = height;
 	}
@@ -132,6 +132,6 @@ private:
 };
 
 
-extern "C" tinygles::Application * CreateApplication() {
+extern "C" tinyngine::Application * CreateApplication() {
 	return new HelloTriangle();
 }

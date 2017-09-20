@@ -4,7 +4,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-namespace tinygles
+namespace tinyngine
 {
 
 class TransformHelper {
@@ -68,4 +68,4 @@ private:
 	std::unique_ptr<Impl> mImpl;
 };
 
-} // namespace tinygles
+} // namespace tinyngine

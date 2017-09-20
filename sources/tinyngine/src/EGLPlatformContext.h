@@ -3,7 +3,7 @@
 #include "IPlatformContext.h"
 #include "EGLApi.h"
 
-namespace tinygles
+namespace tinyngine
 {
 
 typedef EGLNativeWindowType NativeWindow;
@@ -42,4 +42,4 @@ private:
 	uint32_t mSurfaceHeight;
 };
 
-} // namespace tinygles
+} // namespace tinyngine

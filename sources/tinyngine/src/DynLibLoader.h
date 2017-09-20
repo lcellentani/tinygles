@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-namespace tinygles
+namespace tinyngine
 {
 class DynLibLoader final {
 public:
@@ -30,4 +30,4 @@ private:
 	struct Impl;
 	std::unique_ptr<Impl> mImpl;
 };
-} // namespace tinygles
+} // namespace tinyngine

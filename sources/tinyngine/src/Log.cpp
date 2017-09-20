@@ -10,7 +10,7 @@
 #define vsnprintf _vsnprintf
 #endif
 
-tinygles::Logger Log{};
+tinyngine::Logger Log{};
 
 namespace {
 	static void outputString(const char* const severityString, const char* const formatString, va_list argumentList) {
@@ -49,7 +49,7 @@ namespace {
 #endif
 	}
 
-	static const char* getSeverityString(tinygles::Logger::Severity severity) {
+	static const char* getSeverityString(tinyngine::Logger::Severity severity) {
 		static const char* messageTypes[] = {
 			"[VERBOSE]: ",
 			"[DEBUG]: ",
@@ -63,7 +63,7 @@ namespace {
 	}
 }
 
-namespace tinygles {
+namespace tinyngine {
 
 Logger::Logger() {
 
@@ -89,4 +89,4 @@ void Logger::operator()(const char* const formatString, ...)
 	va_end(argumentList);
 }
 
-} // namespace tinygles
+} // namespace tinyngine

@@ -2,7 +2,7 @@
 
 #include "PlatformDefine.h"
 
-namespace tinygles
+namespace tinyngine
 {
 
 class IPlatformBridge {
@@ -12,4 +12,4 @@ public:
 	virtual int16_t Run() = 0;
 };
 
-} // namespace tinygles
+} // namespace tinyngine

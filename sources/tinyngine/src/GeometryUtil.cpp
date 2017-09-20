@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-namespace tinygles
+namespace tinyngine
 {
 
 void GenerateCube(float scale, CubeGeometry& result) {
@@ -127,4 +127,4 @@ void GenerateCube(float scale, CubeGeometry& result) {
 	}
 }
 
-} // namespace tinygles
+} // namespace tinyngine

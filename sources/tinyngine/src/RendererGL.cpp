@@ -5,7 +5,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 
-namespace tinygles
+namespace tinyngine
 {
 
 RendererGL::RendererGL() {
@@ -266,7 +266,7 @@ ProgramHandle Renderer::CreateProgram(const ShaderHandle& vsh, const ShaderHandl
 }
 
 void Renderer::SetProgramUniform(const ProgramHandle& handle) {
-	TINYGLES_UNUSED(handle);
+	TINYNGINE_UNUSED(handle);
 
 }
 
@@ -298,4 +298,4 @@ void Renderer::DrawArray(uint32_t first, uint32_t count) {
 }
 */
 
-}
+} // namespace tinyngine

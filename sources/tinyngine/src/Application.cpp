@@ -1,8 +1,8 @@
 #include "Application.h"
 
-namespace tinygles
+namespace tinyngine
 {
 Application::~Application() {
 
 }
-} // namespace tinygles
+} // namespace tinyngine

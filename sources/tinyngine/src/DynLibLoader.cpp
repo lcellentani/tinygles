@@ -48,7 +48,7 @@ namespace {
 #endif
 }
 
-namespace tinygles
+namespace tinyngine
 {
 struct DynLibLoader::Impl {
 	void* mLibraryHandle = nullptr;
@@ -130,4 +130,4 @@ void* DynLibLoader::GetFunction(const char* functionName) {
 
 	return funcPtr;
 }
-} // namespace tinygles
+} // namespace tinyngine

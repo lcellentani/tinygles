@@ -1,10 +1,10 @@
 #pragma once
 
-#include "PlatformDefine.h"
+#include "GraphicsTypes.h"
 
 //#define SHADER_SOURCE(...) #__VA_ARGS__
 
-namespace tinygles
+namespace tinyngine
 {
 
 class Renderer {
@@ -63,4 +63,4 @@ private:
 	std::unique_ptr<Impl> mImpl;
 };
 */
-} // tinygles
+} // namespace tinyngine

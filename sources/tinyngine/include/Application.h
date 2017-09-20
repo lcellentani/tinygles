@@ -3,7 +3,7 @@
 #include "PlatformTypes.h"
 #include "Renderer.h"
 
-namespace tinygles
+namespace tinyngine
 {
 class Application
 {
@@ -18,8 +18,8 @@ public:
 	virtual void ReleaseView(std::unique_ptr<Renderer>& renderer) = 0;
 	virtual void ReleaseApplication() = 0;
 
-	virtual void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) { TINYGLES_UNUSED(x); TINYGLES_UNUSED(y); TINYGLES_UNUSED(width); TINYGLES_UNUSED(height); }
+	virtual void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) { TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y); TINYNGINE_UNUSED(width); TINYNGINE_UNUSED(height); }
 };
 
 extern "C" Application * CreateApplication();
-} // namespace tinygles
+} // namespace tinyngine

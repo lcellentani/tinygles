@@ -32,14 +32,16 @@ add_library(tinyngine
 	src/main.cpp
 	src/Application.cpp
 	src/DynLibLoader.cpp
-	src/EGLTrampoline.cpp
-	src/Log.cpp
 	src/EGLPlatformContext.cpp
-	src/PlatformBridgeWin32.cpp
+	src/EGLTrampoline.cpp
 	src/GeometryUtil.cpp
+	src/Log.cpp
+	src/PlatformBridgeWin32.cpp
+	src/ProgramGL.cpp
+	src/RendererGL.cpp
+	src/ShaderGL.cpp
 	src/ShadersUtil.cpp
 	src/StringUtils.cpp
-	src/RendererGL.cpp
 	src/TransformHelper.cpp
 )
 

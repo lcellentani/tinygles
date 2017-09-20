@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 
-namespace tinygles
+namespace tinyngine
 {
 
 constexpr uint16_t cMaxModelMatrix = 8;
@@ -351,4 +351,4 @@ const glm::mat4& TransformHelper::GetModelViewProjectionMatrix() const {
 
 }
 
-} // namespace tinygles
+} // namespace tinyngine

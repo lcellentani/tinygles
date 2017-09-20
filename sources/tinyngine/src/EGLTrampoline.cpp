@@ -2,7 +2,7 @@
 #include "DynLibLoader.h"
 
 namespace {
-	static tinygles::DynLibLoader& GetEGLLibrary() {
+	static tinyngine::DynLibLoader& GetEGLLibrary() {
 #ifdef _WIN32
 		static constexpr const char* sEGLLibraryPath = "libEGL.dll";
 #elif defined(TARGET_OS_MAC)
@@ -11,7 +11,7 @@ namespace {
 		static constexpr char* sEGLLibraryPath = "libEGL.so";
 #endif
 
-		static tinygles::DynLibLoader sEGLLibrary(sEGLLibraryPath);
+		static tinyngine::DynLibLoader sEGLLibrary(sEGLLibraryPath);
 		return sEGLLibrary;
 	}
 
@@ -55,7 +55,7 @@ namespace {
 }
 
 bool egl::InitTrampoline() {
-	tinygles::DynLibLoader libHandle = GetEGLLibrary();
+	tinyngine::DynLibLoader libHandle = GetEGLLibrary();
 	if (!libHandle.HasBeenLoaded()) {
 		return false;
 	}

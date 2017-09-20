@@ -104,4 +104,4 @@ std::string toLower(const std::string& str) {
 	return toLower(s);
 }
 
-}
+} // namespace StringUtils

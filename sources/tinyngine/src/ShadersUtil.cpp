@@ -24,7 +24,7 @@ static bool ReadFileToString(const char* source, std::string& content) {
 
 }
 
-namespace tinygles
+namespace tinyngine
 {
 
 GLuint CompileShader(GLenum type, const char * source, std::function<void(GLenum type, const char*)> func) {

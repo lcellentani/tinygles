@@ -1,6 +1,6 @@
 #pragma once
 
-namespace tinygles {
+namespace tinyngine {
 
 class Logger final {
 public:
@@ -23,4 +23,4 @@ public:
 
 } // namespace tinygles
 
-extern tinygles::Logger Log;
+extern tinyngine::Logger Log;

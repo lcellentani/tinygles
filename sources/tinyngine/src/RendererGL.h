@@ -2,7 +2,7 @@
 
 #include "Renderer.h"
 
-namespace tinygles
+namespace tinyngine
 {
 
 class RendererGL : public Renderer {
@@ -103,4 +103,4 @@ private:
 	std::unique_ptr<Impl> mImpl;
 };
 */
-} // tinygles
+} // namespace tinyngine
