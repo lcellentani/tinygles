@@ -1,15 +1,40 @@
 #include "RendererGL.h"
+#include "PlatformDefine.h"
+#include "ShaderGL.h"
+#include "ProgramGL.h"
 
-#include <vector>
+#include <array>
+#include <unordered_map>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 
+namespace {
+static constexpr uint32_t cMaxShaderHandles = (1 << 6);
+static constexpr uint32_t cMaxProgramHandles = (1 << 6);
+static constexpr uint32_t cMaxVertexBufferHandles = (1 << 10);
+
+static std::unordered_map<tinyngine::ShaderType, GLenum> cShaderTypesTranslationTable {
+	{ tinyngine::ShaderType::VertexProgram, GL_VERTEX_SHADER },
+	{ tinyngine::ShaderType::FragmentProgram, GL_FRAGMENT_SHADER }
+};
+
+}
+
 namespace tinyngine
 {
 
-RendererGL::RendererGL() {
+struct RendererGL::Impl {
+	uint32_t mShadersCount;
+	std::array<ShaderGL, cMaxShaderHandles> mShaders;
 
+	uint32_t mProgramsCount;
+	std::array<ProgramGL, cMaxProgramHandles> mPrograms;
+};
+
+//=====================================================================================================================
+
+RendererGL::RendererGL() : mImpl(new Impl()) {
 }
 
 RendererGL::~RendererGL() {
@@ -33,6 +58,34 @@ void RendererGL::Clear(ClearFlags flags, Color color, float depth, uint8_t stenc
 		glClearStencil(stencil);
 		glClear(GL_STENCIL_BUFFER_BIT);
 	}
+}
+
+ShaderHandle RendererGL::CreateShader(ShaderType type, const char* source) {
+	ShaderHandle handle = ShaderHandle(mImpl->mShadersCount++);
+	auto& shader = mImpl->mShaders[handle.mHandle];
+	shader.Create(cShaderTypesTranslationTable[type], source);
+	return shader.IsValid() ? handle : ShaderHandle(cInvalidHandle);
+}
+
+ProgramHandle RendererGL::CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) {
+	if (!vsh.IsValid()) {
+		return ProgramHandle(cInvalidHandle);
+	}
+
+	ProgramHandle handle = ProgramHandle(mImpl->mProgramsCount++);
+
+	auto& vs = mImpl->mShaders[vsh.mHandle];
+	auto& fs = mImpl->mShaders[fsh.mHandle];
+	
+	auto& program = mImpl->mPrograms[handle.mHandle];
+	program.Create(vs, fs);
+
+	if (destroyShaders) {
+		vs.Destroy();
+		fs.Destroy();
+	}
+
+	return program.IsValid() ? handle : ProgramHandle(cInvalidHandle);
 }
 
 /*

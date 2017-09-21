@@ -10,9 +10,17 @@ public:
 	RendererGL();
 	virtual ~RendererGL();
 
-	virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
+	void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 
-	virtual void Clear(ClearFlags flags, Color color, float depth = 1.0f, uint8_t stencil = 0) override;
+	void Clear(ClearFlags flags, Color color, float depth = 1.0f, uint8_t stencil = 0) override;
+
+	ShaderHandle CreateShader(ShaderType type, const char* source) override;
+
+	ProgramHandle CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) override;
+
+private:
+	struct Impl;
+	Impl* mImpl;
 };
 
 /*

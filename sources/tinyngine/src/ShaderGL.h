@@ -14,6 +14,8 @@ public:
 
 	inline GLint GetId() const { return mId; }
 
+	inline bool IsValid() const { return mId > 0; }
+
 private:
 	GLuint mId;
 	GLenum mType;

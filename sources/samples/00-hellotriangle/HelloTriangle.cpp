@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "VertexFormat.h"
 #include "TransformHelper.h"
 #include "Log.h"
 
@@ -32,18 +33,15 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
-
-		/*Renderer* renderer = Renderer::GetRenderer();
-
-		renderer->SetViewClear(ClearFlags::Color, Color(92, 92, 92));
-
-		GLfloat vertexData[] = {
+		const float cVertexData[] = {
 			-0.4f, -0.4f, 0.0f, // Bottom Left
 			0.4f, -0.4f, 0.0f, // Bottom Right
 			0.0f, 0.4f, 0.0f // Top Middle
 		};
-		mVertexBufferHandle = renderer->CreateVertexBuffer(vertexData, sizeof(vertexData));
+
+		mVertexDecl.Add(Attributes::Position, AttributeType::Float, 3, false);
+		
+		//mVertexBufferHandle = renderer->CreateVertexBuffer(vertexData, sizeof(vertexData));
 		
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
@@ -55,24 +53,23 @@ public:
 		const char* vertexShaderSource = SHADER_SOURCE
 		(
 			attribute highp vec4 a_position;
-		uniform mediump mat4 u_mvpMatrix;
-		void main(void)
-		{
-			gl_Position = u_mvpMatrix * a_position;
-		}
+			uniform mediump mat4 u_mvpMatrix;
+			void main(void)
+			{
+				gl_Position = u_mvpMatrix * a_position;
+			}
 		);
 
-		ShaderHandle fsHandle = renderer->CreateShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-		ShaderHandle vsHandle = renderer->CreateShader(GL_VERTEX_SHADER, vertexShaderSource);
+		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
+		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
 
-		renderer->SetProgram(mProgramHandle);
-		glBindAttribLocation(mProgramHandle.mHandle, mPositionAttributePos, "a_position");*/
+		//renderer->SetProgram(mProgramHandle);
+		//glBindAttribLocation(mProgramHandle.mHandle, mPositionAttributePos, "a_position");
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
-
 		//glm::mat4 MVP = mTransformHelper.GetModelViewProjectionMatrix();
 
 		//GLenum lastError;
@@ -81,7 +78,6 @@ public:
 		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
 		/*renderer->SetProgram(mProgramHandle);
-
 
 		//@note: ProgramHandle is now a "internal id", so all this logic needs to be moved internally to the Renderer
 		int matrixLocation = glGetUniformLocation(mProgramHandle.mHandle, "u_mvpMatrix");
@@ -120,7 +116,8 @@ public:
 	}
 
 private:
-	//ProgramHandle mProgramHandle;
+	VertexFormat mVertexDecl;
+	ProgramHandle mProgramHandle;
 	//VertexBufferHandle mVertexBufferHandle;
 
 	//GLuint mPositionAttributePos = 0;

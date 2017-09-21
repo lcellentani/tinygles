@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#define SHADER_SOURCE(...) #__VA_ARGS__
+
 namespace tinyngine
 {
 	enum class Attributes : uint8_t {
@@ -10,14 +12,24 @@ namespace tinyngine
 		Tangent,
 		Bitangent,
 		Color0,
+		Color1,
 		TexCoord0,
+		TexCoord1,
+		TexCoord2,
+		TexCoord3,
 		Count
 	};
 
-	enum class AttributeType {
+	enum class AttributeType : uint8_t {
 		Uint8,
 		Int16,
 		Float,
+		Count
+	};
+
+	enum class ShaderType {
+		VertexProgram,
+		FragmentProgram,
 		Count
 	};
 
@@ -43,17 +55,19 @@ namespace tinyngine
 		uint8_t a;
 	};
 
+	static const uint32_t cInvalidHandle = UINT32_MAX;
+
 	struct ResourceHandle {
 		ResourceHandle() = default;
 		ResourceHandle(uint32_t handle) : mHandle(handle) {}
 
 		ResourceHandle& operator=(const ResourceHandle&) = default;
 
-		inline const bool IsValid() const { return mHandle != 0; }
+		inline const bool IsValid() const { return mHandle != cInvalidHandle; }
 
 		uint32_t mHandle = 0;
 	};
-
+	
 	using ShaderHandle = ResourceHandle;
 	using ProgramHandle = ResourceHandle;
 	using VertexBufferHandle = ResourceHandle;

@@ -43,6 +43,7 @@ add_library(tinyngine
 	src/ShadersUtil.cpp
 	src/StringUtils.cpp
 	src/TransformHelper.cpp
+	src/VertexFormat.cpp
 )
 
 if(MSVC)

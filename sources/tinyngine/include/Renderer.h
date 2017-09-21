@@ -2,8 +2,6 @@
 
 #include "GraphicsTypes.h"
 
-//#define SHADER_SOURCE(...) #__VA_ARGS__
-
 namespace tinyngine
 {
 
@@ -22,6 +20,10 @@ public:
 	virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 
 	virtual void Clear(ClearFlags flags, Color color, float depth = 1.0f, uint8_t stencil = 0) = 0;
+
+	virtual ShaderHandle CreateShader(ShaderType tpye, const char* source) = 0;
+
+	virtual ProgramHandle CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) = 0;
 };
 
 /*
