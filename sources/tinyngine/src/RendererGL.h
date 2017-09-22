@@ -13,10 +13,13 @@ public:
 	void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 
 	void Clear(ClearFlags flags, Color color, float depth = 1.0f, uint8_t stencil = 0) override;
+	void Commit() override;
 
 	ShaderHandle CreateShader(ShaderType type, const char* source) override;
 
-	ProgramHandle CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) override;
+	ProgramHandle CreateProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) override;
+	void SetProgram(ProgramHandle handle) override;
+	void SetUniformMat4(ProgramHandle handle, Uniforms::Enum uniform, float* data, bool transpose) override;
 
 private:
 	struct Impl;

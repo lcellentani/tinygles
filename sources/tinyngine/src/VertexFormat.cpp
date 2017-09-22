@@ -17,12 +17,12 @@ namespace tinyngine
 {
 
 VertexFormat::VertexFormat() {
-	std::memset(mAttributes, 0xff, sizeof(mAttributes));
+	std::memset(mAttributes, 0xffff, sizeof(mAttributes));
 	std::memset(mOffset, 0, sizeof(mOffset));
 	mStride = 0;
 }
 
-void VertexFormat::Add(Attributes attrib, AttributeType type, uint8_t componentsCount, bool normalized) {
+void VertexFormat::Add(Attributes::Enum attrib, AttributeType::Enum type, uint8_t componentsCount, bool normalized) {
 	uint8_t iAttrib = static_cast<uint8_t>(attrib);
 	uint8_t iType = static_cast<uint8_t>(type);
 	uint8_t num = componentsCount - 1;

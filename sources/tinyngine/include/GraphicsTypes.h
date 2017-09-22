@@ -6,25 +6,44 @@
 
 namespace tinyngine
 {
-	enum class Attributes : uint8_t {
-		Position,
-		Normal,
-		Tangent,
-		Bitangent,
-		Color0,
-		Color1,
-		TexCoord0,
-		TexCoord1,
-		TexCoord2,
-		TexCoord3,
-		Count
+	struct Attributes {
+		enum Enum {
+			Position,
+			Normal,
+			Tangent,
+			Bitangent,
+			Color0,
+			Color1,
+			TexCoord0,
+			TexCoord1,
+			TexCoord2,
+			TexCoord3,
+			Count
+		};
 	};
 
-	enum class AttributeType : uint8_t {
-		Uint8,
-		Int16,
-		Float,
-		Count
+	struct AttributeType{
+		enum Enum {
+			Uint8,
+			Int16,
+			Float,
+			Count
+		};
+	};
+
+	struct Uniforms {
+		enum Enum {
+			View,
+			Proj,
+			Model,
+			ViewProj,
+			ModelView,
+			ModelViewProj,
+			Count
+		};
+		uint32_t mLocation;
+		uint16_t mSize;
+		uint8_t mType;
 	};
 
 	enum class ShaderType {

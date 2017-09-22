@@ -53,10 +53,10 @@ public:
 		const char* vertexShaderSource = SHADER_SOURCE
 		(
 			attribute highp vec4 a_position;
-			uniform mediump mat4 u_mvpMatrix;
+			uniform mediump mat4 u_modelViewProj;
 			void main(void)
 			{
-				gl_Position = u_mvpMatrix * a_position;
+				gl_Position = u_modelViewProj * a_position;
 			}
 		);
 
@@ -64,41 +64,31 @@ public:
 		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
 		
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
-
-		//renderer->SetProgram(mProgramHandle);
-		//glBindAttribLocation(mProgramHandle.mHandle, mPositionAttributePos, "a_position");
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
-		//glm::mat4 MVP = mTransformHelper.GetModelViewProjectionMatrix();
-
-		//GLenum lastError;
+		glm::mat4 modelViewProj = mTransformHelper.GetModelViewProjectionMatrix();
 
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
 		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
-		/*renderer->SetProgram(mProgramHandle);
+		renderer->SetProgram(mProgramHandle);
+		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &modelViewProj[0][0], false);
 
-		//@note: ProgramHandle is now a "internal id", so all this logic needs to be moved internally to the Renderer
-		int matrixLocation = glGetUniformLocation(mProgramHandle.mHandle, "u_mvpMatrix");
-		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, &MVP[0][0]);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
-
-		glEnableVertexAttribArray(mPositionAttributePos);
-		glVertexAttribPointer(mPositionAttributePos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
+		
+		//glEnableVertexAttribArray(mPositionAttributePos);
+		//glVertexAttribPointer(mPositionAttributePos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		//lastError = glGetError();
 		//if (lastError != GL_NO_ERROR) { return; }
 
 		
-		renderer->SetVertexBuffer(mVertexBufferHandle);
-		renderer->DrawArray(0, 3);
+		//renderer->SetVertexBuffer(mVertexBufferHandle);
+		//renderer->DrawArray(0, 3);
 
-		renderer->EndFrame();*/
+		//renderer->EndFrame();
+		renderer->Commit();
 	}
 
 	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
@@ -119,8 +109,6 @@ private:
 	VertexFormat mVertexDecl;
 	ProgramHandle mProgramHandle;
 	//VertexBufferHandle mVertexBufferHandle;
-
-	//GLuint mPositionAttributePos = 0;
 
 	TransformHelper mTransformHelper;
 

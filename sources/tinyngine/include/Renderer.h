@@ -20,10 +20,14 @@ public:
 	virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 
 	virtual void Clear(ClearFlags flags, Color color, float depth = 1.0f, uint8_t stencil = 0) = 0;
+	virtual void Commit() = 0;
 
 	virtual ShaderHandle CreateShader(ShaderType tpye, const char* source) = 0;
 
 	virtual ProgramHandle CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) = 0;
+	virtual void SetProgram(ProgramHandle program) = 0;
+
+	virtual void SetUniformMat4(ProgramHandle program, Uniforms::Enum uniform, float* data, bool transpose) = 0;
 };
 
 /*

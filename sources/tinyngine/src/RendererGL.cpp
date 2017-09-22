@@ -9,6 +9,32 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 
+namespace tinyngine {
+	namespace gl {
+		const char* glEnumName(GLenum _enum)
+		{
+#define GLENUM(_ty) case _ty: return #_ty
+
+			switch (_enum) {
+				GLENUM(GL_TEXTURE);
+				GLENUM(GL_RENDERBUFFER);
+
+				GLENUM(GL_INVALID_ENUM);
+				GLENUM(GL_INVALID_FRAMEBUFFER_OPERATION);
+				GLENUM(GL_INVALID_VALUE);
+				GLENUM(GL_INVALID_OPERATION);
+				GLENUM(GL_OUT_OF_MEMORY);
+
+				GLENUM(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
+				GLENUM(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT);
+
+				GLENUM(GL_FRAMEBUFFER_UNSUPPORTED);
+			}
+			return "<unknown>";
+		}
+	}
+}
+
 namespace {
 static constexpr uint32_t cMaxShaderHandles = (1 << 6);
 static constexpr uint32_t cMaxProgramHandles = (1 << 6);
@@ -25,11 +51,32 @@ namespace tinyngine
 {
 
 struct RendererGL::Impl {
-	uint32_t mShadersCount;
+	ProgramGL& SetProgram(ProgramHandle handle) {
+		if (handle.mHandle == mCurrentProgramHandle.mHandle) {
+			return mCurrentProgramHandle.IsValid() ? mPrograms[mCurrentProgramHandle.mHandle] : mInvalidProgram;
+		}
+		
+		if (mCurrentProgramHandle.IsValid()) {
+			auto& program = mPrograms[mCurrentProgramHandle.mHandle];
+			program.UnbindAttributes();
+		}
+
+		mCurrentProgramHandle = handle;
+		auto& currentProgram = mInvalidProgram;
+		if (mCurrentProgramHandle.IsValid()) {
+			currentProgram = mPrograms[mCurrentProgramHandle.mHandle];
+			currentProgram.BindAttributes();
+		}
+		return currentProgram;
+	}
+
+	uint32_t mShadersCount = 0;
 	std::array<ShaderGL, cMaxShaderHandles> mShaders;
 
-	uint32_t mProgramsCount;
+	uint32_t mProgramsCount = 0;
 	std::array<ProgramGL, cMaxProgramHandles> mPrograms;
+	ProgramHandle mCurrentProgramHandle = ResourceHandle(cInvalidHandle);
+	ProgramGL mInvalidProgram;
 };
 
 //=====================================================================================================================
@@ -42,21 +89,29 @@ RendererGL::~RendererGL() {
 }
 
 void RendererGL::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
-	glViewport(x, y, width, height);
+	GL_CHECK(glViewport(x, y, width, height));
 }
 
 void RendererGL::Clear(ClearFlags flags, Color color, float depth, uint8_t stencil) {
 	if (flags & ClearFlags::ColorBuffer) {
-		glClearColor(color.red(), color.green(), color.blue(),color.alpha());
-		glClear(GL_COLOR_BUFFER_BIT);
+		GL_CHECK(glClearColor(color.red(), color.green(), color.blue(), color.alpha()));
+		GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
 	}
 	if (flags & ClearFlags::DepthBuffer) {
-		glClearDepthf(depth);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		GL_CHECK(glClearDepthf(depth));
+		GL_CHECK(glClear(GL_DEPTH_BUFFER_BIT));
 	}
 	if (flags & ClearFlags::StencilBuffer) {
-		glClearStencil(stencil);
-		glClear(GL_STENCIL_BUFFER_BIT);
+		GL_CHECK(glClearStencil(stencil));
+		GL_CHECK(glClear(GL_STENCIL_BUFFER_BIT));
+	}
+}
+
+void RendererGL::Commit() {
+	GL_CHECK(glFinish());
+	if (mImpl->mCurrentProgramHandle.IsValid()) {
+		auto& program = mImpl->mPrograms[mImpl->mCurrentProgramHandle.mHandle];
+		program.UnbindAttributes();
 	}
 }
 
@@ -67,18 +122,20 @@ ShaderHandle RendererGL::CreateShader(ShaderType type, const char* source) {
 	return shader.IsValid() ? handle : ShaderHandle(cInvalidHandle);
 }
 
-ProgramHandle RendererGL::CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) {
-	if (!vsh.IsValid()) {
+ProgramHandle RendererGL::CreateProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) {
+	if (!vertexHandle.IsValid()) {
 		return ProgramHandle(cInvalidHandle);
 	}
 
 	ProgramHandle handle = ProgramHandle(mImpl->mProgramsCount++);
 
-	auto& vs = mImpl->mShaders[vsh.mHandle];
-	auto& fs = mImpl->mShaders[fsh.mHandle];
+	auto& vs = mImpl->mShaders[vertexHandle.mHandle];
+	auto& fs = mImpl->mShaders[fragmentHandle.mHandle];
 	
 	auto& program = mImpl->mPrograms[handle.mHandle];
 	program.Create(vs, fs);
+
+	program.Initialize();
 
 	if (destroyShaders) {
 		vs.Destroy();
@@ -86,6 +143,20 @@ ProgramHandle RendererGL::CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bo
 	}
 
 	return program.IsValid() ? handle : ProgramHandle(cInvalidHandle);
+}
+
+void RendererGL::SetProgram(ProgramHandle handle) {
+	auto& program = mImpl->SetProgram(handle);
+	GL_CHECK(glUseProgram(program.GetId()));
+}
+
+void RendererGL::SetUniformMat4(ProgramHandle handle, Uniforms::Enum uniformName, float* data, bool transpose) {
+	if (!handle.IsValid()) {
+		return;
+	}
+	auto& program = mImpl->mPrograms[handle.mHandle];
+	auto& uniform = program.GetUniform(uniformName);
+	GL_CHECK(glUniformMatrix4fv(uniform.mLocation, uniform.mSize, transpose ? GL_TRUE : GL_FALSE, data));
 }
 
 /*
@@ -298,7 +369,7 @@ ShaderHandle Renderer::CreateShader(uint32_t type, const char* source) {
 	return handle;
 }
 
-ProgramHandle Renderer::CreateProgram(const ShaderHandle& vsh, const ShaderHandle& fsh, bool destroyShaders) {
+ProgramHandle Renderer::CreateProgram(const ShaderHandle& vsh, const ShaderHandle& fragmentHandle, bool destroyShaders) {
 	if (!vsh.IsValid()) {
 		return ProgramHandle(0);
 	}
@@ -306,7 +377,7 @@ ProgramHandle Renderer::CreateProgram(const ShaderHandle& vsh, const ShaderHandl
 	ProgramHandle handle = ProgramHandle(mImpl->mProgramsCount);
 
 	auto& vs = mImpl->mShaders[vsh.mHandle];
-	auto& fs = mImpl->mShaders[fsh.mHandle];
+	auto& fs = mImpl->mShaders[fragmentHandle.mHandle];
 	mImpl->mPrograms[handle.mHandle].Create(vs, fs);
 	mImpl->mShadersCount++;
 

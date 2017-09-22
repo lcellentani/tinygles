@@ -8,10 +8,10 @@ namespace tinyngine
 struct VertexFormat final {
 	VertexFormat();
 
-	void Add(Attributes attrib, AttributeType type, uint8_t componentsCount, bool normalized);
+	void Add(Attributes::Enum attrib, AttributeType::Enum type, uint8_t componentsCount, bool normalized);
 
-	uint16_t mAttributes[static_cast<uint8_t>(Attributes::Count)];
-	uint16_t mOffset[static_cast<uint8_t>(Attributes::Count)];
+	uint16_t mAttributes[Attributes::Count];
+	uint16_t mOffset[Attributes::Count];
 	uint16_t mStride;
 };
 
