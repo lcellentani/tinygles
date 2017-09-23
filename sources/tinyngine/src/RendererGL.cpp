@@ -9,31 +9,6 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 
-namespace tinyngine {
-	namespace gl {
-		const char* glEnumName(GLenum _enum)
-		{
-#define GLENUM(_ty) case _ty: return #_ty
-
-			switch (_enum) {
-				GLENUM(GL_TEXTURE);
-				GLENUM(GL_RENDERBUFFER);
-
-				GLENUM(GL_INVALID_ENUM);
-				GLENUM(GL_INVALID_FRAMEBUFFER_OPERATION);
-				GLENUM(GL_INVALID_VALUE);
-				GLENUM(GL_INVALID_OPERATION);
-				GLENUM(GL_OUT_OF_MEMORY);
-
-				GLENUM(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
-				GLENUM(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT);
-
-				GLENUM(GL_FRAMEBUFFER_UNSUPPORTED);
-			}
-			return "<unknown>";
-		}
-	}
-}
 
 namespace {
 static constexpr uint32_t cMaxShaderHandles = (1 << 6);
@@ -51,7 +26,7 @@ namespace tinyngine
 {
 
 struct RendererGL::Impl {
-	ProgramGL& SetProgram(ProgramHandle handle) {
+	ProgramGL& SetProgram(ProgramHandle handle, const VertexFormat& vertexFormat) {
 		if (handle.mHandle == mCurrentProgramHandle.mHandle) {
 			return mCurrentProgramHandle.IsValid() ? mPrograms[mCurrentProgramHandle.mHandle] : mInvalidProgram;
 		}
@@ -65,7 +40,7 @@ struct RendererGL::Impl {
 		auto& currentProgram = mInvalidProgram;
 		if (mCurrentProgramHandle.IsValid()) {
 			currentProgram = mPrograms[mCurrentProgramHandle.mHandle];
-			currentProgram.BindAttributes();
+			currentProgram.BindAttributes(vertexFormat, 0);
 		}
 		return currentProgram;
 	}
@@ -112,6 +87,7 @@ void RendererGL::Commit() {
 	if (mImpl->mCurrentProgramHandle.IsValid()) {
 		auto& program = mImpl->mPrograms[mImpl->mCurrentProgramHandle.mHandle];
 		program.UnbindAttributes();
+		mImpl->mCurrentProgramHandle = ProgramHandle(cInvalidHandle);
 	}
 }
 
@@ -145,8 +121,8 @@ ProgramHandle RendererGL::CreateProgram(ShaderHandle& vertexHandle, ShaderHandle
 	return program.IsValid() ? handle : ProgramHandle(cInvalidHandle);
 }
 
-void RendererGL::SetProgram(ProgramHandle handle) {
-	auto& program = mImpl->SetProgram(handle);
+void RendererGL::SetProgram(ProgramHandle handle, const VertexFormat& vertexFormat) {
+	auto& program = mImpl->SetProgram(handle, vertexFormat);
 	GL_CHECK(glUseProgram(program.GetId()));
 }
 

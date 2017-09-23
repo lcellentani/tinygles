@@ -3,6 +3,7 @@
 #include "GraphicsTypes.h"
 #include "GLApi.h"
 #include "ShaderGL.h"
+#include "VertexFormat.h"
 
 namespace tinyngine
 {
@@ -14,7 +15,7 @@ public:
 	void Create(const ShaderGL& vs, const ShaderGL& fs);
 	void Initialize();
 
-	void BindAttributes();
+	void BindAttributes(const VertexFormat& vertexFormat, uint32_t baseVertex);
 	void UnbindAttributes();
 
 	const Uniforms& GetUniform(Uniforms::Enum uniform) const;
@@ -24,7 +25,7 @@ public:
 
 private:
 	GLint mId;
-	GLint mAttributes[Attributes::Count];
+	GLint mAttributeLocations[Attributes::Count];
 	uint16_t mUsedAttributesCount;
 	uint8_t mUsedAttributes[Attributes::Count];
 	Uniforms mPredefinedUniforms[Uniforms::Count];

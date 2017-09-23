@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicsTypes.h"
+#include "VertexFormat.h"
 
 namespace tinyngine
 {
@@ -25,7 +26,7 @@ public:
 	virtual ShaderHandle CreateShader(ShaderType tpye, const char* source) = 0;
 
 	virtual ProgramHandle CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) = 0;
-	virtual void SetProgram(ProgramHandle program) = 0;
+	virtual void SetProgram(ProgramHandle program, const VertexFormat& vertexFormat) = 0;
 
 	virtual void SetUniformMat4(ProgramHandle program, Uniforms::Enum uniform, float* data, bool transpose) = 0;
 };

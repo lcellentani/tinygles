@@ -35,6 +35,7 @@ add_library(tinyngine
 	src/EGLPlatformContext.cpp
 	src/EGLTrampoline.cpp
 	src/GeometryUtil.cpp
+	src/GLApi.cpp
 	src/Log.cpp
 	src/PlatformBridgeWin32.cpp
 	src/ProgramGL.cpp

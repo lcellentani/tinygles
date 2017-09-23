@@ -18,7 +18,7 @@ public:
 	ShaderHandle CreateShader(ShaderType type, const char* source) override;
 
 	ProgramHandle CreateProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) override;
-	void SetProgram(ProgramHandle handle) override;
+	void SetProgram(ProgramHandle handle, const VertexFormat& vertexFormat) override;
 	void SetUniformMat4(ProgramHandle handle, Uniforms::Enum uniform, float* data, bool transpose) override;
 
 private:
