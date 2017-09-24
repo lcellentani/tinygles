@@ -22,7 +22,7 @@ namespace tinyngine
 		};
 	};
 
-	struct AttributeType{
+	struct AttributeType {
 		enum Enum {
 			Uint8,
 			Int16,
@@ -46,11 +46,26 @@ namespace tinyngine
 		uint8_t mType;
 	};
 
-	enum class ShaderType {
-		VertexProgram,
-		FragmentProgram,
-		Count
+	struct ShaderType {
+		enum Enum {
+			VertexProgram,
+			FragmentProgram,
+			Count
+		};
 	};
+
+	struct PrimitiveType {
+		enum Enum {
+			Triangles,
+			TriangleStrip,
+			Lines,
+			LineStrip,
+			Point,
+			Count
+		};
+	};
+
+
 
 	struct Color
 	{

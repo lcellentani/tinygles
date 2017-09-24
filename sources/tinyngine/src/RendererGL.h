@@ -15,9 +15,14 @@ public:
 	void Clear(ClearFlags flags, Color color, float depth = 1.0f, uint8_t stencil = 0) override;
 	void Commit() override;
 
-	ShaderHandle CreateShader(ShaderType type, const char* source) override;
+	void DrawArray(PrimitiveType::Enum primitive, uint32_t first, uint32_t count) override;
 
-	ProgramHandle CreateProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) override;
+	VertexBufferHandle CreateVertexBuffer(const void* data, uint32_t size, const VertexFormat& vertexFormat) override;
+	void SetVertexBuffer(VertexBufferHandle& handle) override;
+
+	ShaderHandle CreateShader(ShaderType::Enum type, const char* source) override;
+
+	ProgramHandle CreateProgram(ShaderHandle& vertexShaderHandle, ShaderHandle& fragmentShaderHandle, bool destroyShaders) override;
 	void SetProgram(ProgramHandle handle, const VertexFormat& vertexFormat) override;
 	void SetUniformMat4(ProgramHandle handle, Uniforms::Enum uniform, float* data, bool transpose) override;
 

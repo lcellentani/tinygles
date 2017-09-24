@@ -2,7 +2,7 @@
 
 namespace {
 
-static const GLenum cAttributeType[]{
+static const GLenum cAttributeTypes[]{
 	GL_UNSIGNED_BYTE,
 	GL_SHORT,
 	GL_FLOAT
@@ -32,12 +32,25 @@ static const char* cPredefinedUniformName[] =
 	"u_modelViewProj"
 };
 
+static const GLenum cShaderType[]{
+	GL_VERTEX_SHADER,
+	GL_FRAGMENT_SHADER
+};
+
+static const GLenum cPrimitiveTypes[] = {
+	GL_TRIANGLES,
+	GL_TRIANGLE_STRIP,
+	GL_LINES,
+	GL_LINE_STRIP,
+	GL_POINTS
+};
+
 }
 
 namespace tinyngine {
 namespace gl {
 
-const char* GetEnumName(GLenum _enum) {
+const char* GetErrorString(GLenum _enum) {
 #define GLENUM(_ty) case _ty: return #_ty
 	switch (_enum) {
 		GLENUM(GL_TEXTURE);
@@ -58,7 +71,7 @@ const char* GetEnumName(GLenum _enum) {
 }
 
 GLenum GetAttributeType(AttributeType::Enum type) {
-	return cAttributeType[type];
+	return cAttributeTypes[type];
 }
 
 const char* GetAttributeName(Attributes::Enum attribute) {
@@ -67,6 +80,14 @@ const char* GetAttributeName(Attributes::Enum attribute) {
 
 const char* GetPredefinedUniformName(Uniforms::Enum uniform) {
 	return cPredefinedUniformName[uniform];
+}
+
+GLenum GetShaderType(ShaderType::Enum type) {
+	return cShaderType[type];
+}
+
+GLenum GetPrimitiveType(PrimitiveType::Enum type) {
+	return cPrimitiveTypes[type];
 }
 
 }

@@ -99,7 +99,6 @@ void ProgramGL::BindAttributes(const VertexFormat& vertexFormat, uint32_t baseVe
 			vertexFormat.Decode(attrib, type, size, normalized);
 
 			GL_CHECK(glEnableVertexAttribArray(location));
-
 			uint32_t firstIndex = baseVertex * vertexFormat.mStride + vertexFormat.mOffset[attrib];
 			GL_CHECK(glVertexAttribPointer(location, size, tinyngine::gl::GetAttributeType(static_cast<AttributeType::Enum>(type)), normalized, vertexFormat.mStride, (void*)(uintptr_t)firstIndex));
 		}

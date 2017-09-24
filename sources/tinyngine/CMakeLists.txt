@@ -44,6 +44,7 @@ add_library(tinyngine
 	src/ShadersUtil.cpp
 	src/StringUtils.cpp
 	src/TransformHelper.cpp
+	src/VertexBufferGL.cpp
 	src/VertexFormat.cpp
 )
 

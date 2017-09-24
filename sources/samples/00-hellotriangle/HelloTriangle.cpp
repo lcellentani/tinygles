@@ -39,9 +39,9 @@ public:
 			0.0f, 0.4f, 0.0f // Top Middle
 		};
 
-		mVertexDecl.Add(Attributes::Position, AttributeType::Float, 3, false);
+		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
 		
-		//mVertexBufferHandle = renderer->CreateVertexBuffer(vertexData, sizeof(vertexData));
+		mVertexBufferHandle = renderer->CreateVertexBuffer(cVertexData, sizeof(cVertexData), mPosVertexFormat);
 		
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
@@ -72,22 +72,13 @@ public:
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
 		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
-		renderer->SetProgram(mProgramHandle, mVertexDecl);
+		renderer->SetVertexBuffer(mVertexBufferHandle);
+
+		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
 		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &modelViewProj[0][0], false);
+	
+		renderer->DrawArray(PrimitiveType::Triangles, 0, 3);
 
-		
-		//glEnableVertexAttribArray(mPositionAttributePos);
-		//glVertexAttribPointer(mPositionAttributePos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		//lastError = glGetError();
-		//if (lastError != GL_NO_ERROR) { return; }
-
-		
-		//renderer->SetVertexBuffer(mVertexBufferHandle);
-		//renderer->DrawArray(0, 3);
-
-		//renderer->EndFrame();
 		renderer->Commit();
 	}
 
@@ -106,9 +97,9 @@ public:
 	}
 
 private:
-	VertexFormat mVertexDecl;
+	VertexFormat mPosVertexFormat;
 	ProgramHandle mProgramHandle;
-	//VertexBufferHandle mVertexBufferHandle;
+	VertexBufferHandle mVertexBufferHandle;
 
 	TransformHelper mTransformHelper;
 
