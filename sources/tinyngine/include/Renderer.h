@@ -24,16 +24,20 @@ public:
 	virtual void Commit() = 0;
 
 	virtual void DrawArray(PrimitiveType::Enum primitive, uint32_t first, uint32_t count) = 0;
+	virtual void DrawElements(PrimitiveType::Enum primitive, uint32_t count) = 0;
 
 	virtual VertexBufferHandle CreateVertexBuffer(const void* data, uint32_t size, const VertexFormat& vertexFormat) = 0;
-	virtual void SetVertexBuffer(VertexBufferHandle& vertexBuffer) = 0;
+	virtual void SetVertexBuffer(const VertexBufferHandle& handle) = 0;
+
+	virtual IndexBufferHandle CreateIndexBuffer(const void* data, uint32_t size) = 0;
+	virtual void SetIndexBuffer(const IndexBufferHandle& handle) = 0;
 
 	virtual ShaderHandle CreateShader(ShaderType::Enum tpye, const char* source) = 0;
 
-	virtual ProgramHandle CreateProgram(ShaderHandle& vsh, ShaderHandle& fsh, bool destroyShaders) = 0;
-	virtual void SetProgram(ProgramHandle program, const VertexFormat& vertexFormat) = 0;
+	virtual ProgramHandle CreateProgram(ShaderHandle& vertexShaderHandle, ShaderHandle& fragmentShaderHandle, bool destroyShaders) = 0;
+	virtual void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) = 0;
 
-	virtual void SetUniformMat4(ProgramHandle program, Uniforms::Enum uniform, float* data, bool transpose) = 0;
+	virtual void SetUniformMat4(const ProgramHandle& handle, Uniforms::Enum uniform, const float* data, bool transpose) = 0;
 };
 
 /*

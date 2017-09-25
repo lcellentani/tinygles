@@ -16,15 +16,19 @@ public:
 	void Commit() override;
 
 	void DrawArray(PrimitiveType::Enum primitive, uint32_t first, uint32_t count) override;
+	void DrawElements(PrimitiveType::Enum primitive, uint32_t count) override;
 
 	VertexBufferHandle CreateVertexBuffer(const void* data, uint32_t size, const VertexFormat& vertexFormat) override;
-	void SetVertexBuffer(VertexBufferHandle& handle) override;
+	void SetVertexBuffer(const VertexBufferHandle& handle) override;
+
+	IndexBufferHandle CreateIndexBuffer(const void* data, uint32_t size) override;
+	void SetIndexBuffer(const IndexBufferHandle& handle) override;
 
 	ShaderHandle CreateShader(ShaderType::Enum type, const char* source) override;
 
 	ProgramHandle CreateProgram(ShaderHandle& vertexShaderHandle, ShaderHandle& fragmentShaderHandle, bool destroyShaders) override;
-	void SetProgram(ProgramHandle handle, const VertexFormat& vertexFormat) override;
-	void SetUniformMat4(ProgramHandle handle, Uniforms::Enum uniform, float* data, bool transpose) override;
+	void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) override;
+	void SetUniformMat4(const ProgramHandle& handle, Uniforms::Enum uniform, const float* data, bool transpose) override;
 
 private:
 	struct Impl;

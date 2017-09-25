@@ -36,6 +36,7 @@ add_library(tinyngine
 	src/EGLTrampoline.cpp
 	src/GeometryUtil.cpp
 	src/GLApi.cpp
+	src/IndexBufferGL.cpp
 	src/Log.cpp
 	src/PlatformBridgeWin32.cpp
 	src/ProgramGL.cpp
