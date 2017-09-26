@@ -32,7 +32,7 @@ void VertexFormat::Add(Attributes::Enum attrib, AttributeType::Enum type, uint8_
 	const uint16_t encodedNormalized = (normalized & 1) << 7;
 	
 	mAttributes[iAttrib] = encodedNormalized | encodedType | encodedCount;
-	mOffset[iAttrib] = mStride;
+	mOffset[iAttrib] = cAttribTypeSizeGL[iType][num];// mStride;
 	mStride += cAttribTypeSizeGL[iType][num];
 }
 

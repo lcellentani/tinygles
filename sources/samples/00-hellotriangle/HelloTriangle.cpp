@@ -72,7 +72,7 @@ public:
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
 		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
-		renderer->SetVertexBuffer(mVertexBufferHandle);
+		renderer->SetVertexBuffer(mVertexBufferHandle, Attributes::Position);
 
 		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
 		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &modelViewProj[0][0], false);

@@ -4,6 +4,7 @@
 #include "GLApi.h"
 #include "ShaderGL.h"
 #include "VertexFormat.h"
+#include <array>
 
 namespace tinyngine
 {
@@ -15,6 +16,7 @@ public:
 	void Create(const ShaderGL& vs, const ShaderGL& fs);
 	void Initialize();
 
+	void BindAttributes(const VertexFormat& vertexFormat, const std::array<GLuint, Attributes::Count>& handles);
 	void BindAttributes(const VertexFormat& vertexFormat, uint32_t baseVertex);
 	void UnbindAttributes();
 

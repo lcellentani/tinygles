@@ -27,11 +27,11 @@ namespace tinyngine
 struct RendererGL::Impl {
 	uint32_t mVertexBuffersCount = 0;
 	std::array<VertexBufferGL, cMaxVertexBufferHandles> mVertexBuffers;
-	VertexBufferHandle mCurrentVertexBufferHandle = ResourceHandle(cInvalidHandle);
+	
+	std::array<GLuint, Attributes::Count> mAttributesVertexBufferHandles;
 
 	uint32_t mIndexBuffersCount = 0;
 	std::array<IndexBufferGL, cMaxIndexBufferHandle> mIndexBuffers;
-	IndexBufferHandle mCurrentIndexBufferHandle = ResourceHandle(cInvalidHandle);
 
 	uint32_t mShadersCount = 0;
 	std::array<ShaderGL, cMaxShaderHandles> mShaders;
@@ -68,6 +68,8 @@ void RendererGL::Clear(ClearFlags flags, Color color, float depth, uint8_t stenc
 		GL_CHECK(glClearStencil(stencil));
 		GL_CHECK(glClear(GL_STENCIL_BUFFER_BIT));
 	}
+	std::memset(&mImpl->mAttributesVertexBufferHandles[0], 0, sizeof(GLuint) * mImpl->mAttributesVertexBufferHandles.size());
+	glEnable(GL_CULL_FACE);
 }
 
 void RendererGL::Commit() {
@@ -77,14 +79,9 @@ void RendererGL::Commit() {
 		program.UnbindAttributes();
 		mImpl->mCurrentProgramHandle = ProgramHandle(cInvalidHandle);
 	}
-	if (mImpl->mCurrentVertexBufferHandle.IsValid()) {
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
-		mImpl->mCurrentVertexBufferHandle = VertexBufferHandle(cInvalidHandle);
-	}
-	if (mImpl->mCurrentIndexBufferHandle.IsValid()) {
-		GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-		mImpl->mCurrentIndexBufferHandle = IndexBufferHandle(cInvalidHandle);
-	}
+
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
 void RendererGL::DrawArray(PrimitiveType::Enum primitive, uint32_t first, uint32_t count) {
@@ -102,11 +99,10 @@ VertexBufferHandle RendererGL::CreateVertexBuffer(const void* data, uint32_t siz
 	return vertexBuffer.IsValid() ? handle : VertexBufferHandle(cInvalidHandle);
 }
 
-void RendererGL::SetVertexBuffer(const VertexBufferHandle& handle) {
+void RendererGL::SetVertexBuffer(const VertexBufferHandle& handle, Attributes::Enum attribute) {
 	if (handle.IsValid()) {
-		mImpl->mCurrentVertexBufferHandle = handle;
 		auto& vertexBuffer = mImpl->mVertexBuffers[handle.mHandle];
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.GetId()));
+		mImpl->mAttributesVertexBufferHandles[attribute] = vertexBuffer.GetId();
 	}
 }
 
@@ -119,7 +115,6 @@ IndexBufferHandle RendererGL::CreateIndexBuffer(const void* data, uint32_t size)
 
 void RendererGL::SetIndexBuffer(const IndexBufferHandle& handle) {
 	if (handle.IsValid()) {
-		mImpl->mCurrentIndexBufferHandle = handle;
 		auto& indexBuffer = mImpl->mIndexBuffers[handle.mHandle];
 		GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.GetId()));
 	}
@@ -164,7 +159,7 @@ void RendererGL::SetProgram(const ProgramHandle& handle, const VertexFormat& ver
 	if (mImpl->mCurrentProgramHandle.IsValid()) {
 		auto& program = mImpl->mPrograms[mImpl->mCurrentProgramHandle.mHandle];
 		GL_CHECK(glUseProgram(program.GetId()));
-		program.BindAttributes(vertexFormat, 0);
+		program.BindAttributes(vertexFormat, mImpl->mAttributesVertexBufferHandles);
 	}
 }
 

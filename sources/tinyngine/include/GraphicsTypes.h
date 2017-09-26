@@ -39,6 +39,7 @@ namespace tinyngine
 			ViewProj,
 			ModelView,
 			ModelViewProj,
+			LightPos,
 			Count
 		};
 		uint32_t mLocation;

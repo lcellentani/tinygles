@@ -19,7 +19,7 @@ public:
 	void DrawElements(PrimitiveType::Enum primitive, uint32_t count) override;
 
 	VertexBufferHandle CreateVertexBuffer(const void* data, uint32_t size, const VertexFormat& vertexFormat) override;
-	void SetVertexBuffer(const VertexBufferHandle& handle) override;
+	void SetVertexBuffer(const VertexBufferHandle& handle, Attributes::Enum attribute) override;
 
 	IndexBufferHandle CreateIndexBuffer(const void* data, uint32_t size) override;
 	void SetIndexBuffer(const IndexBufferHandle& handle) override;

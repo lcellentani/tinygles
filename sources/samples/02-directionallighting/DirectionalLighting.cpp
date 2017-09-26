@@ -1,10 +1,14 @@
 #include "Application.h"
 #include "GeometryUtil.h"
-#include "ShadersUtil.h"
+#include "VertexFormat.h"
+#include "TransformHelper.h"
 #include "Log.h"
 
 #include "glm/mat4x4.hpp"
+#include "glm//vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+
+//@note: register and handle custom uniforms + propert directional lighting + renderer states (like glEnable(__x__))
 
 using namespace tinyngine;
 
@@ -34,70 +38,105 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
+		GenerateCube(1.0f, mCube);
 
-		/*GenerateCube(1.0f, mCube);
-
-		mColors.reserve(mCube.numVertices);
+		mColors.reserve(mCube.numVertices * 4);
 		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
 			mColors.push_back(255);
 			mColors.push_back(255);
-			mColors.push_back(0);
+			mColors.push_back(255);
 			mColors.push_back(255);
 		}
 
-		initializeShaders(mShaderProgram);*/
+		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
+		mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
+		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
+
+		mPositionsHandle = renderer->CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
+		mNornalsHandle = renderer->CreateVertexBuffer(&mCube.normals[0], sizeof(mCube.normals[0]) * mCube.numVertices * 3, mPosVertexFormat);
+		mColorsHandle = renderer->CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
+		mIndexesBufferHandle = renderer->CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
+
+		const char* fragmentShaderSource = SHADER_SOURCE
+		(
+			varying lowp vec4 v_color;
+			void main(void)
+			{
+				gl_FragColor = v_color;
+			}
+		);
+		const char* vertexShaderSource = SHADER_SOURCE
+		(
+			attribute highp vec4 a_position;
+			attribute highp vec3 a_normal;
+			attribute lowp vec4 a_color0;
+			uniform mediump mat4 u_modelViewProj;
+			uniform mediump mat4 u_modelView;
+			uniform mediump vec3 u_lightPos;
+			varying lowp vec4 v_color;
+			void main(void)
+			{
+				vec3 modelViewPos = vec3(u_modelView * a_position);
+				vec3 modelViewNormal = vec3(u_modelView * vec4(a_normal, 0.0));
+				float distance = length(u_lightPos - modelViewPos);
+				vec3 lightVector = normalize(u_lightPos - modelViewPos);
+				float diffuse = max(dot(modelViewNormal, lightVector), 0.1);
+				diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));
+				v_color = a_color0 * diffuse;
+
+				gl_Position = u_modelViewProj * a_position;
+			}
+		);
+		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
+		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
+
+		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
+		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		mUp = glm::vec3(0.0f, 1.0f, 0.0f);
+		mRight = glm::vec3(1.0f, 0.0f, 0.0f);
+		mAngles = glm::vec3(0.0f, 0.0f, 0.0f);
+
+		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Projection);;
+		mTransformHelper.LoadMatrix(mProj);
+		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::View);
+		mTransformHelper.LoadMatrix(mView);
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
-
-		/*mAngle += 1.0f;
-		if (mAngle > 360.0f) {
-			mAngle -= 360.0f;
+		mAngles.x -= mSpeed.x;
+		if (mAngles.x < 0.0f) {
+			mAngles.x += 360.0f;
+		}
+		mAngles.y += mSpeed.y;
+		if (mAngles.y > 360.0f) {
+			mAngles.y -= 360.0f;
 		}
 
-		glm::mat4 P = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
-		glm::mat4 V = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 M = glm::rotate(glm::mat4(1.0f), glm::radians(mAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 MVP = P * V * M;
-		glm::mat4 MV = V * M;
+		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Model);
+		mTransformHelper.LoadIdentity();
+		mTransformHelper.Rotate(mAngles.y, mUp);
+		mTransformHelper.Rotate(-mAngles.x, mRight);
 
-		GLenum lastError;
+		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
+		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
-		glClearColor(0.36f, 0.36f, 0.36f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
+		renderer->SetVertexBuffer(mNornalsHandle, Attributes::Normal);
+		renderer->SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
-		glUniformMatrix4fv(mMVPUniformPos, 1, GL_FALSE, &MVP[0][0]);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
-		glUniformMatrix4fv(mMVUniformPos, 1, GL_FALSE, &MV[0][0]);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
+		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
+		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelView, &mTransformHelper.GetModelViewMatrix()[0][0], false);
 
-		glVertexAttribPointer(mPositionAttributePos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void*)&mCube.positions[0]);
-		glEnableVertexAttribArray(mPositionAttributePos);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
-		glVertexAttribPointer(mNormalAttributePos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void*)&mCube.normals[0]);
-		glEnableVertexAttribArray(mNormalAttributePos);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
-		glVertexAttribPointer(mColorAttributePos, 3, GL_UNSIGNED_BYTE, GL_TRUE, 4 * sizeof(GLubyte), (const void*)&mColors[0]);
-		glEnableVertexAttribArray(mColorAttributePos);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
+		renderer->SetIndexBuffer(mIndexesBufferHandle);
+		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
 
-		glDrawElements(GL_TRIANGLES, mCube.numIndices, GL_UNSIGNED_INT, (const void*)&mCube.indices[0]);
-		lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return; }
-
-		glFinish();*/
+		renderer->Commit();
 	}
 
 	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
 		TINYNGINE_UNUSED(renderer);
-		//glDeleteProgram(mShaderProgram);
 	}
 
 	void ReleaseApplication() override {
@@ -112,87 +151,28 @@ public:
 	}
 
 private:
-	/*bool initializeShaders(GLuint& shaderProgram) {
-		const char* fragmentShaderSource = SHADER_SOURCE
-		(
-			varying lowp vec4 v_color;
-			void main(void)
-			{
-				gl_FragColor = v_color;
-			}
-		);
-		const char* vertexShaderSource = SHADER_SOURCE
-		(
-			attribute highp vec4 a_position;
-			attribute highp vec3 a_normal;
-			attribute lowp vec4 a_color;
-			uniform mediump mat4 u_mvpMatrix;
-			uniform mediump mat4 u_mvMatrix;
-			uniform mediump vec3 u_lightPos;
-			varying lowp vec4 v_color;
-			void main(void)
-			{
-				vec3 modelViewPos = vec3(u_mvMatrix * a_position);
-				vec3 modelViewNormal = vec3(u_mvMatrix * vec4(a_normal, 0.0));
-				float distance = length(u_lightPos - modelViewPos);
-				vec3 lightVector = normalize(u_lightPos - modelViewPos);
-				float diffuse = max(dot(modelViewNormal, lightVector), 0.1);
-				diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));
-				v_color = a_color * diffuse;
-
-				gl_Position = u_mvpMatrix * a_position;
-			}
-		);
-		shaderProgram = CompileProgram(vertexShaderSource, fragmentShaderSource, [](GLenum type, const char * errorMessage) {
-			if (errorMessage) {
-				if (type == GL_VERTEX_SHADER) {
-					Log(Logger::Error, "Failed compile vertex shader : %s", errorMessage);
-				}
-				else if (type == GL_FRAGMENT_SHADER) {
-					Log(Logger::Error, "Failed compile fragment shader : %s", errorMessage);
-				}
-				else {
-					Log(Logger::Error, "Failed compile ling program : %s", errorMessage);
-				}
-			}
-		});
-		if (shaderProgram == 0) {
-			return false;
-		}
-
-		glUseProgram(shaderProgram);
-		GLenum lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return false; }
-		mPositionAttributePos = glGetAttribLocation(shaderProgram, "a_position");
-		mColorAttributePos = glGetAttribLocation(shaderProgram, "a_color");
-		mNormalAttributePos = glGetAttribLocation(shaderProgram, "a_normal");
-		mMVPUniformPos = glGetUniformLocation(shaderProgram, "u_mvpMatrix");
-		mMVUniformPos = glGetUniformLocation(shaderProgram, "u_mvMatrix");
-		mLighPositionPos = glGetUniformLocation(shaderProgram, "u_lightPos");
-
-		glEnable(GL_CULL_FACE);
-
-		return true;
-	}*/
-
-private:
 	uint32_t mWindowWidth;
 	uint32_t mWindowHeight;
 	float mAspect;
 
 	CubeGeometry mCube;
-	/*std::vector<GLubyte> mColors;
+	std::vector<uint8_t> mColors;
 
-	GLuint mShaderProgram = 0;
+	VertexFormat mPosVertexFormat;
+	ProgramHandle mProgramHandle;
+	VertexBufferHandle mPositionsHandle;
+	VertexBufferHandle mNornalsHandle;
+	VertexBufferHandle mColorsHandle;
+	IndexBufferHandle mIndexesBufferHandle;
 
-	GLuint mPositionAttributePos = 0;
-	GLuint mColorAttributePos = 0;
-	GLuint mNormalAttributePos = 0;
-	GLuint mMVPUniformPos = 0;
-	GLuint mMVUniformPos = 0;
-	GLuint mLighPositionPos = 0;*/
+	TransformHelper mTransformHelper;
 
-	float mAngle = 0;
+	glm::vec3 mSpeed{ 0.02f, 0.01f, 0.0f };
+	glm::vec3 mAngles;
+	glm::mat4 mProj;
+	glm::mat4 mView;
+	glm::vec3 mRight;
+	glm::vec3 mUp;
 };
 
 

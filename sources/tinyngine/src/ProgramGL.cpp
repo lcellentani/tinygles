@@ -88,6 +88,24 @@ void ProgramGL::Initialize() {
 	delete attribName;
 }
 
+void ProgramGL::BindAttributes(const VertexFormat& vertexFormat, const std::array<GLuint, Attributes::Count>& handles) {
+	for (GLint n = 0; n < mUsedAttributesCount; n++) {
+		Attributes::Enum attrib = static_cast<Attributes::Enum>(mUsedAttributes[n]);
+		GLint location = mAttributeLocations[attrib];
+		if (location >= 0 && vertexFormat.IsValid(attrib)) {
+			uint8_t size;
+			uint8_t type;
+			bool normalized;
+			vertexFormat.Decode(attrib, type, size, normalized);
+
+			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, handles[attrib]));
+
+			GL_CHECK(glEnableVertexAttribArray(location));
+			GL_CHECK(glVertexAttribPointer(location, size, tinyngine::gl::GetAttributeType(static_cast<AttributeType::Enum>(type)), normalized, vertexFormat.mOffset[attrib], 0));
+		}
+	}
+}
+
 void ProgramGL::BindAttributes(const VertexFormat& vertexFormat, uint32_t baseVertex) {
 	for (GLint n = 0; n < mUsedAttributesCount; n++) {
 		Attributes::Enum attrib = static_cast<Attributes::Enum>(mUsedAttributes[n]);

@@ -27,7 +27,7 @@ public:
 	virtual void DrawElements(PrimitiveType::Enum primitive, uint32_t count) = 0;
 
 	virtual VertexBufferHandle CreateVertexBuffer(const void* data, uint32_t size, const VertexFormat& vertexFormat) = 0;
-	virtual void SetVertexBuffer(const VertexBufferHandle& handle) = 0;
+	virtual void SetVertexBuffer(const VertexBufferHandle& handle, Attributes::Enum attribute) = 0;
 
 	virtual IndexBufferHandle CreateIndexBuffer(const void* data, uint32_t size) = 0;
 	virtual void SetIndexBuffer(const IndexBufferHandle& handle) = 0;

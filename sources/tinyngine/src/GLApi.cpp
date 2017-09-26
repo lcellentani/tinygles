@@ -29,7 +29,8 @@ static const char* cPredefinedUniformName[] =
 	"u_model",
 	"u_viewProj",
 	"u_modelView",
-	"u_modelViewProj"
+	"u_modelViewProj",
+	"u_lightPos"
 };
 
 static const GLenum cShaderType[]{

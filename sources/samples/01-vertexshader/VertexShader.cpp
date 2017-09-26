@@ -5,6 +5,7 @@
 #include "Log.h"
 
 #include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 using namespace tinyngine;
@@ -36,32 +37,43 @@ public:
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
 		GenerateCube(1.0f, mCube);
+		mColors.reserve(mCube.numVertices * 4);
+		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
+			mColors.push_back(255);
+			mColors.push_back(255);
+			mColors.push_back(0);
+			mColors.push_back(255);
+		}
 
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
+		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
-		mVertexBufferHandle = renderer->CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
-		mIndexBufferHandle = renderer->CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
+		mPositionsHandle = renderer->CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
+		mColorsHandle = renderer->CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
+		mIndexesBufferHandle = renderer->CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
 
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
+			varying lowp vec4 v_color;
 			void main(void)
 			{
-				gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+				gl_FragColor = v_color;
 			}
 		);
 		const char* vertexShaderSource = SHADER_SOURCE
 		(
 			attribute highp vec4 a_position;
+			attribute lowp vec4 a_color0;
 			uniform mediump mat4 u_modelViewProj;
+			varying lowp vec4 v_color;
 			void main(void)
 			{
 				gl_Position = u_modelViewProj * a_position;
+				v_color = a_color0;
 			}
 		);
-
 		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
 		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
-
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
 
 		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
@@ -94,12 +106,13 @@ public:
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
 		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
-		renderer->SetVertexBuffer(mVertexBufferHandle);
-		renderer->SetIndexBuffer(mIndexBufferHandle);
+		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
+		renderer->SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
 		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
 		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
 
+		renderer->SetIndexBuffer(mIndexesBufferHandle);
 		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
 
 		renderer->Commit();
@@ -126,15 +139,17 @@ private:
 	float mAspect;
 
 	CubeGeometry mCube;
+	std::vector<uint8_t> mColors;
 
 	VertexFormat mPosVertexFormat;
 	ProgramHandle mProgramHandle;
-	VertexBufferHandle mVertexBufferHandle;
-	IndexBufferHandle mIndexBufferHandle;
+	VertexBufferHandle mPositionsHandle;
+	VertexBufferHandle mColorsHandle;
+	IndexBufferHandle mIndexesBufferHandle;
 
 	TransformHelper mTransformHelper;
 
-	glm::vec3 mSpeed{ 0.025f, 0.01f, 0.0f };
+	glm::vec3 mSpeed{ 0.02f, 0.01f, 0.0f };
 	glm::vec3 mAngles;
 	glm::mat4 mProj;
 	glm::mat4 mView;
