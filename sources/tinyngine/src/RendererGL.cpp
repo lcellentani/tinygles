@@ -73,7 +73,7 @@ void RendererGL::Clear(ClearFlags flags, Color color, float depth, uint8_t stenc
 }
 
 void RendererGL::Commit() {
-	GL_CHECK(glFinish());
+	GL_CHECK(glFlush());
 	if (mImpl->mCurrentProgramHandle.IsValid()) {
 		auto& program = mImpl->mPrograms[mImpl->mCurrentProgramHandle.mHandle];
 		program.UnbindAttributes();

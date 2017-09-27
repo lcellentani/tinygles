@@ -38,7 +38,8 @@ public:
 		//CreateTexture(256, 256);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
+		TINYNGINE_UNUSED(deltaTime);
 		TINYNGINE_UNUSED(renderer);
 
 		/*const GLfloat vertices[]{

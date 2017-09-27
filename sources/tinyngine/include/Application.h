@@ -14,7 +14,7 @@ public:
 
 	virtual void InitApplication() = 0;
 	virtual void InitView(std::unique_ptr<Renderer>& renderer) = 0;
-	virtual void RenderFrame(std::unique_ptr<Renderer>& renderer) = 0;
+	virtual void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) = 0;
 	virtual void ReleaseView(std::unique_ptr<Renderer>& renderer) = 0;
 	virtual void ReleaseApplication() = 0;
 

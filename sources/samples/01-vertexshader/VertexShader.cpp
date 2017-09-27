@@ -88,16 +88,16 @@ public:
 		mTransformHelper.LoadMatrix(mView);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
-		mAngles.x -= mSpeed.x;
+	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
+		mAngles.x -= mSpeed.x * deltaTime;
 		if (mAngles.x < 0.0f) {
 			mAngles.x += 360.0f;
 		}
-		mAngles.y += mSpeed.y;
+		mAngles.y += mSpeed.y * deltaTime;
 		if (mAngles.y > 360.0f) {
 			mAngles.y -= 360.0f;
 		}
-
+		
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Model);
 		mTransformHelper.LoadIdentity();
 		mTransformHelper.Rotate(mAngles.y, mUp);
@@ -149,7 +149,7 @@ private:
 
 	TransformHelper mTransformHelper;
 
-	glm::vec3 mSpeed{ 0.02f, 0.01f, 0.0f };
+	glm::vec3 mSpeed{ 2.f, 1.f, 0.0f };
 	glm::vec3 mAngles;
 	glm::mat4 mProj;
 	glm::mat4 mView;

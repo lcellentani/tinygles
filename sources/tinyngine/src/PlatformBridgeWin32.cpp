@@ -1,7 +1,7 @@
 #include "PlatformBridgeWin32.h"
 #include "IPlatformContext.h"
 #include "Application.h"
-
+#include "StopWatchWin32.h"
 #include "RendererGL.h"
 
 namespace
@@ -13,6 +13,11 @@ static constexpr uint32_t cDefaultHeight = 600;
 
 namespace tinyngine
 {
+
+PlatformBridgeWin32::PlatformBridgeWin32() {
+	mFrameDelta = 0;
+	mStopWatch = std::make_unique<StopWatchWin32>();
+}
 
 int16_t PlatformBridgeWin32::Run() {
 	mApplication = CreateApplication();
@@ -36,16 +41,27 @@ int16_t PlatformBridgeWin32::Run() {
 
 	mApplication->InitView(renderer);
 
+	mStopWatch->Start();
+	
+	constexpr float time = 3.0f / 60.0f;
 	MSG msg{ 0 };
 	while (!mExitRequired) {
-		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
+		mFrameDelta = mStopWatch->GetTime();
+		mFrameDelta = (mFrameDelta + time) * 0.25f;
+
+		mApplication->RenderFrame(renderer, mFrameDelta);
+
+		mPlatformContext->Present();
+
+		mStopWatch->Reset();
+
+		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE | PM_NOYIELD)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		mApplication->RenderFrame(renderer);
-
-		mPlatformContext->Present();
 	}
+
+	mStopWatch->Stop();
 
 	mApplication->ReleaseView(renderer);
 	mPlatformContext->Terminate();

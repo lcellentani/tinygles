@@ -14,6 +14,7 @@ namespace tinyngine
 {
 class PlatformBridgeWin32 : public IPlatformBridge {
 public:
+	PlatformBridgeWin32();
 	virtual ~PlatformBridgeWin32() = default;
 
 	virtual int16_t Run() override;

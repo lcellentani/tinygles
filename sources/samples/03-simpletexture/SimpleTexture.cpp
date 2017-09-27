@@ -40,7 +40,8 @@ public:
 		//CreateSimpleTexture();
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
+		TINYNGINE_UNUSED(deltaTime);
 		TINYNGINE_UNUSED(renderer);
 		/*const GLfloat vertices[]{
 			-0.5f, 0.5f, 0.0f,
