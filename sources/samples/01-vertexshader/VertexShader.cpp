@@ -39,10 +39,10 @@ public:
 		GenerateCube(1.0f, mCube);
 		mColors.reserve(mCube.numVertices * 4);
 		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
-			mColors.push_back(255);
-			mColors.push_back(255);
+			mColors.push_back(128);
+			mColors.push_back(128);
 			mColors.push_back(0);
-			mColors.push_back(255);
+			mColors.push_back(128);
 		}
 
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
@@ -86,6 +86,8 @@ public:
 		mTransformHelper.LoadMatrix(mProj);
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::View);
 		mTransformHelper.LoadMatrix(mView);
+
+		renderer->SetState(RendererStateType::CullFace, true);
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
@@ -104,7 +106,7 @@ public:
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
-		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
+		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92));
 
 		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
 		renderer->SetVertexBuffer(mColorsHandle, Attributes::Color0);

@@ -25,6 +25,14 @@ GLenum GetShaderType(ShaderType::Enum type);
 
 GLenum GetPrimitiveType(PrimitiveType::Enum type);
 
+GLenum GetRendererStateType(RendererStateType::Enum type);
+GLenum GetBlendFunc(BlendFuncs::Enum func);
+GLenum GetCullFaceMode(CullFaceModes::Enum mode);
+GLenum GetWindingMode(WindingModes::Enum mode);
+GLenum GetDepthFunc(DepthFuncs::Enum func);
+GLenum GetStencilFunc(StencilFuncs::Enum func);
+GLenum GetStencilOpType(StencilOpTypes::Enum type);
+
 } // namespace gl
 } // namespace tinyngine
 

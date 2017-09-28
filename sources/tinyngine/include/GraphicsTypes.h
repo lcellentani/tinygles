@@ -66,7 +66,97 @@ namespace tinyngine
 		};
 	};
 
+	struct RendererStateType {
+		enum Enum {
+			Blend,
+			CullFace,
+			DepthTest,
+			PolygonOffset,
+			Scissor,
+			Stencil,
+			Count
+		};
+	};
 
+	struct BlendFuncs {
+		enum Enum {
+			Zero,
+			One,
+			SrcColor,
+			OneMinusSrcColor,
+			DstColor,
+			OneMinusDstColor,
+			SrcAlpha,
+			OneMinusSrcAlpha,
+			DstAlpha,
+			OneMinusDstAlpha,
+			ConstantColor,
+			OneMinusConstantColor,
+			ConstantAlpha,
+			OneMinusConstantAlpha,
+			SrcAlphaSaturate,
+			Count
+		};
+	};
+
+	struct CullFaceModes {
+		enum Enum {
+			Front,
+			Back,
+			FrontAndBack,
+			Count
+		};
+	};
+
+	struct WindingModes {
+		enum Enum {
+			ClockWise,
+			CounterClockWise,
+			Count
+		};
+	};
+
+	struct DepthFuncs {
+		enum Enum {
+			Never,
+			Less,
+			Equal,
+			LessEqual,
+			Greater,
+			NotEqual,
+			GreaterEqual,
+			Always,
+			Count
+		};
+	};
+
+	struct StencilFuncs {
+		enum Enum {
+			Never,
+			Less,
+			Equal,
+			LessEqual,
+			Greater,
+			NotEqual,
+			GreaterEqual,
+			Always,
+			Count
+		};
+	};
+
+	struct StencilOpTypes {
+		enum Enum {
+			Keep,
+			Zero,
+			Replace,
+			Increment,
+			IncrementWrap,
+			Decrement,
+			DecrementWrap,
+			Invert,
+			Count
+		};
+	};
 
 	struct Color
 	{

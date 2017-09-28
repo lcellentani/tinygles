@@ -7,20 +7,16 @@ namespace tinyngine
 {
 
 struct StopWatchWin32::Impl{
-	Impl(): mStartTime(), mEndTime(), mDiffTime(0.0f), mFrequency(0.0), mFrequrncySet(false) {
-		if (!mFrequrncySet) {
-			LARGE_INTEGER temp;
-			QueryPerformanceFrequency((LARGE_INTEGER*)&temp);
-			mFrequency = ((double)temp.QuadPart);
-			mFrequrncySet = true;
-		}
+	Impl(): mStartTime(), mEndTime(), mDiffTime(0.0f), mFrequency(0.0) {
+		LARGE_INTEGER temp;
+		QueryPerformanceFrequency((LARGE_INTEGER*)&temp);
+		mFrequency = ((double)temp.QuadPart) / 1000.; // millis
 	}
 
 	LARGE_INTEGER mStartTime;
 	LARGE_INTEGER mEndTime;
 	float mDiffTime;
 	double  mFrequency;
-	bool  mFrequrncySet;
 };
 
 StopWatchWin32::StopWatchWin32() : mImpl(new Impl()) {

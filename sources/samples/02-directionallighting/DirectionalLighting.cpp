@@ -8,7 +8,7 @@
 #include "glm//vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-//@note: register and handle custom uniforms + propert directional lighting + renderer states (like glEnable(__x__))
+//@note: register and handle custom uniforms + propert directional lighting
 
 using namespace tinyngine;
 
@@ -101,6 +101,8 @@ public:
 		mTransformHelper.LoadMatrix(mProj);
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::View);
 		mTransformHelper.LoadMatrix(mView);
+
+		renderer->SetState(RendererStateType::CullFace, true);
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {

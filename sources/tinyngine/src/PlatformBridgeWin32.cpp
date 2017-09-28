@@ -42,23 +42,22 @@ int16_t PlatformBridgeWin32::Run() {
 	mApplication->InitView(renderer);
 
 	mStopWatch->Start();
-	
-	constexpr float time = 3.0f / 60.0f;
+
 	MSG msg{ 0 };
 	while (!mExitRequired) {
 		mFrameDelta = mStopWatch->GetTime();
-		mFrameDelta = (mFrameDelta + time) * 0.25f;
+		mFrameDelta = (mFrameDelta + (3.0f / 60.0f)) * 0.25f;
+
+		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 
 		mApplication->RenderFrame(renderer, mFrameDelta);
 
 		mPlatformContext->Present();
 
 		mStopWatch->Reset();
-
-		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE | PM_NOYIELD)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
 	}
 
 	mStopWatch->Stop();
