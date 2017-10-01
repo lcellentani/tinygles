@@ -21,16 +21,6 @@ static const char* cAttributeNames[]{
 	"a_texcoord3"
 };
 
-static const char* cPredefinedUniformName[]{
-	"u_view",
-	"u_proj",
-	"u_model",
-	"u_viewProj",
-	"u_modelView",
-	"u_modelViewProj",
-	"u_lightPos"
-};
-
 static const GLenum cShaderType[]{
 	GL_VERTEX_SHADER,
 	GL_FRAGMENT_SHADER
@@ -146,10 +136,6 @@ GLenum GetAttributeType(AttributeType::Enum type) {
 
 const char* GetAttributeName(Attributes::Enum attribute) {
 	return cAttributeNames[attribute];
-}
-
-const char* GetPredefinedUniformName(Uniforms::Enum uniform) {
-	return cPredefinedUniformName[uniform];
 }
 
 GLenum GetShaderType(ShaderType::Enum type) {
