@@ -222,13 +222,20 @@ void RendererGL::SetProgram(const ProgramHandle& handle, const VertexFormat& ver
 	}
 }
 
-void RendererGL::SetUniformMat4(const ProgramHandle& handle, Uniforms::Enum uniformName, const float* data, bool transpose) {
-	if (!handle.IsValid()) {
+UniformHandle RendererGL::GetUniform(const ProgramHandle& programHandle, const char* uniformName) const {
+	if (!programHandle.IsValid()) {
+		return UniformHandle(cInvalidHandle);
+	}
+	auto& program = mImpl->mPrograms[programHandle.mHandle];
+	return program.GetUniformHandle(uniformName);
+}
+
+void RendererGL::SetUniformMat4(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data, bool transpose) {
+	if (!programHandle.IsValid()) {
 		return;
 	}
-	auto& program = mImpl->mPrograms[handle.mHandle];
-	auto& uniform = program.GetUniform(uniformName);
-	GL_CHECK(glUniformMatrix4fv(uniform.mLocation, uniform.mSize, transpose ? GL_TRUE : GL_FALSE, data));
+	auto& program = mImpl->mPrograms[programHandle.mHandle];
+	program.SetUniformMat4(uniformHandle, data, transpose);
 }
 
 } // namespace tinyngine

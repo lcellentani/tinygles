@@ -64,6 +64,7 @@ public:
 		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
 		
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
@@ -76,7 +77,7 @@ public:
 		renderer->SetVertexBuffer(mVertexBufferHandle, Attributes::Position);
 
 		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &modelViewProj[0][0], false);
+		renderer->SetUniformMat4(mProgramHandle, mModelViewProjHandle, &modelViewProj[0][0], false);
 	
 		renderer->DrawArray(PrimitiveType::Triangles, 0, 3);
 
@@ -100,6 +101,7 @@ public:
 private:
 	VertexFormat mPosVertexFormat;
 	ProgramHandle mProgramHandle;
+	UniformHandle mModelViewProjHandle;
 	VertexBufferHandle mVertexBufferHandle;
 
 	TransformHelper mTransformHelper;

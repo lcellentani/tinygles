@@ -31,20 +31,34 @@ namespace tinyngine
 		};
 	};
 
-	struct Uniforms {
+	struct UniformType {
 		enum Enum {
-			View,
-			Proj,
-			Model,
-			ViewProj,
-			ModelView,
-			ModelViewProj,
-			LightPos,
+			Float,
+			Float2,
+			Float3,
+			Float4,
+			Int,
+			Int2,
+			Int3,
+			Int4,
+			Bool,
+			Bool2,
+			Bool3,
+			Bool4,
+			Mat2,
+			Mat3,
+			Mat4,
+			Sampler2D,
+			SamplerCube,
 			Count
 		};
+	};
+
+	struct Uniform {
 		uint32_t mLocation;
 		uint16_t mSize;
-		uint8_t mType;
+		UniformType::Enum mType;
+		char mName[256];
 	};
 
 	struct ShaderType {
@@ -197,5 +211,6 @@ namespace tinyngine
 	using ProgramHandle = ResourceHandle;
 	using VertexBufferHandle = ResourceHandle;
 	using IndexBufferHandle = ResourceHandle;
+	using UniformHandle = ResourceHandle;
 
 } // namespace tinyngine

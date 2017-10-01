@@ -51,7 +51,8 @@ public:
 	virtual ProgramHandle CreateProgram(ShaderHandle& vertexShaderHandle, ShaderHandle& fragmentShaderHandle, bool destroyShaders) = 0;
 	virtual void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) = 0;
 
-	virtual void SetUniformMat4(const ProgramHandle& handle, Uniforms::Enum uniform, const float* data, bool transpose) = 0;
+	virtual UniformHandle GetUniform(const ProgramHandle& handle, const char* uniformName) const = 0;
+	virtual void SetUniformMat4(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data, bool transpose) = 0;
 };
 
 /*

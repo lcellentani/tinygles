@@ -8,7 +8,7 @@
 #include "glm//vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-//@note: register and handle custom uniforms + propert directional lighting
+//@note: propert directional lighting
 
 using namespace tinyngine;
 
@@ -90,6 +90,8 @@ public:
 		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
 		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
+		mModelViewHandle = renderer->GetUniform(mProgramHandle, "u_modelView");
 
 		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
 		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -128,8 +130,8 @@ public:
 		renderer->SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
 		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
-		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelView, &mTransformHelper.GetModelViewMatrix()[0][0], false);
+		renderer->SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		renderer->SetUniformMat4(mProgramHandle, mModelViewHandle, &mTransformHelper.GetModelViewMatrix()[0][0], false);
 
 		renderer->SetIndexBuffer(mIndexesBufferHandle);
 		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
@@ -162,6 +164,8 @@ private:
 
 	VertexFormat mPosVertexFormat;
 	ProgramHandle mProgramHandle;
+	UniformHandle mModelViewProjHandle;
+	UniformHandle mModelViewHandle;
 	VertexBufferHandle mPositionsHandle;
 	VertexBufferHandle mNornalsHandle;
 	VertexBufferHandle mColorsHandle;

@@ -42,7 +42,9 @@ public:
 
 	ProgramHandle CreateProgram(ShaderHandle& vertexShaderHandle, ShaderHandle& fragmentShaderHandle, bool destroyShaders) override;
 	void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) override;
-	void SetUniformMat4(const ProgramHandle& handle, Uniforms::Enum uniform, const float* data, bool transpose) override;
+
+	UniformHandle GetUniform(const ProgramHandle& handle, const char* uniformName) const override;
+	void SetUniformMat4(const ProgramHandle& handle, UniformHandle& uniform, const float* data, bool transpose) override;
 
 private:
 	struct Impl;

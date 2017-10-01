@@ -39,10 +39,10 @@ public:
 		GenerateCube(1.0f, mCube);
 		mColors.reserve(mCube.numVertices * 4);
 		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
-			mColors.push_back(128);
-			mColors.push_back(128);
+			mColors.push_back(255);
+			mColors.push_back(255);
 			mColors.push_back(0);
-			mColors.push_back(128);
+			mColors.push_back(255);
 		}
 
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
@@ -75,6 +75,7 @@ public:
 		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
 		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
 
 		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
 		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -112,7 +113,7 @@ public:
 		renderer->SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
 		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer->SetUniformMat4(mProgramHandle, Uniforms::ModelViewProj, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		renderer->SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
 
 		renderer->SetIndexBuffer(mIndexesBufferHandle);
 		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
@@ -145,6 +146,7 @@ private:
 
 	VertexFormat mPosVertexFormat;
 	ProgramHandle mProgramHandle;
+	UniformHandle mModelViewProjHandle;
 	VertexBufferHandle mPositionsHandle;
 	VertexBufferHandle mColorsHandle;
 	IndexBufferHandle mIndexesBufferHandle;

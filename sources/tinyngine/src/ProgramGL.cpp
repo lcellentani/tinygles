@@ -3,6 +3,32 @@
 
 #include <memory>
 #include <algorithm>
+#include <map>
+
+namespace
+{
+
+static std::map<GLenum, tinyngine::UniformType::Enum> cUniformTypeTranslationTable{
+	{ GL_FLOAT, tinyngine::UniformType::Float },
+	{ GL_FLOAT_VEC2, tinyngine::UniformType::Float2 },
+	{ GL_FLOAT_VEC3, tinyngine::UniformType::Float3 },
+	{ GL_FLOAT_VEC4, tinyngine::UniformType::Float4 },
+	{ GL_INT, tinyngine::UniformType::Int },
+	{ GL_INT_VEC2, tinyngine::UniformType::Int2 },
+	{ GL_INT_VEC3, tinyngine::UniformType::Int3 },
+	{ GL_INT_VEC4, tinyngine::UniformType::Int4 },
+	{ GL_BOOL, tinyngine::UniformType::Bool },
+	{ GL_BOOL_VEC2, tinyngine::UniformType::Bool2 },
+	{ GL_BOOL_VEC3, tinyngine::UniformType::Bool3 },
+	{ GL_BOOL_VEC4, tinyngine::UniformType::Bool4 },
+	{ GL_FLOAT_MAT2, tinyngine::UniformType::Mat2 },
+	{ GL_FLOAT_MAT3, tinyngine::UniformType::Mat3 },
+	{ GL_FLOAT_MAT4, tinyngine::UniformType::Mat4 },
+	{ GL_SAMPLER_2D, tinyngine::UniformType::Sampler2D },
+	{ GL_SAMPLER_CUBE, tinyngine::UniformType::SamplerCube }
+};
+
+}
 
 namespace tinyngine
 {
@@ -52,7 +78,7 @@ void ProgramGL::Initialize() {
 	GLint maxLength = std::max(maxAttribLength, maxUniformLength);
 	char* attribName = new char[maxLength + 1];
 
-	std::memset(mPredefinedUniforms, 0, sizeof(mPredefinedUniforms));
+	mUniforms.reserve(activeUniforms);
 	for (GLint n = 0; n < activeUniforms; n++) {
 		GLint size;
 		GLenum type = 0;
@@ -61,19 +87,17 @@ void ProgramGL::Initialize() {
 		GLint location = glGetUniformLocation(mId, attribName);
 		GL_ERROR(location == -1);
 
-		GLint uniform = -1;
-		for (GLint i = 0; i < Uniforms::Count && uniform == -1; i++) {
-			if (std::strncmp(tinyngine::gl::GetPredefinedUniformName(static_cast<Uniforms::Enum>(i)), attribName, maxLength) == 0) {
-				mPredefinedUniforms[i].mLocation = location;
-				mPredefinedUniforms[i].mSize = static_cast<uint16_t>(size);
-				mPredefinedUniforms[i].mType = static_cast<uint8_t>(type);
-				uniform = i;
-			}
-		}
+		Uniform uniform;
+		uniform.mLocation = location;
+		uniform.mSize = static_cast<uint16_t>(size);
+		uniform.mType = cUniformTypeTranslationTable[type];
+		memset(uniform.mName, 0, sizeof(uniform.mName));
+		strcpy(uniform.mName, attribName);
+		mUniforms.push_back(uniform);
 	}
 
-	std::memset(mAttributeLocations, -1, sizeof(mAttributeLocations));
-	std::memset(mUsedAttributes, UINT8_MAX, sizeof(mUsedAttributes));
+	std::fill(std::begin(mAttributeLocations), std::end(mAttributeLocations), -1);
+	std::fill(std::begin(mUsedAttributes), std::end(mUsedAttributes), UINT8_MAX);
 	uint16_t used = 0;
 	for (uint8_t n = 0; n < Attributes::Count; n++) {
 		GLint location = glGetAttribLocation(mId, tinyngine::gl::GetAttributeName(static_cast<Attributes::Enum>(n)));
@@ -133,8 +157,20 @@ void ProgramGL::UnbindAttributes() {
 	}
 }
 
-const Uniforms& ProgramGL::GetUniform(Uniforms::Enum uniform) const {
-	return mPredefinedUniforms[uniform];
+UniformHandle ProgramGL::GetUniformHandle(const char* uniformName) const {
+	int index = -1;
+	for (size_t n = 0; n < mUniforms.size(); n++) {
+		if (strcmp(mUniforms[n].mName, uniformName) == 0) {
+			index = n;
+			break;
+		}
+	}
+	return index != -1 ? UniformHandle(index) : UniformHandle(cInvalidHandle);
+}
+
+void ProgramGL::SetUniformMat4(const UniformHandle& uniformHandle, const float* data, bool transpose) {
+	auto& uniform = mUniforms[uniformHandle.mHandle];
+	GL_CHECK(glUniformMatrix4fv(uniform.mLocation, uniform.mSize, transpose ? GL_TRUE : GL_FALSE, data));
 }
 
 } // namespace tinyngine

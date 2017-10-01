@@ -19,8 +19,6 @@ const char* GetErrorString(GLenum _enum);
 GLenum GetAttributeType(AttributeType::Enum type);
 const char* GetAttributeName(Attributes::Enum attribute);
 
-const char* GetPredefinedUniformName(Uniforms::Enum uniform);
-
 GLenum GetShaderType(ShaderType::Enum type);
 
 GLenum GetPrimitiveType(PrimitiveType::Enum type);
