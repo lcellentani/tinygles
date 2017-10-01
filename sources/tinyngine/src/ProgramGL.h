@@ -23,6 +23,7 @@ public:
 
 	UniformHandle GetUniformHandle(const char* uniformName) const;
 
+	void SetUniformFloat3(const UniformHandle& uniformHandle, const float* data);
 	void SetUniformMat4(const UniformHandle& uniformHandle, const float* data, bool transpose);
 
 	inline GLint GetId() const { return mId; }

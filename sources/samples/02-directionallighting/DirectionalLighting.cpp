@@ -8,7 +8,16 @@
 #include "glm//vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-//@note: propert directional lighting
+namespace
+{
+
+static float cMaterialAmbient[] = { 0.1f, 0.1f, 0.1f };
+static float cLightAmbient[] = { 1.0f, 1.0f, 1.0f };
+static float cMaterialDiffuse[] = { 1.0f, 0.0f, 0.0f };
+static float cLightDiffuse[] = { 1.0f, 1.0f, 1.0f };
+static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
+
+}
 
 using namespace tinyngine;
 
@@ -72,18 +81,23 @@ public:
 			attribute lowp vec4 a_color0;
 			uniform mediump mat4 u_modelViewProj;
 			uniform mediump mat4 u_modelView;
-			uniform mediump vec3 u_lightPos;
+			uniform mediump vec3 u_materialAmbient;
+			uniform mediump vec3 u_lightAmbient;
+			uniform mediump vec3 u_materialDiffuse;
+			uniform mediump vec3 u_lightDiffuse;
+			uniform highp vec3 u_lightPosition;
 			varying lowp vec4 v_color;
 			void main(void)
 			{
 				vec3 modelViewPos = vec3(u_modelView * a_position);
-				vec3 modelViewNormal = vec3(u_modelView * vec4(a_normal, 0.0));
-				float distance = length(u_lightPos - modelViewPos);
-				vec3 lightVector = normalize(u_lightPos - modelViewPos);
-				float diffuse = max(dot(modelViewNormal, lightVector), 0.1);
-				diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));
-				v_color = a_color0 * diffuse;
-
+				vec3 lightVector = normalize(u_lightPosition - modelViewPos);
+				vec3 normal = normalize(vec3(u_modelView * vec4(a_normal, 0.0)));
+				
+				vec3 ambient = u_materialAmbient * u_lightAmbient;
+				vec3 diffuse = (u_materialDiffuse * u_lightDiffuse) * max(0.0, dot(normal, lightVector));
+				
+				v_color.rgb = ambient + diffuse;
+				v_color.a = 1.0;
 				gl_Position = u_modelViewProj * a_position;
 			}
 		);
@@ -92,6 +106,11 @@ public:
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
 		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
 		mModelViewHandle = renderer->GetUniform(mProgramHandle, "u_modelView");
+		mMaterialAmbientHandle = renderer->GetUniform(mProgramHandle, "u_materialAmbient");
+		mLightAmbientHandle = renderer->GetUniform(mProgramHandle, "u_lightAmbient");
+		mMaterialDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_materialDiffuse");
+		mLightDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_lightDiffuse");
+		mLightPositionHandle = renderer->GetUniform(mProgramHandle, "u_lightPosition");
 
 		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
 		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -132,6 +151,11 @@ public:
 		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
 		renderer->SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
 		renderer->SetUniformMat4(mProgramHandle, mModelViewHandle, &mTransformHelper.GetModelViewMatrix()[0][0], false);
+		renderer->SetUniformFloat3(mProgramHandle, mMaterialAmbientHandle, &cMaterialAmbient[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mLightAmbientHandle, &cLightAmbient[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mMaterialDiffuseHandle, &cMaterialDiffuse[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mLightDiffuseHandle, &cLightDiffuse[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
 
 		renderer->SetIndexBuffer(mIndexesBufferHandle);
 		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
@@ -166,6 +190,12 @@ private:
 	ProgramHandle mProgramHandle;
 	UniformHandle mModelViewProjHandle;
 	UniformHandle mModelViewHandle;
+	UniformHandle mMaterialAmbientHandle;
+	UniformHandle mLightAmbientHandle;
+	UniformHandle mMaterialDiffuseHandle;
+	UniformHandle mLightDiffuseHandle;
+	UniformHandle mLightPositionHandle;
+
 	VertexBufferHandle mPositionsHandle;
 	VertexBufferHandle mNornalsHandle;
 	VertexBufferHandle mColorsHandle;

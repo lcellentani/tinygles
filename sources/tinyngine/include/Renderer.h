@@ -52,7 +52,8 @@ public:
 	virtual void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) = 0;
 
 	virtual UniformHandle GetUniform(const ProgramHandle& handle, const char* uniformName) const = 0;
-	virtual void SetUniformMat4(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data, bool transpose) = 0;
+	virtual void SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) = 0;
+	virtual void SetUniformMat4(const ProgramHandle& programHandle, const UniformHandle& uniformHandle, const float* data, bool transpose) = 0;
 };
 
 /*

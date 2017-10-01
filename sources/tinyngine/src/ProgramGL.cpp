@@ -168,6 +168,11 @@ UniformHandle ProgramGL::GetUniformHandle(const char* uniformName) const {
 	return index != -1 ? UniformHandle(index) : UniformHandle(cInvalidHandle);
 }
 
+void ProgramGL::SetUniformFloat3(const UniformHandle& uniformHandle, const float* data) {
+	auto& uniform = mUniforms[uniformHandle.mHandle];
+	GL_CHECK(glUniform3fv(uniform.mLocation, uniform.mSize, data));
+}
+
 void ProgramGL::SetUniformMat4(const UniformHandle& uniformHandle, const float* data, bool transpose) {
 	auto& uniform = mUniforms[uniformHandle.mHandle];
 	GL_CHECK(glUniformMatrix4fv(uniform.mLocation, uniform.mSize, transpose ? GL_TRUE : GL_FALSE, data));
