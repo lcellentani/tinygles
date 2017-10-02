@@ -21,10 +21,10 @@ static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
 
 using namespace tinyngine;
 
-class DirectionalLighting : public Application {
+class PerPIxelLighting : public Application {
 public:
-	DirectionalLighting() = default;
-	virtual ~DirectionalLighting() {
+	PerPIxelLighting() = default;
+	virtual ~PerPIxelLighting() {
 
 	}
 
@@ -213,5 +213,5 @@ private:
 
 
 extern "C" tinyngine::Application * CreateApplication() {
-	return new DirectionalLighting();
+	return new PerPIxelLighting();
 }

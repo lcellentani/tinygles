@@ -16,11 +16,15 @@ file(GLOB TINYNGINE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h*")
 file(GLOB TINYNGINE_IMGUI_INCLUDES "${PROJECT_SOURCE_DIR}/3rdparty/imgui/*.h*")
 file(GLOB TINYNGINE_IMGUI_SOURCES "${PROJECT_SOURCE_DIR}/3rdparty/imgui/*.c*")
 
+file(GLOB TINYNGINE_TINYOBJLOADER_INCLUDES "${PROJECT_SOURCE_DIR}/3rdparty/tinyobjloader/*.h*")
+file(GLOB TINYNGINE_TINYOBJLOADER_SOURCES "${PROJECT_SOURCE_DIR}/3rdparty/tinyobjloader/*.c*")
+
 file(GLOB TINYNGINE_PRIVATE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h*")
 
 if(MSVC) 
 	list(APPEND TINYNGINE_ALL_INCLUDES ${TINYNGINE_INCLUDES}) 
-	list(APPEND TINYNGINE_ALL_INCLUDES ${TINYNGINE_IMGUI_INCLUDES}) 
+	list(APPEND TINYNGINE_ALL_INCLUDES ${TINYNGINE_IMGUI_INCLUDES})
+	list(APPEND TINYNGINE_ALL_INCLUDES ${TINYNGINE_TINYOBJLOADER_INCLUDES})
 endif()
 
 add_library(tinyngine
@@ -29,6 +33,7 @@ add_library(tinyngine
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_demo.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_draw.cpp
+	${PROJECT_SOURCE_DIR}/3rdparty/tinyobjloader/tiny_obj_loader.cc
 	src/main.cpp
 	src/Application.cpp
 	src/DynLibLoader.cpp
@@ -55,6 +60,8 @@ if(MSVC)
 	source_group("Source Files\\" FILES ${TINYNGINE_PRIVATE_INCLUDES})
 	source_group("Header Files\\imgui" FILES ${TINYNGINE_IMGUI_INCLUDES})
 	source_group("Source Files\\imgui" FILES ${TINYNGINE_IMGUI_SOURCES})
+	source_group("Header Files\\tinyobjloader" FILES ${TINYNGINE_TINYOBJLOADER_INCLUDES})
+	source_group("Source Files\\tinyobjloader" FILES ${TINYNGINE_TINYOBJLOADER_SOURCES})
 endif()
 
 Enable_Cpp11(tinyngine)
