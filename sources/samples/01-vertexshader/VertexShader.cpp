@@ -141,7 +141,7 @@ private:
 	uint32_t mWindowHeight;
 	float mAspect;
 
-	CubeGeometry mCube;
+	Geometry mCube;
 	std::vector<uint8_t> mColors;
 
 	VertexFormat mPosVertexFormat;

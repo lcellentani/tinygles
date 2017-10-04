@@ -6,7 +6,7 @@
 namespace tinyngine
 {
 
-struct CubeGeometry {
+struct Geometry {
 	uint32_t numVertices;
 	std::vector<float> positions;
 	std::vector<float> normals;
@@ -16,17 +16,12 @@ struct CubeGeometry {
 	std::vector<uint32_t> indices;
 };
 
-/*struct ObjGeometrySOA {
-	uint32_t numVertices;
-	std::vector<float> positions;
-	std::vector<float> normals;
-	std::vector<float> texcoords;
+struct ObjGeometry {
+	uint32_t numShapes;
+	std::vector<Geometry> shapes;
+};
 
-	uint32_t numIndices;
-	std::vector<uint32_t> indices;
-};*/
-
-void GenerateCube(float scale, CubeGeometry& result);
-void LoadObj(const  char * filename, bool triangulate = true);
+void GenerateCube(float scale, Geometry& result);
+void LoadObj(const  char * filename, bool triangulate, ObjGeometry& result);
 
 } // namespace tinyngine

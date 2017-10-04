@@ -38,8 +38,8 @@ Release/
 *.app
 *.ilk
 *.pdb
+*.bat
 
-media
 sources/Config.h
 
 !/3rdparty/gles/angle/lib/**
@@ -49,4 +49,4 @@ sources/Config.h
 !/bin/libEGL.dll
 !/bin/libGLES_CM.dll
 !/bin/libGLESv2.dll
-*.bat
+!media/**

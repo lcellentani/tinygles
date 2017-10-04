@@ -279,7 +279,7 @@ private:
 	uint32_t mWindowHeight;
 	float mAspect;
 
-	CubeGeometry mCube;
+	Geometry mCube;
 
 	//GLuint mShaderProgram = 0;
 

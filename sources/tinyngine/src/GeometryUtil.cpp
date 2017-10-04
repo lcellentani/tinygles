@@ -2,6 +2,8 @@
 #include "Log.h"
 
 #include <cstring>
+#include <algorithm>
+
 #include <fstream>
 #include <iostream>
 #include "tiny_obj_loader.h"
@@ -9,7 +11,7 @@
 namespace tinyngine
 {
 
-void GenerateCube(float scale, CubeGeometry& result) {
+void GenerateCube(float scale, Geometry& result) {
 	const float cubeVerts[] = {
 		-0.5f, -0.5f, -0.5f,
 		-0.5f, -0.5f,  0.5f,
@@ -131,7 +133,10 @@ void GenerateCube(float scale, CubeGeometry& result) {
 	}
 }
 
-void LoadObj(const  char * filename, bool triangulate) {
+void LoadObj(const  char * filename, bool triangulate, ObjGeometry& result) {
+	result.numShapes = 0;
+	result.shapes.clear();
+	
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -139,85 +144,82 @@ void LoadObj(const  char * filename, bool triangulate) {
 	std::string err;
 	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, nullptr, triangulate);
 	if (ret) {
-		Log(Logger::Information, "# of vertices  : %d", (attrib.vertices.size() / 3));
-		Log(Logger::Information, "# of normals  : %d", (attrib.normals.size() / 3));
-		Log(Logger::Information, "# of texcoords  : %d", (attrib.texcoords.size() / 2));
-		Log(Logger::Information, "# of shapes  : %d", shapes.size());
-		Log(Logger::Information, "# of materials  : %d", materials.size());
-
-		for (size_t v = 0; v < attrib.vertices.size() / 3; v++) {
-			Log(Logger::Information, "  v[%ld] = (%f, %f, %f)", static_cast<long>(v),
-				static_cast<const double>(attrib.vertices[3 * v + 0]),
-				static_cast<const double>(attrib.vertices[3 * v + 1]),
-				static_cast<const double>(attrib.vertices[3 * v + 2]));
-		}
-		for (size_t v = 0; v < attrib.normals.size() / 3; v++) {
-			Log(Logger::Information, "  n[%ld] = (%f, %f, %f)", static_cast<long>(v),
-				static_cast<const double>(attrib.normals[3 * v + 0]),
-				static_cast<const double>(attrib.normals[3 * v + 1]),
-				static_cast<const double>(attrib.normals[3 * v + 2]));
-		}
-		for (size_t v = 0; v < attrib.texcoords.size() / 2; v++) {
-			Log(Logger::Information, "  uv[%ld] = (%f, %f)", static_cast<long>(v),
-				static_cast<const double>(attrib.texcoords[2 * v + 0]),
-				static_cast<const double>(attrib.texcoords[2 * v + 1]));
-		}
-
 		for (size_t i = 0; i < shapes.size(); i++) {
-			Log(Logger::Information, "shape[%ld].name = %s", static_cast<long>(i), shapes[i].name.c_str());
-			Log(Logger::Information, "Size of shape[%ld].indices: %lu", static_cast<long>(i), static_cast<unsigned long>(shapes[i].mesh.indices.size()));
-			Log(Logger::Information, "shape[%ld].num_faces: %lu", static_cast<long>(i), static_cast<unsigned long>(shapes[i].mesh.num_face_vertices.size()));
+			std::vector<tinyobj::index_t> vertices;
+			Geometry newGeometry{ 0 };
 
 			size_t index_offset = 0;
-			// For each face
 			for (size_t f = 0; f < shapes[i].mesh.num_face_vertices.size(); f++) {
 				size_t fnum = shapes[i].mesh.num_face_vertices[f];
-				Log(Logger::Information, "  face[%ld].fnum = %ld", static_cast<long>(f), static_cast<unsigned long>(fnum));
-
-				// For each vertex in the face
 				for (size_t v = 0; v < fnum; v++) {
-					tinyobj::index_t idx = shapes[i].mesh.indices[index_offset + v];
-					Log(Logger::Information, "    face[%ld].v[%ld].idx = %d/%d/%d", static_cast<long>(f), static_cast<long>(v), idx.vertex_index, idx.normal_index, idx.texcoord_index);
+					tinyobj::index_t thisIdx = shapes[i].mesh.indices[index_offset + v];
+					auto elem = std::find_if(std::begin(vertices), std::end(vertices), [&thisIdx](const tinyobj::index_t otherIdx) {
+						return thisIdx.vertex_index == otherIdx.vertex_index && thisIdx.normal_index == otherIdx.normal_index && thisIdx.texcoord_index == otherIdx.texcoord_index;
+					});
+					if (elem == vertices.end()) {
+						vertices.push_back(thisIdx);
+					}
 				}
-				Log(Logger::Information, "  face[%ld].material_id = %d", static_cast<long>(f), shapes[i].mesh.material_ids[f]);
-
+				index_offset += fnum;
+			}
+			
+			index_offset = 0;
+			for (size_t f = 0; f < shapes[i].mesh.num_face_vertices.size(); f++) {
+				size_t fnum = shapes[i].mesh.num_face_vertices[f];
+				for (size_t v = 0; v < fnum; v++) {
+					tinyobj::index_t thisIdx = shapes[i].mesh.indices[index_offset + v];
+					for (size_t n = 0; n < vertices.size(); n++) {
+						tinyobj::index_t otherIdx = vertices[n];
+						if (thisIdx.vertex_index == otherIdx.vertex_index && thisIdx.normal_index == otherIdx.normal_index && thisIdx.texcoord_index == otherIdx.texcoord_index) {
+							newGeometry.indices.push_back(n);
+							newGeometry.numIndices++;
+							break;
+						}
+					}
+				}
 				index_offset += fnum;
 			}
 
-			/*Log(Logger::Information, "shape[%ld].num_tags: %lu\n", static_cast<long>(i), static_cast<unsigned long>(shapes[i].mesh.tags.size()));
-			for (size_t t = 0; t < shapes[i].mesh.tags.size(); t++) {
-				printf("  tag[%ld] = %s ", static_cast<long>(t),
-					shapes[i].mesh.tags[t].name.c_str());
-				printf(" ints: [");
-				for (size_t j = 0; j < shapes[i].mesh.tags[t].intValues.size(); ++j) {
-					printf("%ld", static_cast<long>(shapes[i].mesh.tags[t].intValues[j]));
-					if (j < (shapes[i].mesh.tags[t].intValues.size() - 1)) {
-						printf(", ");
-					}
+			int32_t numVertices = attrib.vertices.size() / 3;
+			int32_t numNormals = attrib.normals.size() / 3;
+			int32_t numTexcoords = attrib.texcoords.size() / 2;
+			for(size_t ii = 0; ii < vertices.size(); ii++) {
+				tinyobj::index_t idx = vertices[ii];
+				if (numVertices > 0 && idx.vertex_index < numVertices) {
+					newGeometry.positions.push_back(attrib.vertices[3 * idx.vertex_index]);
+					newGeometry.positions.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
+					newGeometry.positions.push_back(attrib.vertices[3 * idx.vertex_index + 2]);
 				}
-				printf("]");
+				if (numNormals > 0 && idx.normal_index < numNormals) {
+					newGeometry.normals.push_back(attrib.normals[3 * idx.normal_index]);
+					newGeometry.normals.push_back(attrib.normals[3 * idx.normal_index + 1]);
+					newGeometry.normals.push_back(attrib.normals[3 * idx.normal_index + 2]);
+				}
+				if (numTexcoords > 0 && idx.texcoord_index < numTexcoords) {
+					newGeometry.texcoords.push_back(attrib.texcoords[2 * idx.texcoord_index]);
+					newGeometry.texcoords.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
+				}
+				newGeometry.numVertices++;
+			}
 
-				printf(" floats: [");
-				for (size_t j = 0; j < shapes[i].mesh.tags[t].floatValues.size(); ++j) {
-					printf("%f", static_cast<const double>(
-						shapes[i].mesh.tags[t].floatValues[j]));
-					if (j < (shapes[i].mesh.tags[t].floatValues.size() - 1)) {
-						printf(", ");
-					}
-				}
-				printf("]");
-
-				printf(" strings: [");
-				for (size_t j = 0; j < shapes[i].mesh.tags[t].stringValues.size(); ++j) {
-					printf("%s", shapes[i].mesh.tags[t].stringValues[j].c_str());
-					if (j < (shapes[i].mesh.tags[t].stringValues.size() - 1)) {
-						printf(", ");
-					}
-				}
-				printf("]");
-				printf("\n");
-			}*/
+			result.shapes.push_back(newGeometry);
+			result.numShapes++;
 		}
+
+		/*Log(Logger::Information, "# of shapes: %d", result.numShapes);
+		for (auto& shape : result.shapes) {
+			Log(Logger::Information, "# of vertices  : %d", shape.positions.size());
+			Log(Logger::Information, "# of normals  : %d", shape.normals.size());
+			Log(Logger::Information, "# of texcoords  : %d", shape.texcoords.size());
+			for (size_t ii = 0; ii < shape.positions.size(); ii += 3) {
+				Log(Logger::Information, "v[%d]: %f, %f, %f", (ii / 3), shape.positions[ii], shape.positions[ii + 1], shape.positions[ii + 2]);
+			}
+
+			Log(Logger::Information, "# of indexes  : %d", shape.indices.size());
+			for (size_t ii = 0; ii < shape.indices.size(); ii++) {
+				Log(Logger::Information, "i[%d]: %d", ii, shape.indices[ii]);
+			}
+		}*/
 	}
 }
 

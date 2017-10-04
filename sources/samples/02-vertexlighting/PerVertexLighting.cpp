@@ -11,9 +11,9 @@
 namespace
 {
 
-static float cMaterialAmbient[] = { 0.1f, 0.1f, 0.1f };
+static float cMaterialAmbient[] = { 0.2f, 0.0f, 0.2f };
 static float cLightAmbient[] = { 1.0f, 1.0f, 1.0f };
-static float cMaterialDiffuse[] = { 1.0f, 0.0f, 0.0f };
+static float cMaterialDiffuse[] = { 0.9f, 0.0f, 0.0f };
 static float cLightDiffuse[] = { 1.0f, 1.0f, 1.0f };
 static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
 
@@ -47,14 +47,12 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		GenerateCube(1.0f, mCube);
+		//LoadObj("Cube.obj", true, mObject);
+		LoadObj("Monkey.obj", true, mObject);
 
-		LoadObj("Cube.obj");
-		//LoadObj("Sphere.obj");
-		//LoadObj("Monkey.obj");
-
-		mColors.reserve(mCube.numVertices * 4);
-		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
+		Geometry& shape = mObject.shapes[0];
+		mColors.reserve(shape.numVertices * 4);
+		for (uint32_t i = 0; i < shape.numVertices * 4; i += 4) {
 			mColors.push_back(255);
 			mColors.push_back(255);
 			mColors.push_back(255);
@@ -65,10 +63,10 @@ public:
 		mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
-		mPositionsHandle = renderer->CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
-		mNornalsHandle = renderer->CreateVertexBuffer(&mCube.normals[0], sizeof(mCube.normals[0]) * mCube.numVertices * 3, mPosVertexFormat);
+		mPositionsHandle = renderer->CreateVertexBuffer(&shape.positions[0], sizeof(shape.positions[0]) * shape.numVertices * 3, mPosVertexFormat);
+		mNornalsHandle = renderer->CreateVertexBuffer(&shape.normals[0], sizeof(shape.normals[0]) * shape.numVertices * 3, mPosVertexFormat);
 		mColorsHandle = renderer->CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
-		mIndexesBufferHandle = renderer->CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
+		mIndexesBufferHandle = renderer->CreateIndexBuffer(&shape.indices[0], sizeof(shape.indices[0]) * shape.numIndices);
 
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
@@ -128,6 +126,7 @@ public:
 		mTransformHelper.LoadMatrix(mView);
 
 		renderer->SetState(RendererStateType::CullFace, true);
+		renderer->SetState(RendererStateType::DepthTest, true);
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
@@ -146,7 +145,7 @@ public:
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
-		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
+		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92), 1.0f);
 
 		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
 		renderer->SetVertexBuffer(mNornalsHandle, Attributes::Normal);
@@ -162,7 +161,7 @@ public:
 		renderer->SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
 
 		renderer->SetIndexBuffer(mIndexesBufferHandle);
-		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
+		renderer->DrawElements(PrimitiveType::Triangles, mObject.shapes[0].numIndices);
 
 		renderer->Commit();
 	}
@@ -187,7 +186,7 @@ private:
 	uint32_t mWindowHeight;
 	float mAspect;
 
-	CubeGeometry mCube;
+	ObjGeometry mObject;
 	std::vector<uint8_t> mColors;
 
 	VertexFormat mPosVertexFormat;
