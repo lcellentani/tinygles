@@ -15,6 +15,9 @@ static float cMaterialAmbient[] = { 0.2f, 0.0f, 0.2f };
 static float cLightAmbient[] = { 1.0f, 1.0f, 1.0f };
 static float cMaterialDiffuse[] = { 0.9f, 0.0f, 0.0f };
 static float cLightDiffuse[] = { 1.0f, 1.0f, 1.0f };
+static float cMaterialSpecular[] = { 1.0f, 0.9f, 0.9f };
+static float cLightSpecular[] = { 1.0f, 1.0f, 1.0f };
+static float cShininessFactor = 15.0f;
 static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
 
 }
@@ -48,6 +51,7 @@ public:
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
 		//LoadObj("Cube.obj", true, mObject);
+		//LoadObj("Sphere.obj", true, mObject);
 		LoadObj("Monkey.obj", true, mObject);
 
 		Geometry& shape = mObject.shapes[0];
@@ -87,6 +91,9 @@ public:
 			uniform mediump vec3 u_lightAmbient;
 			uniform mediump vec3 u_materialDiffuse;
 			uniform mediump vec3 u_lightDiffuse;
+			uniform mediump vec3 u_materialSpecular;
+			uniform mediump vec3 u_lightSpecular;
+			uniform mediump float u_shininessFactor;
 			uniform highp vec3 u_lightPosition;
 			varying lowp vec4 v_color;
 			void main(void)
@@ -95,10 +102,14 @@ public:
 				vec3 lightVector = normalize(u_lightPosition - modelViewPos);
 				vec3 normal = normalize(vec3(u_modelView * vec4(a_normal, 0.0)));
 				
+				vec3 V = normalize(-modelViewPos);
+				vec3 R = reflect(-lightVector, normal);
+
 				vec3 ambient = u_materialAmbient * u_lightAmbient;
 				vec3 diffuse = (u_materialDiffuse * u_lightDiffuse) * max(0.0, dot(normal, lightVector));
+				vec3 specular = (u_materialSpecular * u_lightSpecular) * pow(max(0.0, dot(R, V)), u_shininessFactor);
 				
-				v_color.rgb = ambient + diffuse;
+				v_color.rgb = ambient + diffuse + specular;
 				v_color.a = 1.0;
 				gl_Position = u_modelViewProj * a_position;
 			}
@@ -112,6 +123,9 @@ public:
 		mLightAmbientHandle = renderer->GetUniform(mProgramHandle, "u_lightAmbient");
 		mMaterialDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_materialDiffuse");
 		mLightDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_lightDiffuse");
+		mMaterialSpecularHandle = renderer->GetUniform(mProgramHandle, "u_materialSpecular");
+		mLightSpecularHandle = renderer->GetUniform(mProgramHandle, "u_lightSpecular");
+		mShininessFactorHandle = renderer->GetUniform(mProgramHandle, "u_shininessFactor");
 		mLightPositionHandle = renderer->GetUniform(mProgramHandle, "u_lightPosition");
 
 		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
@@ -158,6 +172,9 @@ public:
 		renderer->SetUniformFloat3(mProgramHandle, mLightAmbientHandle, &cLightAmbient[0]);
 		renderer->SetUniformFloat3(mProgramHandle, mMaterialDiffuseHandle, &cMaterialDiffuse[0]);
 		renderer->SetUniformFloat3(mProgramHandle, mLightDiffuseHandle, &cLightDiffuse[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mMaterialSpecularHandle, &cMaterialSpecular[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mLightSpecularHandle, &cLightSpecular[0]);
+		renderer->SetUniformFloat(mProgramHandle, mShininessFactorHandle, cShininessFactor);
 		renderer->SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
 
 		renderer->SetIndexBuffer(mIndexesBufferHandle);
@@ -197,6 +214,9 @@ private:
 	UniformHandle mLightAmbientHandle;
 	UniformHandle mMaterialDiffuseHandle;
 	UniformHandle mLightDiffuseHandle;
+	UniformHandle mMaterialSpecularHandle;
+	UniformHandle mLightSpecularHandle;
+	UniformHandle mShininessFactorHandle;
 	UniformHandle mLightPositionHandle;
 
 	VertexBufferHandle mPositionsHandle;

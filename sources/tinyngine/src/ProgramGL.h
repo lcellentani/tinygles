@@ -23,6 +23,7 @@ public:
 
 	UniformHandle GetUniformHandle(const char* uniformName) const;
 
+	void SetUniformFloat(const UniformHandle& uniformHandle, float data);
 	void SetUniformFloat3(const UniformHandle& uniformHandle, const float* data);
 	void SetUniformMat4(const UniformHandle& uniformHandle, const float* data, bool transpose);
 
@@ -32,12 +33,9 @@ public:
 private:
 	GLint mId;
 	std::array<GLint, Attributes::Count> mAttributeLocations;
-	//GLint mAttributeLocations[Attributes::Count];
 	uint16_t mUsedAttributesCount;
 	std::array<uint8_t, Attributes::Count> mUsedAttributes;
-	//uint8_t mUsedAttributes[Attributes::Count];
 	std::vector<Uniform> mUniforms;
-	//Uniforms mPredefinedUniforms[PredefinedUniforms::Count];
 };
 
 } // namespace tinyngine

@@ -44,6 +44,7 @@ public:
 	void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) override;
 
 	UniformHandle GetUniform(const ProgramHandle& handle, const char* uniformName) const override;
+	void SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) override;
 	void SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) override;
 	void SetUniformMat4(const ProgramHandle& handle, const UniformHandle& uniform, const float* data, bool transpose) override;
 

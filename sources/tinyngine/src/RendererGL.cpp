@@ -230,6 +230,14 @@ UniformHandle RendererGL::GetUniform(const ProgramHandle& programHandle, const c
 	return program.GetUniformHandle(uniformName);
 }
 
+void RendererGL::SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) {
+	if (!programHandle.IsValid()) {
+		return;
+	}
+	auto& program = mImpl->mPrograms[programHandle.mHandle];
+	program.SetUniformFloat(uniformHandle, data);
+}
+
 void RendererGL::SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) {
 	if (!programHandle.IsValid()) {
 		return;
