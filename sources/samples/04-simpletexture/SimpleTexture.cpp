@@ -1,6 +1,5 @@
 #include "Application.h"
 #include "GeometryUtil.h"
-#include "ShadersUtil.h"
 #include "Log.h"
 
 #include <vector>

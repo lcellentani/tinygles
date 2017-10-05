@@ -2,6 +2,7 @@
 #include "GeometryUtil.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
+#include "StringUtils.h"
 #include "Log.h"
 
 #include "glm/mat4x4.hpp"
@@ -11,20 +12,23 @@
 namespace
 {
 
-static float cMaterialAmbient[] = { 0.1f, 0.1f, 0.1f };
+static float cMaterialAmbient[] = { 0.2f, 0.0f, 0.2f };
 static float cLightAmbient[] = { 1.0f, 1.0f, 1.0f };
-static float cMaterialDiffuse[] = { 1.0f, 0.0f, 0.0f };
+static float cMaterialDiffuse[] = { 0.9f, 0.0f, 0.0f };
 static float cLightDiffuse[] = { 1.0f, 1.0f, 1.0f };
+static float cMaterialSpecular[] = { 1.0f, 0.9f, 0.9f };
+static float cLightSpecular[] = { 1.0f, 1.0f, 1.0f };
+static float cShininessFactor = 15.0f;
 static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
 
 }
 
 using namespace tinyngine;
 
-class PerPIxelLighting : public Application {
+class PhongShading : public Application {
 public:
-	PerPIxelLighting() = default;
-	virtual ~PerPIxelLighting() {
+	PhongShading() = default;
+	virtual ~PhongShading() {
 
 	}
 
@@ -47,10 +51,14 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		GenerateCube(1.0f, mCube);
+		//LoadObj("models/Cube.obj", true, mObject);
+		//LoadObj("models/Sphere.obj", true, mObject);
+		LoadObj("models/Monkey.obj", true, mObject);
+		//LoadObj("models/Teapot.obj", true, mObject);
 
-		mColors.reserve(mCube.numVertices * 4);
-		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
+		Geometry& shape = mObject.shapes[0];
+		mColors.reserve(shape.numVertices * 4);
+		for (uint32_t i = 0; i < shape.numVertices * 4; i += 4) {
 			mColors.push_back(255);
 			mColors.push_back(255);
 			mColors.push_back(255);
@@ -61,48 +69,18 @@ public:
 		mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
-		mPositionsHandle = renderer->CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
-		mNornalsHandle = renderer->CreateVertexBuffer(&mCube.normals[0], sizeof(mCube.normals[0]) * mCube.numVertices * 3, mPosVertexFormat);
+		mPositionsHandle = renderer->CreateVertexBuffer(&shape.positions[0], sizeof(shape.positions[0]) * shape.numVertices * 3, mPosVertexFormat);
+		mNornalsHandle = renderer->CreateVertexBuffer(&shape.normals[0], sizeof(shape.normals[0]) * shape.numVertices * 3, mPosVertexFormat);
 		mColorsHandle = renderer->CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
-		mIndexesBufferHandle = renderer->CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
+		mIndexesBufferHandle = renderer->CreateIndexBuffer(&shape.indices[0], sizeof(shape.indices[0]) * shape.numIndices);
 
-		const char* fragmentShaderSource = SHADER_SOURCE
-		(
-			varying lowp vec4 v_color;
-			void main(void)
-			{
-				gl_FragColor = v_color;
-			}
-		);
-		const char* vertexShaderSource = SHADER_SOURCE
-		(
-			attribute highp vec4 a_position;
-			attribute highp vec3 a_normal;
-			attribute lowp vec4 a_color0;
-			uniform mediump mat4 u_modelViewProj;
-			uniform mediump mat4 u_modelView;
-			uniform mediump vec3 u_materialAmbient;
-			uniform mediump vec3 u_lightAmbient;
-			uniform mediump vec3 u_materialDiffuse;
-			uniform mediump vec3 u_lightDiffuse;
-			uniform highp vec3 u_lightPosition;
-			varying lowp vec4 v_color;
-			void main(void)
-			{
-				vec3 modelViewPos = vec3(u_modelView * a_position);
-				vec3 lightVector = normalize(u_lightPosition - modelViewPos);
-				vec3 normal = normalize(vec3(u_modelView * vec4(a_normal, 0.0)));
-				
-				vec3 ambient = u_materialAmbient * u_lightAmbient;
-				vec3 diffuse = (u_materialDiffuse * u_lightDiffuse) * max(0.0, dot(normal, lightVector));
-				
-				v_color.rgb = ambient + diffuse;
-				v_color.a = 1.0;
-				gl_Position = u_modelViewProj * a_position;
-			}
-		);
-		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
-		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		std::string vertexShaderSource;
+		StringUtils::ReadFileToString("shaders/phong_vert_2.glsl", vertexShaderSource);
+		std::string fragmentShaderSource;
+		StringUtils::ReadFileToString("shaders/phong_frag_2.glsl", fragmentShaderSource);
+
+		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource.c_str());
+		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource.c_str());
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
 		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
 		mModelViewHandle = renderer->GetUniform(mProgramHandle, "u_modelView");
@@ -110,10 +88,13 @@ public:
 		mLightAmbientHandle = renderer->GetUniform(mProgramHandle, "u_lightAmbient");
 		mMaterialDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_materialDiffuse");
 		mLightDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_lightDiffuse");
+		mMaterialSpecularHandle = renderer->GetUniform(mProgramHandle, "u_materialSpecular");
+		mLightSpecularHandle = renderer->GetUniform(mProgramHandle, "u_lightSpecular");
+		mShininessFactorHandle = renderer->GetUniform(mProgramHandle, "u_shininessFactor");
 		mLightPositionHandle = renderer->GetUniform(mProgramHandle, "u_lightPosition");
 
 		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
-		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, -4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		mRight = glm::vec3(1.0f, 0.0f, 0.0f);
 		mAngles = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -124,6 +105,7 @@ public:
 		mTransformHelper.LoadMatrix(mView);
 
 		renderer->SetState(RendererStateType::CullFace, true);
+		renderer->SetState(RendererStateType::DepthTest, true);
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
@@ -135,14 +117,14 @@ public:
 		if (mAngles.y > 360.0f) {
 			mAngles.y -= 360.0f;
 		}
-		
+
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Model);
 		mTransformHelper.LoadIdentity();
 		mTransformHelper.Rotate(mAngles.y, mUp);
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
 		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
-		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
+		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92), 1.0f);
 
 		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
 		renderer->SetVertexBuffer(mNornalsHandle, Attributes::Normal);
@@ -155,10 +137,13 @@ public:
 		renderer->SetUniformFloat3(mProgramHandle, mLightAmbientHandle, &cLightAmbient[0]);
 		renderer->SetUniformFloat3(mProgramHandle, mMaterialDiffuseHandle, &cMaterialDiffuse[0]);
 		renderer->SetUniformFloat3(mProgramHandle, mLightDiffuseHandle, &cLightDiffuse[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mMaterialSpecularHandle, &cMaterialSpecular[0]);
+		renderer->SetUniformFloat3(mProgramHandle, mLightSpecularHandle, &cLightSpecular[0]);
+		renderer->SetUniformFloat(mProgramHandle, mShininessFactorHandle, cShininessFactor);
 		renderer->SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
 
 		renderer->SetIndexBuffer(mIndexesBufferHandle);
-		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
+		renderer->DrawElements(PrimitiveType::Triangles, mObject.shapes[0].numIndices);
 
 		renderer->Commit();
 	}
@@ -183,7 +168,7 @@ private:
 	uint32_t mWindowHeight;
 	float mAspect;
 
-	Geometry mCube;
+	ObjGeometry mObject;
 	std::vector<uint8_t> mColors;
 
 	VertexFormat mPosVertexFormat;
@@ -194,6 +179,9 @@ private:
 	UniformHandle mLightAmbientHandle;
 	UniformHandle mMaterialDiffuseHandle;
 	UniformHandle mLightDiffuseHandle;
+	UniformHandle mMaterialSpecularHandle;
+	UniformHandle mLightSpecularHandle;
+	UniformHandle mShininessFactorHandle;
 	UniformHandle mLightPositionHandle;
 
 	VertexBufferHandle mPositionsHandle;
@@ -203,7 +191,7 @@ private:
 
 	TransformHelper mTransformHelper;
 
-	glm::vec3 mSpeed{ 2.f, 1.f, 0.0f };
+	glm::vec3 mSpeed{ 1.0f, 2.5f, 0.0f };
 	glm::vec3 mAngles;
 	glm::mat4 mProj;
 	glm::mat4 mView;
@@ -213,5 +201,5 @@ private:
 
 
 extern "C" tinyngine::Application * CreateApplication() {
-	return new PerPIxelLighting();
+	return new PhongShading();
 }

@@ -103,11 +103,11 @@ std::string EGLPlatformContext::GetInfo() {
 
 	lines << "\nEGL:\n";
 
-	tmp = StringUtils::createFormatted("\tVendor:   %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_VENDOR));
+	tmp = StringUtils::CreateFormatted("\tVendor:   %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_VENDOR));
 	lines << tmp;
-	tmp = StringUtils::createFormatted("\tVersion:  %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_VERSION));
+	tmp = StringUtils::CreateFormatted("\tVersion:  %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_VERSION));
 	lines << tmp;
-	tmp = StringUtils::createFormatted("\tExtensions:  %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_EXTENSIONS));
+	tmp = StringUtils::CreateFormatted("\tExtensions:  %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_EXTENSIONS));
 	lines << tmp;
 
 	if (egl::QueryContext(mEGLDisplay, mEGLContext, EGL_CONTEXT_PRIORITY_LEVEL_IMG, &i32Values[0])) {
@@ -131,15 +131,15 @@ std::string EGLPlatformContext::GetInfo() {
 	}
 
 #if defined(EGL_VERSION_1_2)
-	tmp = StringUtils::createFormatted("\tClient APIs:  %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_CLIENT_APIS));
+	tmp = StringUtils::CreateFormatted("\tClient APIs:  %s\n", (const char*)egl::QueryString(mEGLDisplay, EGL_CLIENT_APIS));
 	lines << tmp;
 #endif
 
 	egl::QuerySurface(mEGLDisplay, mEGLSurface, EGL_WIDTH, &i32Values[0]);
-	tmp = StringUtils::createFormatted("\nSurface Width:  %i\n", i32Values[0]);
+	tmp = StringUtils::CreateFormatted("\nSurface Width:  %i\n", i32Values[0]);
 	lines << tmp;
 	egl::QuerySurface(mEGLDisplay, mEGLSurface, EGL_HEIGHT, &i32Values[0]);
-	tmp = StringUtils::createFormatted("Surface Height: %i\n\n", i32Values[0]);
+	tmp = StringUtils::CreateFormatted("Surface Height: %i\n\n", i32Values[0]);
 	lines << tmp;
 
 	EGLConfig config;
@@ -149,7 +149,7 @@ std::string EGLPlatformContext::GetInfo() {
 
 	lines << ("EGL Surface:\n");
 
-	tmp = StringUtils::createFormatted("\tConfig ID:\t%i\n", i32Values[0]);
+	tmp = StringUtils::CreateFormatted("\tConfig ID:\t%i\n", i32Values[0]);
 	lines << tmp;
 
 	// Color buffer
@@ -158,25 +158,25 @@ std::string EGLPlatformContext::GetInfo() {
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_GREEN_SIZE, &i32Values[2]);
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_BLUE_SIZE, &i32Values[3]);
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_ALPHA_SIZE, &i32Values[4]);
-	tmp = StringUtils::createFormatted("\tColor Buffer:  %i bits (R%i G%i B%i A%i)\n", i32Values[0], i32Values[1], i32Values[2], i32Values[3], i32Values[4]);
+	tmp = StringUtils::CreateFormatted("\tColor Buffer:  %i bits (R%i G%i B%i A%i)\n", i32Values[0], i32Values[1], i32Values[2], i32Values[3], i32Values[4]);
 	lines << tmp;
 	// Depth buffer
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_DEPTH_SIZE, &i32Values[0]);
-	tmp = StringUtils::createFormatted("\tDepth Buffer:   %i bits\n", i32Values[0]);
+	tmp = StringUtils::CreateFormatted("\tDepth Buffer:   %i bits\n", i32Values[0]);
 	lines << tmp;
 	// Stencil Buffer
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_STENCIL_SIZE, &i32Values[0]);
-	tmp = StringUtils::createFormatted("\tStencil Buffer: %i bits\n", i32Values[0]);
+	tmp = StringUtils::CreateFormatted("\tStencil Buffer: %i bits\n", i32Values[0]);
 	lines << tmp;
 	// EGL surface bits support
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_SURFACE_TYPE, &i32Values[0]);
-	tmp = StringUtils::createFormatted("\tSurface type:   %s%s%s\n", i32Values[0] & EGL_WINDOW_BIT ? "WINDOW " : "", i32Values[1] & EGL_PBUFFER_BIT ? "PBUFFER " : "", i32Values[2] & EGL_PIXMAP_BIT ? "PIXMAP " : "");
+	tmp = StringUtils::CreateFormatted("\tSurface type:   %s%s%s\n", i32Values[0] & EGL_WINDOW_BIT ? "WINDOW " : "", i32Values[1] & EGL_PBUFFER_BIT ? "PBUFFER " : "", i32Values[2] & EGL_PIXMAP_BIT ? "PIXMAP " : "");
 	lines << tmp;
 
 	// EGL renderable type
 #if defined(EGL_VERSION_1_2)
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_RENDERABLE_TYPE, &i32Values[0]);
-	tmp = StringUtils::createFormatted("\tRenderable type: %s%s%s%s\n",
+	tmp = StringUtils::CreateFormatted("\tRenderable type: %s%s%s%s\n",
 		i32Values[0] & EGL_OPENVG_BIT ? "OPENVG " : "",
 		i32Values[0] & EGL_OPENGL_ES_BIT ? "OPENGL_ES " : "",
 #if defined(EGL_OPENGL_BIT)
@@ -188,9 +188,9 @@ std::string EGLPlatformContext::GetInfo() {
 
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_SAMPLE_BUFFERS, &i32Values[0]);
 	egl::GetConfigAttrib(mEGLDisplay, config, EGL_SAMPLES, &i32Values[1]);
-	tmp = StringUtils::createFormatted("\tSample buffer No.: %i\n", i32Values[0]);
+	tmp = StringUtils::CreateFormatted("\tSample buffer No.: %i\n", i32Values[0]);
 	lines << tmp;
-	tmp = StringUtils::createFormatted("\tSamples per pixel: %i", i32Values[1]);
+	tmp = StringUtils::CreateFormatted("\tSamples per pixel: %i", i32Values[1]);
 	lines << tmp;
 
 	return lines.str();

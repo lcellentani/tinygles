@@ -2,6 +2,7 @@
 #include "GeometryUtil.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
+#include "StringUtils.h"
 #include "Log.h"
 
 #include "glm/mat4x4.hpp"
@@ -24,10 +25,10 @@ static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
 
 using namespace tinyngine;
 
-class PerVertexLighting : public Application {
+class GouraudShading : public Application {
 public:
-	PerVertexLighting() = default;
-	virtual ~PerVertexLighting() {
+	GouraudShading() = default;
+	virtual ~GouraudShading() {
 
 	}
 
@@ -50,9 +51,9 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		//LoadObj("Cube.obj", true, mObject);
-		//LoadObj("Sphere.obj", true, mObject);
-		LoadObj("Monkey.obj", true, mObject);
+		//LoadObj("models/Cube.obj", true, mObject);
+		//LoadObj("models/Sphere.obj", true, mObject);
+		LoadObj("models/Monkey.obj", true, mObject);
 
 		Geometry& shape = mObject.shapes[0];
 		mColors.reserve(shape.numVertices * 4);
@@ -72,50 +73,13 @@ public:
 		mColorsHandle = renderer->CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
 		mIndexesBufferHandle = renderer->CreateIndexBuffer(&shape.indices[0], sizeof(shape.indices[0]) * shape.numIndices);
 
-		const char* fragmentShaderSource = SHADER_SOURCE
-		(
-			varying lowp vec4 v_color;
-			void main(void)
-			{
-				gl_FragColor = v_color;
-			}
-		);
-		const char* vertexShaderSource = SHADER_SOURCE
-		(
-			attribute highp vec4 a_position;
-			attribute highp vec3 a_normal;
-			attribute lowp vec4 a_color0;
-			uniform mediump mat4 u_modelViewProj;
-			uniform mediump mat4 u_modelView;
-			uniform mediump vec3 u_materialAmbient;
-			uniform mediump vec3 u_lightAmbient;
-			uniform mediump vec3 u_materialDiffuse;
-			uniform mediump vec3 u_lightDiffuse;
-			uniform mediump vec3 u_materialSpecular;
-			uniform mediump vec3 u_lightSpecular;
-			uniform mediump float u_shininessFactor;
-			uniform highp vec3 u_lightPosition;
-			varying lowp vec4 v_color;
-			void main(void)
-			{
-				vec3 modelViewPos = vec3(u_modelView * a_position);
-				vec3 lightVector = normalize(u_lightPosition - modelViewPos);
-				vec3 normal = normalize(vec3(u_modelView * vec4(a_normal, 0.0)));
-				
-				vec3 V = normalize(-modelViewPos);
-				vec3 R = reflect(-lightVector, normal);
+		std::string vertexShaderSource;
+		StringUtils::ReadFileToString("shaders/gouraud_vert_2.glsl", vertexShaderSource);
+		std::string fragmentShaderSource;
+		StringUtils::ReadFileToString("shaders/gouraud_frag_2.glsl", fragmentShaderSource);
 
-				vec3 ambient = u_materialAmbient * u_lightAmbient;
-				vec3 diffuse = (u_materialDiffuse * u_lightDiffuse) * max(0.0, dot(normal, lightVector));
-				vec3 specular = (u_materialSpecular * u_lightSpecular) * pow(max(0.0, dot(R, V)), u_shininessFactor);
-				
-				v_color.rgb = ambient + diffuse + specular;
-				v_color.a = 1.0;
-				gl_Position = u_modelViewProj * a_position;
-			}
-		);
-		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
-		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource.c_str());
+		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource.c_str());
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
 		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
 		mModelViewHandle = renderer->GetUniform(mProgramHandle, "u_modelView");
@@ -236,5 +200,5 @@ private:
 
 
 extern "C" tinyngine::Application * CreateApplication() {
-	return new PerVertexLighting();
+	return new GouraudShading();
 }

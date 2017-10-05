@@ -2,8 +2,10 @@
 
 #include <cctype>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
 
-namespace StringUtils {
+namespace {
 
 std::string vaFormatString(const char* format, va_list argumentList) {
 	bool result = true;
@@ -75,7 +77,11 @@ std::basic_string<wchar_t> vaFormatString(const wchar_t* const format, va_list a
 	return std::basic_string<wchar_t>(newString);
 }
 
-std::string createFormatted(const char* const format, ...) {
+}
+
+namespace StringUtils {
+
+std::string CreateFormatted(const char* const format, ...) {
 	// Calculate the length of the new string
 	va_list argumentList;
 	va_start(argumentList, format);
@@ -85,7 +91,7 @@ std::string createFormatted(const char* const format, ...) {
 	return newString;
 }
 
-std::basic_string<wchar_t> createFormatted(const wchar_t* const format, ...) {
+std::basic_string<wchar_t> CreateFormatted(const wchar_t* const format, ...) {
 	// Calculate the length of the new string
 	va_list argumentList;
 	va_start(argumentList, format);
@@ -94,14 +100,31 @@ std::basic_string<wchar_t> createFormatted(const wchar_t* const format, ...) {
 	return newString;
 }
 
-std::string toLower(std::string& str) {
+std::string ToLower(std::string& str) {
 	std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) -> unsigned char { return static_cast<unsigned char>(std::tolower(c)); });
 	return str;
 }
 
-std::string toLower(const std::string& str) {
+std::string ToLower(const std::string& str) {
 	std::string s = str;
-	return toLower(s);
+	return ToLower(s);
+}
+
+bool ReadFileToString(const char* source, std::string& content) {
+	bool result = false;
+	if (source) {
+		std::ifstream stream(source);
+		if (stream) {
+			stream.seekg(0, std::ios::end);
+			content.reserve(static_cast<unsigned int>(stream.tellg()));
+			stream.seekg(0, std::ios::beg);
+
+			content.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+
+			result = true;
+		}
+	}
+	return result;
 }
 
 } // namespace StringUtils
