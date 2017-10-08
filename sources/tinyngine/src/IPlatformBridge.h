@@ -2,6 +2,7 @@
 
 #include "PlatformDefine.h"
 #include "StopWatch.h"
+#include "EventQueue.h"
 
 namespace tinyngine
 {
@@ -15,6 +16,7 @@ public:
 protected:
 	float mFrameDelta;
 	std::unique_ptr<StopWatch> mStopWatch;
+	std::unique_ptr<EventQueue> mEventQueue;
 };
 
 } // namespace tinyngine

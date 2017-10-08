@@ -17,6 +17,10 @@ namespace tinyngine
 PlatformBridgeWin32::PlatformBridgeWin32() {
 	mFrameDelta = 0;
 	mStopWatch = std::make_unique<StopWatchWin32>();
+	mEventQueue = std::make_unique<EventQueue>();
+	mEventQueue->postExitEvent();
+	Event e = mEventQueue->poll();
+	(void)e;
 }
 
 int16_t PlatformBridgeWin32::Run() {

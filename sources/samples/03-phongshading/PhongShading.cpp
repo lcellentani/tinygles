@@ -6,7 +6,7 @@
 #include "Log.h"
 
 #include "glm/mat4x4.hpp"
-#include "glm//vec3.hpp"
+#include "glm/vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace
@@ -52,9 +52,10 @@ public:
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
 		//LoadObj("models/Cube.obj", true, mObject);
-		//LoadObj("models/Sphere.obj", true, mObject);
-		LoadObj("models/Monkey.obj", true, mObject);
+		LoadObj("models/Sphere.obj", true, mObject);
+		//LoadObj("models/Monkey.obj", true, mObject);
 		//LoadObj("models/Teapot.obj", true, mObject);
+		//LoadObj("models/Cylinder.obj", true, mObject);
 
 		Geometry& shape = mObject.shapes[0];
 		mColors.reserve(shape.numVertices * 4);
