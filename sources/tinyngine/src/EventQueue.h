@@ -28,12 +28,15 @@ public:
 
 class EventQueue {
 public:
+	EventQueue() = default;
+	~EventQueue() = default;
+
 	void postExitEvent() {
 		mQueue.push(ExitEvent());
 	}
 
-	Event poll() {
-		return mQueue.pop();
+	bool poll(Event* event) {
+		return mQueue.tryPop(event);
 	}
 
 private:

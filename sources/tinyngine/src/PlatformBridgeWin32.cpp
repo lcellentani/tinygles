@@ -1,4 +1,4 @@
-#include "PlatformBridgeWin32.h"
+/*#include "PlatformBridgeWin32.h"
 #include "IPlatformContext.h"
 #include "Application.h"
 #include "StopWatchWin32.h"
@@ -14,13 +14,17 @@ static constexpr uint32_t cDefaultHeight = 600;
 namespace tinyngine
 {
 
+PlatformBridgeWin32::PlatformBridgeWin32(HWND hwnd) : mHwnd(hwnd) {
+}
+
+Event PlatformBridgeWin32::PollEvents() {
+	return ExitEvent();
+}
+
 PlatformBridgeWin32::PlatformBridgeWin32() {
 	mFrameDelta = 0;
 	mStopWatch = std::make_unique<StopWatchWin32>();
 	mEventQueue = std::make_unique<EventQueue>();
-	mEventQueue->postExitEvent();
-	Event e = mEventQueue->poll();
-	(void)e;
 }
 
 int16_t PlatformBridgeWin32::Run() {
@@ -29,9 +33,19 @@ int16_t PlatformBridgeWin32::Run() {
 		return 1;
 	}
 
-	mApplication->InitApplication();
-
 	CreateNativeWindow();
+
+	MSG msg{ 0 };
+	while (!mExitRequired) {
+		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+
+	//==============================================================================================
+
+	mApplication->InitApplication();
 
 	mPlatformContext = CreatePlatformContext(mHwnd, mApplication->GetContextAttribs());
 	if (!mPlatformContext) {
@@ -47,15 +61,10 @@ int16_t PlatformBridgeWin32::Run() {
 
 	mStopWatch->Start();
 
-	MSG msg{ 0 };
 	while (!mExitRequired) {
+		// eventQueue.poll();
 		mFrameDelta = mStopWatch->GetTime();
 		mFrameDelta = (mFrameDelta + (3.0f / 60.0f)) * 0.25f;
-
-		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
 
 		mApplication->RenderFrame(renderer, mFrameDelta);
 
@@ -204,3 +213,4 @@ LRESULT CALLBACK PlatformBridgeWin32::WndProc(HWND hwnd, UINT id, WPARAM wparam,
 }
 
 } // namespace tinyngine
+*/

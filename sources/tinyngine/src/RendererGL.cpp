@@ -50,7 +50,9 @@ RendererGL::RendererGL() : mImpl(new Impl()) {
 }
 
 RendererGL::~RendererGL() {
-
+	GL_CHECK(glUseProgram(0));
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
 void RendererGL::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {

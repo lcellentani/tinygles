@@ -106,8 +106,8 @@ private:
 
 	TransformHelper mTransformHelper;
 
-	uint32_t mWindowWidth = 0;
-	uint32_t mWindowHeight = 0;
+	uint32_t mWindowWidth = 800;
+	uint32_t mWindowHeight = 600;
 };
 
 

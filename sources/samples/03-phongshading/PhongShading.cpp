@@ -51,9 +51,10 @@ public:
 	}
 
 	void InitView(std::unique_ptr<Renderer>& renderer) override {
+		mAspect = (float)mWindowWidth / (float)mWindowHeight;
 		//LoadObj("models/Cube.obj", true, mObject);
-		LoadObj("models/Sphere.obj", true, mObject);
-		//LoadObj("models/Monkey.obj", true, mObject);
+		//LoadObj("models/Sphere.obj", true, mObject);
+		LoadObj("models/Monkey.obj", true, mObject);
 		//LoadObj("models/Teapot.obj", true, mObject);
 		//LoadObj("models/Cylinder.obj", true, mObject);
 
@@ -165,8 +166,8 @@ public:
 	}
 
 private:
-	uint32_t mWindowWidth;
-	uint32_t mWindowHeight;
+	uint32_t mWindowWidth = 800;
+	uint32_t mWindowHeight = 600;
 	float mAspect;
 
 	ObjGeometry mObject;
@@ -192,7 +193,7 @@ private:
 
 	TransformHelper mTransformHelper;
 
-	glm::vec3 mSpeed{ 1.0f, 2.5f, 0.0f };
+	glm::vec3 mSpeed{ 20.0f, 30.0f, 0.0f };
 	glm::vec3 mAngles;
 	glm::mat4 mProj;
 	glm::mat4 mView;

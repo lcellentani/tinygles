@@ -1,23 +1,27 @@
 #pragma once
-
-#include "PlatformDefine.h"
+/*
+//#include "PlatformDefine.h"
 #include "IPlatformBridge.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
 
-namespace tinyngine { class IPlatformContext;  }
-namespace tinyngine { class Application; }
+//namespace tinyngine { class IPlatformContext;  }
+//namespace tinyngine { class Application; }
 
 namespace tinyngine
 {
 class PlatformBridgeWin32 : public IPlatformBridge {
 public:
-	PlatformBridgeWin32();
+	PlatformBridgeWin32() = delete;
+	explicit PlatformBridgeWin32(HWND hwnd);
 	virtual ~PlatformBridgeWin32() = default;
 
-	virtual int16_t Run() override;
+	Event PollEvents() override;
+
+private:
+	HWND mHwnd;
 
 private:
 	void CreateNativeWindow();
@@ -43,4 +47,6 @@ private:
 	uint32_t mWindowWidth;
 	uint32_t mWindowHeight;
 };
+
 } // namespace tinyngine
+*/

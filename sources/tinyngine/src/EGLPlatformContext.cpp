@@ -25,7 +25,6 @@ EGLPlatformContext::EGLPlatformContext(const NativeWindowHandle& handle, const C
 	, mEGLContext(0)
 	, mEGLSurface(0)
 	, mAttributes(attributes) {
-
 }
 
 Result EGLPlatformContext::Initialize() {
