@@ -65,8 +65,7 @@ DynLibLoader::DynLibLoader(const std::string& libraryPath) : mImpl(std::unique_p
 
 		if (end == std::string::npos) {
 			tmp = libraryPath.substr(start, libraryPath.length() - start);
-		}
-		else {
+		} else {
 			tmp = libraryPath.substr(start, end - start);
 		}
 
@@ -89,8 +88,7 @@ DynLibLoader::DynLibLoader(const std::string& libraryPath) : mImpl(std::unique_p
 	if (mImpl->mLibraryHandle == nullptr) {
 		//Log(Logger.Critical, "Could not load host library '%s'", LibPath.c_str());
 		mImpl->mLastError = true;
-	}
-	else {
+	} else {
 		//Log(Logger.Debug, "Host library '%s' loaded", LibPath.c_str());
 	}
 }

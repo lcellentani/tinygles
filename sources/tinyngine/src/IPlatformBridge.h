@@ -8,7 +8,7 @@ namespace tinyngine
 
 class IPlatformBridge {
 public:
-	virtual bool PollEvents(Event* event) = 0;
+	virtual std::unique_ptr<Event> PollEvents() = 0;
 
 //protected:
 	float mFrameDelta;

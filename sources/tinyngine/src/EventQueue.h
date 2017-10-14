@@ -1,6 +1,10 @@
 #pragma once
 
+#include "PlatformDefine.h"
+#include "PlatformTypes.h"
 #include "SpScLockFreeQueue.h"
+
+#include <memory>
 
 namespace tinyngine
 {
@@ -12,11 +16,13 @@ public:
 		Exit,
 		Key,
 		Mouse,
-		Size
+		Size,
+		Char
 	};
 
 	Event() : mType(Type::Null) {}
 	Event(Type type) : mType(type) {}
+	virtual ~Event() = default;
 
 	Type mType;
 };
@@ -26,22 +32,76 @@ public:
 	ExitEvent() : Event(Event::Exit) {}
 };
 
+class SizeEvent : public Event {
+public:
+	SizeEvent() = delete;
+	explicit SizeEvent(uint32_t width, uint32_t height) : Event(Event::Size), mWidth(width), mHeight(height) {}
+
+	uint32_t mWidth;
+	uint32_t mHeight;
+};
+
+class KeyEvent : public Event {
+public:
+	KeyEvent() = delete;
+	explicit KeyEvent(Key::Enum key, uint8_t modifiers, bool pressed) : Event(Event::Key), mKey(key), mModifilers(modifiers), mPressed(pressed) {}
+
+	Key::Enum mKey;
+	uint8_t mModifilers;
+	bool mPressed;
+};
+
+class CharEvent : public Event {
+public:
+	CharEvent() = delete;
+	CharEvent(std::array<uint8_t, 4>& ch, uint8_t len) : Event(Event::Char), mChar(ch), mLength(len) {}
+
+	std::array<uint8_t, 4> mChar;
+	uint8_t mLength;
+};
+
+class MouseEvent : public Event {
+public:
+	MouseEvent() = delete;
+	MouseEvent(int32_t x, int32_t y, MouseButton::Enum button, bool pressed) : Event(Event::Mouse), mPosX(x), mPosY(y), mButton(button), mPressed(pressed) {}
+
+	int32_t mPosX;
+	int32_t mPosY;
+	MouseButton::Enum mButton;
+	bool mPressed;
+};
+
 class EventQueue {
 public:
-	EventQueue() = default;
-	~EventQueue() = default;
-
 	void postExitEvent() {
-		mQueue.push(ExitEvent());
+		mQueue.push(std::make_unique<ExitEvent>());
 	}
 
-	bool poll(Event* event) {
-		return mQueue.tryPop(event);
+	void postSizeEvent(uint32_t width, uint32_t height) {
+		mQueue.push(std::make_unique<SizeEvent>(width, height));
+	}
+
+	void postKeyEvent(Key::Enum key, uint8_t modifier, bool pressed) {
+		mQueue.push(std::make_unique<KeyEvent>(key, modifier, pressed));
+	}
+
+	void postCharEvent(std::array<uint8_t, 4>& ch, uint8_t len) {
+		mQueue.push(std::make_unique<CharEvent>(ch, len));
+	}
+
+	void postMouseEvent(int32_t x, int32_t y, MouseButton::Enum button, bool pressed) {
+		mQueue.push(std::make_unique<MouseEvent>(x, y, button, pressed));
+	}
+
+	std::unique_ptr<Event> poll() {
+		std::unique_ptr<Event> event;
+		mQueue.pop(event);
+		return event;
 	}
 
 private:
 	static constexpr size_t QueueSize = 64;
-	SpScLockFreeQueue<Event, QueueSize> mQueue;
+	SpScLockFreeQueue<std::unique_ptr<Event>, QueueSize> mQueue;
 };
 
 } // namespace tinyngine

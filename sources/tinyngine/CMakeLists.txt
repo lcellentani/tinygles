@@ -34,7 +34,7 @@ add_library(tinyngine
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_demo.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_draw.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/tinyobjloader/tiny_obj_loader.cc
-	src/main.cpp
+	src/mainWin32.cpp
 	src/Application.cpp
 	src/DynLibLoader.cpp
 	src/EGLPlatformContext.cpp
@@ -43,7 +43,6 @@ add_library(tinyngine
 	src/GLApi.cpp
 	src/IndexBufferGL.cpp
 	src/Log.cpp
-	src/PlatformBridgeWin32.cpp
 	src/ProgramGL.cpp
 	src/RendererGL.cpp
 	src/ShaderGL.cpp

@@ -101,13 +101,6 @@ public:
 
 	}
 
-	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
-		TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y);
-		mWindowWidth = width;
-		mWindowHeight = height;
-		mAspect = (float)mWindowWidth / (float)mWindowHeight;
-	}
-
 private:
 	/*bool CreateSimpleTexture() {
 		const GLubyte pixels[4 * 3]{
@@ -179,10 +172,6 @@ private:
 	}*/
 
 private:
-	uint32_t mWindowWidth;
-	uint32_t mWindowHeight;
-	float mAspect;
-
 	//GLuint mShaderProgram = 0;
 
 	//GLuint mPositionAttributePos = 0;

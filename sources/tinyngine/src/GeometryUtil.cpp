@@ -246,7 +246,7 @@ void LoadObj(const  char * filename, bool triangulate, ObjGeometry& result) {
 			}
 
 			//for (auto& shape : result.shapes) {
-			{
+			/*{
 				auto& shape = newGeometry;
 				Log(Logger::Information, "# of vertices  : %d", shape.positions.size());
 				Log(Logger::Information, "# of normals  : %d", shape.normals.size());
@@ -270,14 +270,14 @@ void LoadObj(const  char * filename, bool triangulate, ObjGeometry& result) {
 				//	Log(Logger::Information, "i[%d]: %d", ii, shape.indices[ii]);
 				//}
 				Log(Logger::Information, "---------------------------------------------------------------------------------");
-			}
+			}*/
 			//}
 
-			newGeometry.normals.clear();
+			//newGeometry.normals.clear();
 
 			GenerateNormalsIfNeeded(newGeometry);
 
-			{
+			/*{
 				auto& shape = newGeometry;
 				Log(Logger::Information, "# of vertices  : %d", shape.positions.size());
 				Log(Logger::Information, "# of normals  : %d", shape.normals.size());
@@ -294,7 +294,7 @@ void LoadObj(const  char * filename, bool triangulate, ObjGeometry& result) {
 				//	Log(Logger::Information, "i[%d]: %d", ii, shape.indices[ii]);
 				//}
 				Log(Logger::Information, "---------------------------------------------------------------------------------");
-			}
+			}*/
 
 			result.shapes.push_back(newGeometry);
 			result.numShapes++;

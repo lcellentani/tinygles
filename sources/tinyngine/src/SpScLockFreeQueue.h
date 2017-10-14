@@ -19,34 +19,24 @@ public:
 
 	}
 
-	bool tryPush(const T& elem) {
+	bool push(T&& elem) {
 		const auto currentTail = mWrite.load();
 		if (currentTail - mRead.load() < mSize - 1) {
-			mBuffer[currentTail % mSize] = elem;
+			mBuffer[currentTail % mSize] = std::move(elem);
 			mWrite.store(currentTail + 1);
 			return true;
 		}
 		return false;
 	}
 
-	void push(const T& elem) {
-		while (!tryPush(elem));
-	}
-
-	bool tryPop(T* elem) {
+	bool pop(T& elem) {
 		const auto currentHead = mRead.load();
 		if (currentHead != mWrite.load()) {
-			(*elem) = mBuffer[currentHead & mSize];
+			elem = std::move(mBuffer[currentHead % mSize]);
 			mRead.store(currentHead + 1);
 			return true;
 		}
 		return false;
-	}
-
-	T pop() {
-		T elem;
-		while (!tryPop(&elem));
-		return elem;
 	}
 
 	SpScLockFreeQueue(const SpScLockFreeQueue& other) = delete;

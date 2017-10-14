@@ -123,8 +123,7 @@ std::string EGLPlatformContext::GetInfo() {
 		default:
 			lines << "\tContext priority: Unrecognised.\n";
 		}
-	}
-	else {
+	} else {
 		egl::GetError();
 		lines << "\tContext priority: Unsupported\n";
 	}
@@ -214,8 +213,7 @@ Result EGLPlatformContext::InitializeBinding() {
 	Api targetApi = mAttributes.mRequiredApi;
 	if (targetApi == Api::Unspecified) {
 
-	}
-	else {
+	} else {
 		Log(Logger::Information, "Forcing specific API level: %s", GetApiName(targetApi));
 	}
 
@@ -246,8 +244,7 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 	bool createContextSupported = egl::isEglExtensionSupported(mEGLDisplay, "EGL_KHR_create_context");
 	if (createContextSupported) {
 		Log(Logger::Information, "EGL context creation: EGL_KHR_create_context supported...");
-	}
-	else {
+	} else {
 		Log(requestedMinorVersion ? Logger::Warning : Logger::Information, "EGL context creation: EGL_KHR_create_context not supported. Minor version will be discarded, and debug disabled.");
 		requestedMinorVersion = 0;
 	}
@@ -259,8 +256,7 @@ Result EGLPlatformContext::InitializeContext(EGLConfig& config, bool wantsWindow
 		case 1: Log(Logger::Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context MEDIUM priority..."); break;
 		default: Log(Logger::Information, "EGL context creation: EGL_IMG_context_priority supported! Setting context HIGH priority (default)..."); break;
 		}
-	}
-	else {
+	} else {
 		Log(Logger::Information, "EGL context creation: EGL_IMG_context_priority not supported. Ignoring context Priority attribute.");
 	}
 

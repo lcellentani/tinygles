@@ -112,13 +112,6 @@ public:
 
 	}
 
-	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
-		TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y);
-		mWindowWidth = width;
-		mWindowHeight = height;
-		mAspect = (float)mWindowWidth / (float)mWindowHeight;
-	}
-
 private:
 	/*bool GenMipmap2D(const std::vector<GLubyte>& src, std::vector<GLubyte>& dst, const uint32_t srcWidth, const uint32_t srcHeight, uint32_t& dstWidth, uint32_t& dstHeight) {
 		constexpr int32_t texelSize = 3;
@@ -274,10 +267,6 @@ private:
 	}*/
 
 private:
-	uint32_t mWindowWidth;
-	uint32_t mWindowHeight;
-	float mAspect;
-
 	Geometry mCube;
 
 	//GLuint mShaderProgram = 0;

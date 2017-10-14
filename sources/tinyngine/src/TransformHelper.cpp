@@ -48,8 +48,7 @@ TransformHelper& TransformHelper::operator=(TransformHelper& rhs) {
 	}
 	else if (mImpl == nullptr) {
 		mImpl = std::make_unique<Impl>((*rhs.mImpl));
-	}
-	else {
+	} else {
 		*mImpl = *rhs.mImpl;
 	}
 	return (*this);
@@ -183,25 +182,26 @@ void TransformHelper::Translate(float tx, float ty, float tz) {
 }
 
 void TransformHelper::Rotate(float angle_in_degree, glm::vec3& axis) {
+	float angle_in_radians = glm::radians(angle_in_degree);
 	MatrixMode mode = mImpl->mMode;
 	if (mode == MatrixMode::Model) {
 		glm::mat4& m = GetModelMatrix();
-		m = glm::rotate(m, angle_in_degree, axis);
+		m = glm::rotate(m, angle_in_radians, axis);
 		return;
 	}
 	if (mode == MatrixMode::View) {
 		glm::mat4& m = GetViewMatrix();
-		m = glm::rotate(m, angle_in_degree, axis);
+		m = glm::rotate(m, angle_in_radians, axis);
 		return;
 	}
 	if (mode == MatrixMode::Projection) {
 		glm::mat4& m = GetProjectionMatrix();
-		m = glm::rotate(m, angle_in_degree, axis);
+		m = glm::rotate(m, angle_in_radians, axis);
 		return;
 	}
 	if (mode == MatrixMode::Texture) {
 		glm::mat4& m = GetTextureMatrix();
-		m = glm::rotate(m, angle_in_degree, axis);
+		m = glm::rotate(m, angle_in_radians, axis);
 		return;
 	}
 }

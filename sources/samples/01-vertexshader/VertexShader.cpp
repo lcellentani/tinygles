@@ -77,8 +77,8 @@ public:
 		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
 		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
 
-		mProj = glm::perspective(glm::radians(60.0f), mAspect, 0.1f, 100.0f);
-		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		mProj = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		mRight = glm::vec3(1.0f, 0.0f, 0.0f);
 		mAngles = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -92,11 +92,12 @@ public:
 	}
 
 	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
-		mAngles.x -= mSpeed.x * deltaTime;
+		TINYNGINE_UNUSED(deltaTime);
+		mAngles.x -= mSpeed.x;
 		if (mAngles.x < 0.0f) {
 			mAngles.x += 360.0f;
 		}
-		mAngles.y += mSpeed.y * deltaTime;
+		mAngles.y += mSpeed.y;
 		if (mAngles.y > 360.0f) {
 			mAngles.y -= 360.0f;
 		}
@@ -106,7 +107,6 @@ public:
 		mTransformHelper.Rotate(mAngles.y, mUp);
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
-		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
 		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92));
 
 		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
@@ -129,18 +129,7 @@ public:
 
 	}
 
-	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
-		TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y);
-		mWindowWidth = width;
-		mWindowHeight = height;
-		mAspect = (float)mWindowWidth / (float)mWindowHeight;
-	}
-
 private:
-	uint32_t mWindowWidth;
-	uint32_t mWindowHeight;
-	float mAspect;
-
 	Geometry mCube;
 	std::vector<uint8_t> mColors;
 

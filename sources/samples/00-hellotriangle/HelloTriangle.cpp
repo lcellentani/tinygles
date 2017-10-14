@@ -71,7 +71,6 @@ public:
 		TINYNGINE_UNUSED(deltaTime);
 		glm::mat4 modelViewProj = mTransformHelper.GetModelViewProjectionMatrix();
 
-		renderer->SetViewport(0, 0, mWindowWidth, mWindowHeight);
 		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
 		renderer->SetVertexBuffer(mVertexBufferHandle, Attributes::Position);
@@ -92,12 +91,6 @@ public:
 
 	}
 
-	void OnReshape(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override {
-		TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y);
-		mWindowWidth = width;
-		mWindowHeight = height;
-	}
-
 private:
 	VertexFormat mPosVertexFormat;
 	ProgramHandle mProgramHandle;
@@ -105,9 +98,6 @@ private:
 	VertexBufferHandle mVertexBufferHandle;
 
 	TransformHelper mTransformHelper;
-
-	uint32_t mWindowWidth = 800;
-	uint32_t mWindowHeight = 600;
 };
 
 
