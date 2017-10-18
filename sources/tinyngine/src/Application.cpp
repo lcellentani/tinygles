@@ -2,7 +2,4 @@
 
 namespace tinyngine
 {
-Application::~Application() {
-
-}
 } // namespace tinyngine

@@ -35,12 +35,12 @@ add_library(tinyngine
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_draw.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/tinyobjloader/tiny_obj_loader.cc
 	src/mainWin32.cpp
-	src/Application.cpp
 	src/DynLibLoader.cpp
 	src/EGLPlatformContext.cpp
 	src/EGLTrampoline.cpp
 	src/GeometryUtil.cpp
 	src/GLApi.cpp
+	src/ImGUIWrapper.cpp
 	src/IndexBufferGL.cpp
 	src/Log.cpp
 	src/ProgramGL.cpp
@@ -48,6 +48,7 @@ add_library(tinyngine
 	src/ShaderGL.cpp
 	src/StopWatchWin32.cpp
 	src/StringUtils.cpp
+	src/Timer.cpp
 	src/TransformHelper.cpp
 	src/VertexBufferGL.cpp
 	src/VertexFormat.cpp

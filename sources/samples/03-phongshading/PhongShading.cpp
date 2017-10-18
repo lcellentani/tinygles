@@ -4,10 +4,12 @@
 #include "TransformHelper.h"
 #include "StringUtils.h"
 #include "Log.h"
+#include "imgui.h"
 
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+
 
 namespace
 {
@@ -50,7 +52,7 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer) override {
+	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t windowWidth, uint32_t windowHeight) override {
 		//LoadObj("models/Cube.obj", true, mObject);
 		//LoadObj("models/Sphere.obj", true, mObject);
 		LoadObj("models/Monkey.obj", true, mObject);
@@ -94,7 +96,8 @@ public:
 		mShininessFactorHandle = renderer->GetUniform(mProgramHandle, "u_shininessFactor");
 		mLightPositionHandle = renderer->GetUniform(mProgramHandle, "u_lightPosition");
 
-		mProj = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
+		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
 		mView = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		mRight = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -109,8 +112,7 @@ public:
 		renderer->SetState(RendererStateType::DepthTest, true);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
-		TINYNGINE_UNUSED(deltaTime);
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
 		mAngles.x += mSpeed.x;
 		if (mAngles.x > 360.0f) {
 			mAngles.x -= 360.0f;
@@ -124,7 +126,15 @@ public:
 		mTransformHelper.Rotate(mAngles.y, mUp);
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
-		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92), 1.0f);
+		ImVec4 clear_color = ImColor(114, 144, 154);
+		ImGui::Text("Hello, world!");
+		ImGui::Button("Test Window");
+		ImGui::ColorEdit3("clear color", (float*)&clear_color);
+		uint8_t r = (uint8_t)(clear_color.x * 255.0f);
+		uint8_t g = (uint8_t)(clear_color.y * 255.0f);
+		uint8_t b = (uint8_t)(clear_color.z * 255.0f);
+
+		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(r, g, b), 1.0f);
 
 		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
 		renderer->SetVertexBuffer(mNornalsHandle, Attributes::Normal);

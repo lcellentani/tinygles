@@ -35,7 +35,7 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer) override {
+	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t, uint32_t) override {
 		GenerateCube(1.0f, mCube);
 		mColors.reserve(mCube.numVertices * 4);
 		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
@@ -91,8 +91,7 @@ public:
 		renderer->SetState(RendererStateType::CullFace, true);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
-		TINYNGINE_UNUSED(deltaTime);
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
 		mAngles.x -= mSpeed.x;
 		if (mAngles.x < 0.0f) {
 			mAngles.x += 360.0f;

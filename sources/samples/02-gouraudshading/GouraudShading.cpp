@@ -50,7 +50,7 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer) override {
+	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t windowWidth, uint32_t windowHeight) override {
 		//LoadObj("models/Cube.obj", true, mObject);
 		//LoadObj("models/Sphere.obj", true, mObject);
 		LoadObj("models/Monkey.obj", true, mObject);
@@ -92,7 +92,8 @@ public:
 		mShininessFactorHandle = renderer->GetUniform(mProgramHandle, "u_shininessFactor");
 		mLightPositionHandle = renderer->GetUniform(mProgramHandle, "u_lightPosition");
 
-		mProj = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
+		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
 		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		mRight = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -107,8 +108,7 @@ public:
 		renderer->SetState(RendererStateType::DepthTest, true);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
-		TINYNGINE_UNUSED(deltaTime);
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
 		mAngles.x += mSpeed.x;
 		if (mAngles.x > 360.0f) {
 			mAngles.x -= 360.0f;

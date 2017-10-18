@@ -31,16 +31,15 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
+	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t windowWidth, uint32_t windowHeight) override {
+		TINYNGINE_UNUSED(renderer); TINYNGINE_UNUSED(windowWidth); TINYNGINE_UNUSED(windowHeight);
 
 		//InitializeShaders();
 
 		//CreateSimpleTexture();
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
-		TINYNGINE_UNUSED(deltaTime);
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
 		TINYNGINE_UNUSED(renderer);
 		/*const GLfloat vertices[]{
 			-0.5f, 0.5f, 0.0f,

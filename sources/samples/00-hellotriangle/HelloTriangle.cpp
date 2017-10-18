@@ -32,7 +32,8 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer) override {
+	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t windowWidth, uint32_t windowHeight) override {
+		TINYNGINE_UNUSED(windowWidth); TINYNGINE_UNUSED(windowHeight);
 		const float cVertexData[] = {
 			-0.4f, -0.4f, 0.0f, // Bottom Left
 			0.4f, -0.4f, 0.0f, // Bottom Right
@@ -67,8 +68,7 @@ public:
 		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
-		TINYNGINE_UNUSED(deltaTime);
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
 		glm::mat4 modelViewProj = mTransformHelper.GetModelViewProjectionMatrix();
 
 		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));

@@ -3,6 +3,7 @@
 #include "IPlatformContext.h"
 #include "Application.h"
 #include "RendererGL.h"
+#include "ImGUIWrapper.h"
 #include "Log.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -16,8 +17,8 @@
 namespace
 {
 
-static constexpr uint32_t cDefaultWidth = 800;
-static constexpr uint32_t cDefaultHeight = 600;
+static constexpr uint32_t cDefaultWidth = 1280;
+static constexpr uint32_t cDefaultHeight = 720;
 
 struct TranslateKeyModifiers {
 	int mVirtualKey;
@@ -402,8 +403,9 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 	if (result != Result::Success) { return; }
 	
 	std::unique_ptr<Renderer> renderer = std::make_unique<RendererGL>();
-
-	pinst->mApplication->InitView(renderer);
+	std::unique_ptr<ImGUIWrapper> uiWrapper = CreateImGUIWrapper();
+	
+	pinst->mApplication->InitView(renderer, pinst->mWidth, pinst->mHeight);
 
 	pinst->mStopWatch->Start();
 	do {
@@ -439,12 +441,18 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 			}
 		}
 
-		pinst->mApplication->RenderFrame(renderer, pinst->mFrameDelta);
+		uiWrapper->BeginFrame(pinst->mWidth, pinst->mHeight);
+
+		pinst->mApplication->RenderFrame(renderer);
+
+		uiWrapper->EndFrame();
+
 		pinst->mPlatformContext->Present();
 
 		pinst->mStopWatch->Reset();
 	} while (!pinst->mExitRequired);
 
+	uiWrapper.reset();
 	renderer.reset();
 
 	pinst->mPlatformContext->Terminate();

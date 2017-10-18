@@ -150,7 +150,6 @@ GLenum GetRendererStateType(RendererStateType::Enum type) {
 	return cStateTypes[type];
 }
 
-;
 GLenum GetBlendFunc(BlendFuncs::Enum func) {
 	return cBlendFuncs[func];
 }

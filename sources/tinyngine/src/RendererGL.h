@@ -10,9 +10,9 @@ public:
 	RendererGL();
 	virtual ~RendererGL();
 
-	void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
-
 	void Commit() override;
+
+	void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 
 	void Clear(uint8_t flags, Color color, float depth = 1.0f, uint8_t stencil = 0) override;
 	void SetColorMake(bool red, bool green, bool blue, bool alpha) override;

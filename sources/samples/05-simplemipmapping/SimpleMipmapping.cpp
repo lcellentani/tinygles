@@ -29,7 +29,7 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer) override {
+	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t, uint32_t) override {
 		TINYNGINE_UNUSED(renderer);
 
 		//InitializeShaders();
@@ -37,8 +37,7 @@ public:
 		//CreateTexture(256, 256);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer, float deltaTime) override {
-		TINYNGINE_UNUSED(deltaTime);
+	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
 		TINYNGINE_UNUSED(renderer);
 
 		/*const GLfloat vertices[]{
