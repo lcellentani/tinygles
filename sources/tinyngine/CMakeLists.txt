@@ -38,17 +38,19 @@ add_library(tinyngine
 	src/DynLibLoader.cpp
 	src/EGLPlatformContext.cpp
 	src/EGLTrampoline.cpp
+	src/Engine.cpp
 	src/GeometryUtil.cpp
 	src/GLApi.cpp
 	src/ImGUIWrapper.cpp
 	src/IndexBufferGL.cpp
+	src/InputWin32.cpp
 	src/Log.cpp
 	src/ProgramGL.cpp
 	src/RendererGL.cpp
 	src/ShaderGL.cpp
 	src/StopWatchWin32.cpp
 	src/StringUtils.cpp
-	src/Timer.cpp
+	src/Time.cpp
 	src/TransformHelper.cpp
 	src/VertexBufferGL.cpp
 	src/VertexFormat.cpp

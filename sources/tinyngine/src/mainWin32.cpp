@@ -2,6 +2,9 @@
 #include "StopWatchWin32.h"
 #include "IPlatformContext.h"
 #include "Application.h"
+#include "Engine.h"
+#include "Input.h"
+#include "Time.h"
 #include "RendererGL.h"
 #include "ImGUIWrapper.h"
 #include "Log.h"
@@ -63,6 +66,16 @@ struct MainThread {
 class PlatformBridgeWin32 : public IPlatformBridge {
 public:
 	PlatformBridgeWin32::PlatformBridgeWin32() {
+		//@debug
+		Engine e;
+		Input& s1 = e.GetSystem<Input>();
+		s1.GetI();
+		s1.SetI(33);
+		s1.GetI();
+		const Time& s2 = e.GetSystem<Time>();
+		s2.GetTime();
+		//@debug
+
 		mFrameDelta = 0;
 		mStopWatch = std::make_unique<StopWatchWin32>();
 		mEventQueue = std::make_unique<EventQueue>();
