@@ -1,12 +1,13 @@
 #pragma once
 
+#include "System.h"
 #include "GraphicsTypes.h"
 #include "VertexFormat.h"
 
 namespace tinyngine
 {
 
-class Renderer {
+class Renderer : public System {
 public:
 	enum ClearFlags {
 		None = 0,

@@ -216,11 +216,18 @@ struct Key {
 
 struct MouseButton {
 	enum Enum {
-		None,
+		None = -1,
 		Left,
 		Middle,
-		Right
+		Right,
+		Count
 	};
+};
+
+struct MouseState {
+	uint32_t mPosX = 0;
+	uint32_t mPosY = 0;
+	uint8_t mButtons[MouseButton::Enum::Count]{ 0 };
 };
 
 } // namespace tinyngine

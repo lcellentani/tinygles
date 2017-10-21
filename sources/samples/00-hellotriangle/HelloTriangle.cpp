@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Renderer.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
 #include "Log.h"
@@ -32,17 +33,18 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t windowWidth, uint32_t windowHeight) override {
-		TINYNGINE_UNUSED(windowWidth); TINYNGINE_UNUSED(windowHeight);
+	void InitView(Engine& engine, uint32_t, uint32_t) override {
 		const float cVertexData[] = {
 			-0.4f, -0.4f, 0.0f, // Bottom Left
 			0.4f, -0.4f, 0.0f, // Bottom Right
 			0.0f, 0.4f, 0.0f // Top Middle
 		};
 
+		Renderer& renderer = engine.GetSystem<Renderer>();
+
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
 		
-		mVertexBufferHandle = renderer->CreateVertexBuffer(cVertexData, sizeof(cVertexData), mPosVertexFormat);
+		mVertexBufferHandle = renderer.CreateVertexBuffer(cVertexData, sizeof(cVertexData), mPosVertexFormat);
 		
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
@@ -61,30 +63,31 @@ public:
 			}
 		);
 
-		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
-		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		ShaderHandle vsHandle = renderer.CreateShader(ShaderType::VertexProgram, vertexShaderSource);
+		ShaderHandle fsHandle = renderer.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
 		
-		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
-		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
+		mProgramHandle = renderer.CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = renderer.GetUniform(mProgramHandle, "u_modelViewProj");
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+	void RenderFrame(Engine& engine) override {
+		Renderer& renderer = engine.GetSystem<Renderer>();
+
 		glm::mat4 modelViewProj = mTransformHelper.GetModelViewProjectionMatrix();
 
-		renderer->Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
+		renderer.Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
 
-		renderer->SetVertexBuffer(mVertexBufferHandle, Attributes::Position);
+		renderer.SetVertexBuffer(mVertexBufferHandle, Attributes::Position);
 
-		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer->SetUniformMat4(mProgramHandle, mModelViewProjHandle, &modelViewProj[0][0], false);
+		renderer.SetProgram(mProgramHandle, mPosVertexFormat);
+		renderer.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &modelViewProj[0][0], false);
 	
-		renderer->DrawArray(PrimitiveType::Triangles, 0, 3);
+		renderer.DrawArray(PrimitiveType::Triangles, 0, 3);
 
-		renderer->Commit();
+		renderer.Commit();
 	}
 
-	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
+	void ReleaseView(Engine&) override {
 	}
 
 	void ReleaseApplication() override {

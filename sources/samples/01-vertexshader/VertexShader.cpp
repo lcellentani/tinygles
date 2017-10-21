@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Renderer.h"
 #include "GeometryUtil.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
@@ -35,7 +36,8 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t, uint32_t) override {
+	void InitView(Engine& engine, uint32_t, uint32_t) override {
+		Renderer& renderer = engine.GetSystem<Renderer>();
 		GenerateCube(1.0f, mCube);
 		mColors.reserve(mCube.numVertices * 4);
 		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
@@ -48,9 +50,9 @@ public:
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
-		mPositionsHandle = renderer->CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
-		mColorsHandle = renderer->CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
-		mIndexesBufferHandle = renderer->CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
+		mPositionsHandle = renderer.CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
+		mColorsHandle = renderer.CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
+		mIndexesBufferHandle = renderer.CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
 
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
@@ -72,10 +74,10 @@ public:
 				v_color = a_color0;
 			}
 		);
-		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource);
-		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
-		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
-		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
+		ShaderHandle vsHandle = renderer.CreateShader(ShaderType::VertexProgram, vertexShaderSource);
+		ShaderHandle fsHandle = renderer.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		mProgramHandle = renderer.CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = renderer.GetUniform(mProgramHandle, "u_modelViewProj");
 
 		mProj = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -88,10 +90,11 @@ public:
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::View);
 		mTransformHelper.LoadMatrix(mView);
 
-		renderer->SetState(RendererStateType::CullFace, true);
+		renderer.SetState(RendererStateType::CullFace, true);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+	void RenderFrame(Engine& engine) override {
+		Renderer& renderer = engine.GetSystem<Renderer>();
 		mAngles.x -= mSpeed.x;
 		if (mAngles.x < 0.0f) {
 			mAngles.x += 360.0f;
@@ -106,22 +109,21 @@ public:
 		mTransformHelper.Rotate(mAngles.y, mUp);
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
-		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92));
+		renderer.Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92));
 
-		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
-		renderer->SetVertexBuffer(mColorsHandle, Attributes::Color0);
+		renderer.SetVertexBuffer(mPositionsHandle, Attributes::Position);
+		renderer.SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
-		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer->SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		renderer.SetProgram(mProgramHandle, mPosVertexFormat);
+		renderer.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
 
-		renderer->SetIndexBuffer(mIndexesBufferHandle);
-		renderer->DrawElements(PrimitiveType::Triangles, mCube.numIndices);
+		renderer.SetIndexBuffer(mIndexesBufferHandle);
+		renderer.DrawElements(PrimitiveType::Triangles, mCube.numIndices);
 
-		renderer->Commit();
+		renderer.Commit();
 	}
 
-	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
+	void ReleaseView(Engine&) override {
 	}
 
 	void ReleaseApplication() override {

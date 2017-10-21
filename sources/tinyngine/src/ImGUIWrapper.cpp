@@ -1,6 +1,6 @@
 #include "ImGUIWrapper.h"
 #include "GLApi.h"
-#include "debugbreak.h"
+#include "imgui.h"
 
 namespace tinyngine
 {
@@ -230,8 +230,8 @@ private:
 	GLint mAttribLocationColor = -1;
 };
 
-std::unique_ptr<ImGUIWrapper> CreateImGUIWrapper() {
-	return std::make_unique<ImGUIWrapperImpl>();
+ImGUIWrapper* CreateImGUIWrapper() {
+	return new ImGUIWrapperImpl();
 }
 
 } // namespace tinyngine

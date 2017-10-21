@@ -1,18 +1,18 @@
 #pragma once
 
 #include "PlatformDefine.h"
-#include "imgui.h"
+#include "System.h"
 
 namespace tinyngine
 {
 
-class ImGUIWrapper {
+class ImGUIWrapper : public System {
 public:
 	virtual ~ImGUIWrapper() = default;
 	virtual void BeginFrame(int32_t windowWidth, int32_t windowHeight) = 0;
 	virtual void EndFrame() = 0;
 };
 
-std::unique_ptr<ImGUIWrapper> CreateImGUIWrapper();
+ImGUIWrapper* CreateImGUIWrapper();
 
 } // namespace tinyngine

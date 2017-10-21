@@ -29,17 +29,13 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t, uint32_t) override {
-		TINYNGINE_UNUSED(renderer);
-
+	void InitView(Engine&, uint32_t, uint32_t) override {
 		//InitializeShaders();
 
 		//CreateTexture(256, 256);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
-
+	void RenderFrame(Engine&) override {
 		/*const GLfloat vertices[]{
 			-0.5f, 0.5f, 0.0f, 2.0f,
 			0.0f, 0.0f,
@@ -101,8 +97,7 @@ public:
 		glFinish();*/
 	}
 
-	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
+	void ReleaseView(Engine&) override {
 		//glDeleteProgram(mShaderProgram);
 		//glDeleteTextures(1, &mTextureId);
 	}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PlatformTypes.h"
-#include "Renderer.h"
+#include "Engine.h"
 
 namespace tinyngine
 {
@@ -13,9 +13,9 @@ public:
 	virtual ContextAttribs& GetContextAttribs() = 0;
 
 	virtual void InitApplication() = 0;
-	virtual void InitView(std::unique_ptr<Renderer>& renderer, uint32_t windowWidth, uint32_t windowHeight) = 0;
-	virtual void RenderFrame(std::unique_ptr<Renderer>& renderer) = 0;
-	virtual void ReleaseView(std::unique_ptr<Renderer>& renderer) = 0;
+	virtual void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) = 0;
+	virtual void RenderFrame(Engine& engine) = 0;
+	virtual void ReleaseView(Engine& engine) = 0;
 	virtual void ReleaseApplication() = 0;
 };
 

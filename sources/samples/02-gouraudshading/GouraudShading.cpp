@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Renderer.h"
 #include "GeometryUtil.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
@@ -50,7 +51,8 @@ public:
 
 	}
 
-	void InitView(std::unique_ptr<Renderer>& renderer, uint32_t windowWidth, uint32_t windowHeight) override {
+	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		Renderer& renderer = engine.GetSystem<Renderer>();
 		//LoadObj("models/Cube.obj", true, mObject);
 		//LoadObj("models/Sphere.obj", true, mObject);
 		LoadObj("models/Monkey.obj", true, mObject);
@@ -68,29 +70,29 @@ public:
 		mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
-		mPositionsHandle = renderer->CreateVertexBuffer(&shape.positions[0], sizeof(shape.positions[0]) * shape.numVertices * 3, mPosVertexFormat);
-		mNornalsHandle = renderer->CreateVertexBuffer(&shape.normals[0], sizeof(shape.normals[0]) * shape.numVertices * 3, mPosVertexFormat);
-		mColorsHandle = renderer->CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
-		mIndexesBufferHandle = renderer->CreateIndexBuffer(&shape.indices[0], sizeof(shape.indices[0]) * shape.numIndices);
+		mPositionsHandle = renderer.CreateVertexBuffer(&shape.positions[0], sizeof(shape.positions[0]) * shape.numVertices * 3, mPosVertexFormat);
+		mNornalsHandle = renderer.CreateVertexBuffer(&shape.normals[0], sizeof(shape.normals[0]) * shape.numVertices * 3, mPosVertexFormat);
+		mColorsHandle = renderer.CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
+		mIndexesBufferHandle = renderer.CreateIndexBuffer(&shape.indices[0], sizeof(shape.indices[0]) * shape.numIndices);
 
 		std::string vertexShaderSource;
 		StringUtils::ReadFileToString("shaders/gouraud_vert_2.glsl", vertexShaderSource);
 		std::string fragmentShaderSource;
 		StringUtils::ReadFileToString("shaders/gouraud_frag_2.glsl", fragmentShaderSource);
 
-		ShaderHandle vsHandle = renderer->CreateShader(ShaderType::VertexProgram, vertexShaderSource.c_str());
-		ShaderHandle fsHandle = renderer->CreateShader(ShaderType::FragmentProgram, fragmentShaderSource.c_str());
-		mProgramHandle = renderer->CreateProgram(vsHandle, fsHandle, true);
-		mModelViewProjHandle = renderer->GetUniform(mProgramHandle, "u_modelViewProj");
-		mModelViewHandle = renderer->GetUniform(mProgramHandle, "u_modelView");
-		mMaterialAmbientHandle = renderer->GetUniform(mProgramHandle, "u_materialAmbient");
-		mLightAmbientHandle = renderer->GetUniform(mProgramHandle, "u_lightAmbient");
-		mMaterialDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_materialDiffuse");
-		mLightDiffuseHandle = renderer->GetUniform(mProgramHandle, "u_lightDiffuse");
-		mMaterialSpecularHandle = renderer->GetUniform(mProgramHandle, "u_materialSpecular");
-		mLightSpecularHandle = renderer->GetUniform(mProgramHandle, "u_lightSpecular");
-		mShininessFactorHandle = renderer->GetUniform(mProgramHandle, "u_shininessFactor");
-		mLightPositionHandle = renderer->GetUniform(mProgramHandle, "u_lightPosition");
+		ShaderHandle vsHandle = renderer.CreateShader(ShaderType::VertexProgram, vertexShaderSource.c_str());
+		ShaderHandle fsHandle = renderer.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource.c_str());
+		mProgramHandle = renderer.CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = renderer.GetUniform(mProgramHandle, "u_modelViewProj");
+		mModelViewHandle = renderer.GetUniform(mProgramHandle, "u_modelView");
+		mMaterialAmbientHandle = renderer.GetUniform(mProgramHandle, "u_materialAmbient");
+		mLightAmbientHandle = renderer.GetUniform(mProgramHandle, "u_lightAmbient");
+		mMaterialDiffuseHandle = renderer.GetUniform(mProgramHandle, "u_materialDiffuse");
+		mLightDiffuseHandle = renderer.GetUniform(mProgramHandle, "u_lightDiffuse");
+		mMaterialSpecularHandle = renderer.GetUniform(mProgramHandle, "u_materialSpecular");
+		mLightSpecularHandle = renderer.GetUniform(mProgramHandle, "u_lightSpecular");
+		mShininessFactorHandle = renderer.GetUniform(mProgramHandle, "u_shininessFactor");
+		mLightPositionHandle = renderer.GetUniform(mProgramHandle, "u_lightPosition");
 
 		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
@@ -104,11 +106,12 @@ public:
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::View);
 		mTransformHelper.LoadMatrix(mView);
 
-		renderer->SetState(RendererStateType::CullFace, true);
-		renderer->SetState(RendererStateType::DepthTest, true);
+		renderer.SetState(RendererStateType::CullFace, true);
+		renderer.SetState(RendererStateType::DepthTest, true);
 	}
 
-	void RenderFrame(std::unique_ptr<Renderer>& renderer) override {
+	void RenderFrame(Engine& engine) override {
+		Renderer& renderer = engine.GetSystem<Renderer>();
 		mAngles.x += mSpeed.x;
 		if (mAngles.x > 360.0f) {
 			mAngles.x -= 360.0f;
@@ -123,32 +126,31 @@ public:
 		mTransformHelper.Rotate(mAngles.y, mUp);
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
-		renderer->Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92), 1.0f);
+		renderer.Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92), 1.0f);
 
-		renderer->SetVertexBuffer(mPositionsHandle, Attributes::Position);
-		renderer->SetVertexBuffer(mNornalsHandle, Attributes::Normal);
-		renderer->SetVertexBuffer(mColorsHandle, Attributes::Color0);
+		renderer.SetVertexBuffer(mPositionsHandle, Attributes::Position);
+		renderer.SetVertexBuffer(mNornalsHandle, Attributes::Normal);
+		renderer.SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
-		renderer->SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer->SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
-		renderer->SetUniformMat4(mProgramHandle, mModelViewHandle, &mTransformHelper.GetModelViewMatrix()[0][0], false);
-		renderer->SetUniformFloat3(mProgramHandle, mMaterialAmbientHandle, &cMaterialAmbient[0]);
-		renderer->SetUniformFloat3(mProgramHandle, mLightAmbientHandle, &cLightAmbient[0]);
-		renderer->SetUniformFloat3(mProgramHandle, mMaterialDiffuseHandle, &cMaterialDiffuse[0]);
-		renderer->SetUniformFloat3(mProgramHandle, mLightDiffuseHandle, &cLightDiffuse[0]);
-		renderer->SetUniformFloat3(mProgramHandle, mMaterialSpecularHandle, &cMaterialSpecular[0]);
-		renderer->SetUniformFloat3(mProgramHandle, mLightSpecularHandle, &cLightSpecular[0]);
-		renderer->SetUniformFloat(mProgramHandle, mShininessFactorHandle, cShininessFactor);
-		renderer->SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
+		renderer.SetProgram(mProgramHandle, mPosVertexFormat);
+		renderer.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		renderer.SetUniformMat4(mProgramHandle, mModelViewHandle, &mTransformHelper.GetModelViewMatrix()[0][0], false);
+		renderer.SetUniformFloat3(mProgramHandle, mMaterialAmbientHandle, &cMaterialAmbient[0]);
+		renderer.SetUniformFloat3(mProgramHandle, mLightAmbientHandle, &cLightAmbient[0]);
+		renderer.SetUniformFloat3(mProgramHandle, mMaterialDiffuseHandle, &cMaterialDiffuse[0]);
+		renderer.SetUniformFloat3(mProgramHandle, mLightDiffuseHandle, &cLightDiffuse[0]);
+		renderer.SetUniformFloat3(mProgramHandle, mMaterialSpecularHandle, &cMaterialSpecular[0]);
+		renderer.SetUniformFloat3(mProgramHandle, mLightSpecularHandle, &cLightSpecular[0]);
+		renderer.SetUniformFloat(mProgramHandle, mShininessFactorHandle, cShininessFactor);
+		renderer.SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
 
-		renderer->SetIndexBuffer(mIndexesBufferHandle);
-		renderer->DrawElements(PrimitiveType::Triangles, mObject.shapes[0].numIndices);
+		renderer.SetIndexBuffer(mIndexesBufferHandle);
+		renderer.DrawElements(PrimitiveType::Triangles, mObject.shapes[0].numIndices);
 
-		renderer->Commit();
+		renderer.Commit();
 	}
 
-	void ReleaseView(std::unique_ptr<Renderer>& renderer) override {
-		TINYNGINE_UNUSED(renderer);
+	void ReleaseView(Engine&) override {
 	}
 
 	void ReleaseApplication() override {

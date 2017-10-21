@@ -5,7 +5,7 @@
 #include "Engine.h"
 #include "Input.h"
 #include "Time.h"
-#include "RendererGL.h"
+#include "Renderer.h"
 #include "ImGUIWrapper.h"
 #include "Log.h"
 
@@ -66,18 +66,6 @@ struct MainThread {
 class PlatformBridgeWin32 : public IPlatformBridge {
 public:
 	PlatformBridgeWin32::PlatformBridgeWin32() {
-		//@debug
-		Engine e;
-		Input& s1 = e.GetSystem<Input>();
-		s1.GetI();
-		s1.SetI(33);
-		s1.GetI();
-		const Time& s2 = e.GetSystem<Time>();
-		s2.GetTime();
-		//@debug
-
-		mFrameDelta = 0;
-		mStopWatch = std::make_unique<StopWatchWin32>();
 		mEventQueue = std::make_unique<EventQueue>();
 
 		cTranslateKey[VK_ESCAPE] = Key::Esc;
@@ -199,14 +187,14 @@ public:
 
 		mEventQueue->postSizeEvent(mWidth, mHeight);
 
-		std::chrono::milliseconds delay(100);
+		std::chrono::milliseconds delay(50);
 		MSG msg{ 0 };
 		while (!mExitRequired) {
+			std::this_thread::sleep_for(delay);
 			if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-			std::this_thread::sleep_for(delay);
 		}
 
 		return 0;
@@ -415,16 +403,13 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 	Result result = pinst->mPlatformContext->Initialize();
 	if (result != Result::Success) { return; }
 	
-	std::unique_ptr<Renderer> renderer = std::make_unique<RendererGL>();
-	std::unique_ptr<ImGUIWrapper> uiWrapper = CreateImGUIWrapper();
-	
-	pinst->mApplication->InitView(renderer, pinst->mWidth, pinst->mHeight);
+	std::unique_ptr<Engine> engine = std::make_unique<Engine>();
+	Renderer& renderer = engine->GetSystem<Renderer>();
+	ImGUIWrapper& uiWrapper = engine->GetSystem<ImGUIWrapper>();
 
-	pinst->mStopWatch->Start();
+	pinst->mApplication->InitView((*engine), pinst->mWidth, pinst->mHeight);
+
 	do {
-		pinst->mFrameDelta = pinst->mStopWatch->GetTime();
-		//pinst->mFrameDelta = (pinst->mFrameDelta + (3.0f / 60.0f)) * 0.25f;
-		//Log(Logger::Information, "%f", pinst->mFrameDelta);
 		std::unique_ptr<Event> event = pinst->PollEvents();
 		if (event) {
 			switch (event->mType) {
@@ -433,7 +418,7 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 				break;
 			case Event::Size:
 				if (SizeEvent* sizeEvent = reinterpret_cast<SizeEvent*>(event.get())) {
-					renderer->SetViewport(0, 0, sizeEvent->mWidth, sizeEvent->mHeight);
+					renderer.SetViewport(0, 0, sizeEvent->mWidth, sizeEvent->mHeight);
 				}
 				break;
 			case Event::Key:
@@ -454,19 +439,18 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 			}
 		}
 
-		uiWrapper->BeginFrame(pinst->mWidth, pinst->mHeight);
+		uiWrapper.BeginFrame(pinst->mWidth, pinst->mHeight);
 
-		pinst->mApplication->RenderFrame(renderer);
+		pinst->mApplication->RenderFrame((*engine));
 
-		uiWrapper->EndFrame();
+		uiWrapper.EndFrame();
 
 		pinst->mPlatformContext->Present();
-
-		pinst->mStopWatch->Reset();
 	} while (!pinst->mExitRequired);
 
-	uiWrapper.reset();
-	renderer.reset();
+	pinst->mApplication->ReleaseView((*engine));
+
+	engine.reset();
 
 	pinst->mPlatformContext->Terminate();
 	pinst->mApplication->ReleaseApplication();
