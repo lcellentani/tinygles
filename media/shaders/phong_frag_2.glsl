@@ -11,12 +11,10 @@ varying highp vec3 v_normal;
 varying highp vec3 v_eyeCoord;
 
 uniform mediump vec3 u_materialAmbient;
-uniform mediump vec3 u_lightAmbient;
 uniform mediump vec3 u_materialDiffuse;
-uniform mediump vec3 u_lightDiffuse;
 uniform mediump vec3 u_materialSpecular;
-uniform mediump vec3 u_lightSpecular;
 uniform mediump float u_shininessFactor;
+uniform mediump vec3 u_lightColor;
 uniform highp vec3 u_lightPosition;
 
 vec3 PhongShading()
@@ -31,11 +29,10 @@ vec3 PhongShading()
 	float spec = dot(R, V);
 	//float spec = dot(H, normal);
 
-	vec3 ambient = u_materialAmbient * u_lightAmbient;
-	vec3 diffuse = (u_materialDiffuse * u_lightDiffuse) * max(0.0, dot(normal, lightVector));
-	vec3 specular = (u_materialSpecular * u_lightSpecular) * pow(max(0.0, spec), u_shininessFactor);
+	vec3 diffuse = u_materialDiffuse * max(0.0, dot(normal, lightVector));
+	vec3 specular = u_materialSpecular * pow(max(0.0, spec), u_shininessFactor);
 				
-	return ambient + diffuse + specular;
+	return (u_materialAmbient + diffuse + specular) * u_lightColor;
 }
 
 void main(void)

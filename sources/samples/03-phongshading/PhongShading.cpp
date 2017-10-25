@@ -16,13 +16,11 @@ namespace
 {
 
 static float cMaterialAmbient[] = { 0.2f, 0.0f, 0.2f };
-static float cLightAmbient[] = { 1.0f, 1.0f, 1.0f };
 static float cMaterialDiffuse[] = { 0.9f, 0.0f, 0.0f };
-static float cLightDiffuse[] = { 1.0f, 1.0f, 1.0f };
 static float cMaterialSpecular[] = { 1.0f, 0.9f, 0.9f };
-static float cLightSpecular[] = { 1.0f, 1.0f, 1.0f };
 static float cShininessFactor = 15.0f;
-static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
+static float cLightColor[] = { 1.0f, 1.0f, 1.0f };
+static float cLightPosision[] = { 0.0f, 20.0f, 10.0f };
 
 }
 
@@ -91,12 +89,10 @@ public:
 		mModelViewProjHandle = renderer.GetUniform(mProgramHandle, "u_modelViewProj");
 		mModelViewHandle = renderer.GetUniform(mProgramHandle, "u_modelView");
 		mMaterialAmbientHandle = renderer.GetUniform(mProgramHandle, "u_materialAmbient");
-		mLightAmbientHandle = renderer.GetUniform(mProgramHandle, "u_lightAmbient");
 		mMaterialDiffuseHandle = renderer.GetUniform(mProgramHandle, "u_materialDiffuse");
-		mLightDiffuseHandle = renderer.GetUniform(mProgramHandle, "u_lightDiffuse");
 		mMaterialSpecularHandle = renderer.GetUniform(mProgramHandle, "u_materialSpecular");
-		mLightSpecularHandle = renderer.GetUniform(mProgramHandle, "u_lightSpecular");
 		mShininessFactorHandle = renderer.GetUniform(mProgramHandle, "u_shininessFactor");
+		mLightColorHandle = renderer.GetUniform(mProgramHandle, "u_lightColor");
 		mLightPositionHandle = renderer.GetUniform(mProgramHandle, "u_lightPosition");
 
 		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
@@ -104,6 +100,7 @@ public:
 		mView = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		mRight = glm::vec3(1.0f, 0.0f, 0.0f);
+		mForward = glm::vec3(0.0f, 0.0f, 1.0f);
 		mAngles = glm::vec3(0.0f, 0.0f, 0.0f);
 
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Projection);;
@@ -127,31 +124,30 @@ public:
 		float delta = ((float)(now - mLastTime) / (float)time.GetFrequency()) * 1000.0f;
 		mLastTime = now;
 
-		mAngles.x += mSpeed.x * delta;
-		if (mAngles.x > 360.0f) {
-			mAngles.x -= 360.0f;
-		}
-		mAngles.y += mSpeed.y * delta;
-		if (mAngles.y > 360.0f) {
-			mAngles.y -= 360.0f;
-		}
-		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Model);
-		mTransformHelper.LoadIdentity();
-		mTransformHelper.Rotate(mAngles.y, mUp);
-		mTransformHelper.Rotate(-mAngles.x, mRight);
-
 		char buffer[512];
+		ImGui::SetNextWindowPos(ImVec2(5.0f, 5.0f), ImGuiSetCond_FirstUseEver);
+		ImGui::Begin("Phong Shading", nullptr, ImVec2(200.0f, 200.0f), -1.f, ImGuiWindowFlags_AlwaysAutoResize);
 		sprintf(buffer, "Time: %f", delta);
 		ImGui::Text(buffer);
-		sprintf(buffer, "Angle: (%f, %f)", mAngles.x, mAngles.y);
-		ImGui::Text(buffer);
-		ImGui::Button("Test Window");
-		ImGui::ColorEdit3("clear color", (float*)&clear_color);
-		uint8_t r = (uint8_t)(clear_color.x * 255.0f);
-		uint8_t g = (uint8_t)(clear_color.y * 255.0f);
-		uint8_t b = (uint8_t)(clear_color.z * 255.0f);
+		ImGui::SliderFloat("RX", &mAngles.x, 0.0f, 360.0f, "%.2f");
+		ImGui::SliderFloat("RY", &mAngles.y, 0.0f, 360.0f, "%.2f");
+		ImGui::SliderFloat("RZ", &mAngles.z, 0.0f, 360.0f, "%.2f");
+		ImGui::Spacing();
+		ImGui::ColorEdit3("Light Color", (float*)&cLightColor);
+		ImGui::InputFloat3("LightPos", cLightPosision, 2);
+		ImGui::SliderFloat("Shininess", &cShininessFactor, 1.0f, 200.0f, "%.2f");
+		ImGui::ColorEdit3("Material Ambient", (float*)&cMaterialAmbient);
+		ImGui::ColorEdit3("Material Diffuse", (float*)&cMaterialDiffuse);
+		ImGui::ColorEdit3("Material Specular", (float*)&cMaterialSpecular);
+		ImGui::End();
 
-		renderer.Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(r, g, b), 1.0f);
+		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Model);
+		mTransformHelper.LoadIdentity();
+		mTransformHelper.Rotate(mAngles.z, mForward);
+		mTransformHelper.Rotate(mAngles.y, mUp);
+		mTransformHelper.Rotate(mAngles.x, mRight);
+
+		renderer.Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(80, 80, 80), 1.0f);
 
 		renderer.SetVertexBuffer(mPositionsHandle, Attributes::Position);
 		renderer.SetVertexBuffer(mNornalsHandle, Attributes::Normal);
@@ -161,13 +157,11 @@ public:
 		renderer.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
 		renderer.SetUniformMat4(mProgramHandle, mModelViewHandle, &mTransformHelper.GetModelViewMatrix()[0][0], false);
 		renderer.SetUniformFloat3(mProgramHandle, mMaterialAmbientHandle, &cMaterialAmbient[0]);
-		renderer.SetUniformFloat3(mProgramHandle, mLightAmbientHandle, &cLightAmbient[0]);
 		renderer.SetUniformFloat3(mProgramHandle, mMaterialDiffuseHandle, &cMaterialDiffuse[0]);
-		renderer.SetUniformFloat3(mProgramHandle, mLightDiffuseHandle, &cLightDiffuse[0]);
 		renderer.SetUniformFloat3(mProgramHandle, mMaterialSpecularHandle, &cMaterialSpecular[0]);
-		renderer.SetUniformFloat3(mProgramHandle, mLightSpecularHandle, &cLightSpecular[0]);
 		renderer.SetUniformFloat(mProgramHandle, mShininessFactorHandle, cShininessFactor);
-		renderer.SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
+		renderer.SetUniformFloat3(mProgramHandle, mLightColorHandle, &cLightColor[0]);
+		renderer.SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosision[0]);
 
 		renderer.SetIndexBuffer(mIndexesBufferHandle);
 		renderer.DrawElements(PrimitiveType::Triangles, mObject.shapes[0].numIndices);
@@ -195,12 +189,10 @@ private:
 	UniformHandle mModelViewProjHandle;
 	UniformHandle mModelViewHandle;
 	UniformHandle mMaterialAmbientHandle;
-	UniformHandle mLightAmbientHandle;
 	UniformHandle mMaterialDiffuseHandle;
-	UniformHandle mLightDiffuseHandle;
 	UniformHandle mMaterialSpecularHandle;
-	UniformHandle mLightSpecularHandle;
 	UniformHandle mShininessFactorHandle;
+	UniformHandle mLightColorHandle;
 	UniformHandle mLightPositionHandle;
 
 	VertexBufferHandle mPositionsHandle;
@@ -216,6 +208,7 @@ private:
 	glm::mat4 mView;
 	glm::vec3 mRight;
 	glm::vec3 mUp;
+	glm::vec3 mForward;
 };
 
 
