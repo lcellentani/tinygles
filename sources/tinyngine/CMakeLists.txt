@@ -48,7 +48,6 @@ add_library(tinyngine
 	src/ProgramGL.cpp
 	src/RendererGL.cpp
 	src/ShaderGL.cpp
-	src/StopWatchWin32.cpp
 	src/StringUtils.cpp
 	src/Time.cpp
 	src/TransformHelper.cpp

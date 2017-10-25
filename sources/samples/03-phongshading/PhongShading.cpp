@@ -116,6 +116,7 @@ public:
 
 		Time& time = engine.GetSystem<Time>();
 		mLastTime = time.GetTime();
+		clear_color = ImColor(114, 144, 154);
 	}
 
 	void RenderFrame(Engine& engine) override {
@@ -140,8 +141,6 @@ public:
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
 		char buffer[512];
-
-		ImVec4 clear_color = ImColor(114, 144, 154);
 		sprintf(buffer, "Time: %f", delta);
 		ImGui::Text(buffer);
 		sprintf(buffer, "Angle: (%f, %f)", mAngles.x, mAngles.y);
@@ -185,6 +184,8 @@ public:
 	}
 
 private:
+	ImVec4 clear_color;
+
 	ObjGeometry mObject;
 	std::vector<uint8_t> mColors;
 	int64_t mLastTime;

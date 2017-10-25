@@ -54,8 +54,9 @@ public:
 class CharEvent : public Event {
 public:
 	CharEvent() = delete;
-	CharEvent(std::array<uint8_t, 4>& ch, uint8_t len) : Event(Event::Char), mChar(ch), mLength(len) {}
+	CharEvent(uint32_t codepoint, std::array<uint8_t, 4>& ch, uint8_t len) : Event(Event::Char), mCodepoint(codepoint), mChar(ch), mLength(len) {}
 
+	uint32_t mCodepoint;
 	std::array<uint8_t, 4> mChar;
 	uint8_t mLength;
 };
@@ -68,7 +69,7 @@ public:
 	int32_t mPosX;
 	int32_t mPosY;
 	MouseButton::Enum mButton;
-	bool mPressed;
+	uint8_t mPressed;
 };
 
 class EventQueue {
@@ -85,8 +86,8 @@ public:
 		mQueue.push(std::make_unique<KeyEvent>(key, modifier, pressed));
 	}
 
-	void postCharEvent(std::array<uint8_t, 4>& ch, uint8_t len) {
-		mQueue.push(std::make_unique<CharEvent>(ch, len));
+	void postCharEvent(uint32_t codepoint, std::array<uint8_t, 4>& ch, uint8_t len) {
+		mQueue.push(std::make_unique<CharEvent>(codepoint, ch, len));
 	}
 
 	void postMouseEvent(int32_t x, int32_t y, MouseButton::Enum button, bool pressed) {

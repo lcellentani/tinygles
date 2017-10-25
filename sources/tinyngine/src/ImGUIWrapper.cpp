@@ -15,12 +15,17 @@ public:
 		DestroyDeviceObjects();
 	}
 
-	void ImGUIWrapperImpl::BeginFrame(int32_t windowWidth, int32_t windowHeight) override {
+	void ImGUIWrapperImpl::BeginFrame(MouseState& mouseState, int32_t windowWidth, int32_t windowHeight) override {
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2((float)windowWidth, (float)windowHeight);
 		io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 
 		io.DeltaTime = 1.0f / 60.0f;
+
+		io.MousePos = ImVec2(static_cast<float>(mouseState.mPosX), static_cast<float>(mouseState.mPosY));
+		for (int n = 0; n < 3; n++) {
+			io.MouseDown[n] = mouseState.mButtons[n];
+		}
 
 		ImGui::NewFrame();
 	}
@@ -124,6 +129,13 @@ public:
 		if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
 		glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 		glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
+	}
+
+	void AddInputCharacter(uint32_t ch) override {
+		ImGuiIO& io = ImGui::GetIO();
+		if (ch > 0 && ch < 0x10000) {
+			io.AddInputCharacter(static_cast<ImWchar>(ch));
+		}
 	}
 
 private:

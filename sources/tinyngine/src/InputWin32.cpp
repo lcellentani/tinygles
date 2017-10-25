@@ -3,16 +3,24 @@
 namespace tinyngine
 {
 
-void InputWin32::SetMousePosition(uint32_t x, uint32_t y) {
-	TINYNGINE_UNUSED(x); TINYNGINE_UNUSED(y);
+InputWin32::InputWin32() {
+	memset(mMousePosition, 0, sizeof(mMousePosition));
+	memset(mMouseButtons, MouseButton::None, sizeof(mMouseButtons));
+}
+
+void InputWin32::SetMousePosition(int32_t x, int32_t y) {
+	mMousePosition[0] = x;
+	mMousePosition[1] = y;
 }
 
 void InputWin32::SetMouseButtonState(MouseButton::Enum button, uint8_t state) {
-	TINYNGINE_UNUSED(button); TINYNGINE_UNUSED(state);
+	mMouseButtons[button] = state;
 }
 
 void InputWin32::GetMouseState(MouseState& mouseState) {
-	TINYNGINE_UNUSED(mouseState);
+	memcpy(mouseState.mButtons, mMouseButtons, sizeof(MouseButton));
+	mouseState.mPosX = mMousePosition[0];
+	mouseState.mPosY = mMousePosition[1];
 }
 
 } // tinyngine

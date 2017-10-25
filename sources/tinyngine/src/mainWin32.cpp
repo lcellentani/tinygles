@@ -1,5 +1,4 @@
 #include "IPlatformBridge.h"
-#include "StopWatchWin32.h"
 #include "IPlatformContext.h"
 #include "Application.h"
 #include "Engine.h"
@@ -8,6 +7,7 @@
 #include "Renderer.h"
 #include "ImGUIWrapper.h"
 #include "Log.h"
+#include "imgui.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -319,12 +319,23 @@ LRESULT CALLBACK PlatformBridgeWin32::WndProc(HWND hwnd, UINT id, WPARAM wparam,
 	case WM_SIZE:
 		break;
 	case WM_MOUSEMOVE:
+		{
+			int32_t mx = GET_X_LPARAM(lparam);
+			int32_t my = GET_Y_LPARAM(lparam);
+
+			if (0 == mx && 0 == my) {
+				break;
+			}
+
+			//setMousePos(_hwnd, m_mx, m_my);
+			thisClass->mEventQueue->postMouseEvent(mx, my, MouseButton::None, 0);
+		}
 		break;
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_LBUTTONDBLCLK:
 		{
-			bool pressed = id == WM_LBUTTONDOWN;
+			uint8_t pressed = (id == WM_LBUTTONDOWN) ? 1 : 0;
 			if (pressed) {
 				SetCapture(thisClass->mHwnd);
 			} else {
@@ -337,7 +348,7 @@ LRESULT CALLBACK PlatformBridgeWin32::WndProc(HWND hwnd, UINT id, WPARAM wparam,
 	case WM_MBUTTONUP:
 	case WM_MBUTTONDBLCLK:
 		{
-			bool pressed = id == WM_LBUTTONDOWN;
+			uint8_t pressed = (id == WM_LBUTTONDOWN) ? 1 : 0;
 			if (pressed) {
 				SetCapture(thisClass->mHwnd);
 			}
@@ -351,7 +362,7 @@ LRESULT CALLBACK PlatformBridgeWin32::WndProc(HWND hwnd, UINT id, WPARAM wparam,
 	case WM_RBUTTONUP:
 	case WM_RBUTTONDBLCLK:
 		{
-			bool pressed = id == WM_LBUTTONDOWN;
+			uint8_t pressed = (id == WM_LBUTTONDOWN) ? 1 : 0;
 			if (pressed) {
 				SetCapture(thisClass->mHwnd);
 			}
@@ -382,7 +393,7 @@ LRESULT CALLBACK PlatformBridgeWin32::WndProc(HWND hwnd, UINT id, WPARAM wparam,
 			std::array<uint8_t, 4> utf8{ 0 };
 			uint8_t len = (uint8_t)WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)&wparam, 1, (LPSTR)&utf8[0], 4, NULL, NULL);
 			if (len) {
-				thisClass->mEventQueue->postCharEvent(utf8, len);
+				thisClass->mEventQueue->postCharEvent((uint32_t)wparam, utf8, len);
 			}
 		}
 		break;
@@ -405,10 +416,12 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 	
 	std::unique_ptr<Engine> engine = std::make_unique<Engine>();
 	Renderer& renderer = engine->GetSystem<Renderer>();
+	Input& input = engine->GetSystem<Input>();
 	ImGUIWrapper& uiWrapper = engine->GetSystem<ImGUIWrapper>();
 
 	pinst->mApplication->InitView((*engine), pinst->mWidth, pinst->mHeight);
 
+	MouseState mouseState{ 0 };
 	do {
 		std::unique_ptr<Event> event = pinst->PollEvents();
 		if (event) {
@@ -428,18 +441,23 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 				break;
 			case Event::Char:
 				if (CharEvent* charEvent = reinterpret_cast<CharEvent*>(event.get())) {
-					Log(Logger::Information, "char: %s", (char*)&charEvent->mChar[0]);
+					//Log(Logger::Information, "char: %s", (char*)&charEvent->mChar[0]);
+					uiWrapper.AddInputCharacter(charEvent->mCodepoint);
 				}
 				break;
 			case Event::Mouse:
 				if (MouseEvent* mouseEvent = reinterpret_cast<MouseEvent*>(event.get())) {
-					Log(Logger::Information, "x = %d , y = %d - button =  %d - pressed = %d", mouseEvent->mPosX, mouseEvent->mPosY, mouseEvent->mButton, mouseEvent->mPressed);
+					//Log(Logger::Information, "x = %d , y = %d - button =  %d - pressed = %d", mouseEvent->mPosX, mouseEvent->mPosY, mouseEvent->mButton, mouseEvent->mPressed);
+					input.SetMousePosition(mouseEvent->mPosX, mouseEvent->mPosY);
+					input.SetMouseButtonState(mouseEvent->mButton, mouseEvent->mPressed);
 				}
 				break;
 			}
 		}
 
-		uiWrapper.BeginFrame(pinst->mWidth, pinst->mHeight);
+		input.GetMouseState(mouseState);
+
+		uiWrapper.BeginFrame(mouseState, pinst->mWidth, pinst->mHeight);
 
 		pinst->mApplication->RenderFrame((*engine));
 
