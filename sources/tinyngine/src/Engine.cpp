@@ -1,17 +1,19 @@
 #include "Engine.h"
 #include "InputWin32.h"
 #include "Time.h"
-#include "RendererGL.h"
+#include "gl/GraphicsDeviceGL.h"
 #include "ImGUIWrapper.h"
+#include "MeshLoader.h"
 
 namespace tinyngine
 {
 
 Engine::Engine() {
 	mSystems[std::type_index(typeid(Input))] = new InputWin32();
-	mSystems[std::type_index(typeid(Renderer))] = new RendererGL();
+	mSystems[std::type_index(typeid(GraphicsDevice))] = new GraphicsDeviceGL();
 	mSystems[std::type_index(typeid(ImGUIWrapper))] = CreateImGUIWrapper();
 	mSystems[std::type_index(typeid(Time))] = new Time();
+	mSystems[std::type_index(typeid(MeshLoader))] = new MeshLoader();
 }
 
 Engine::~Engine() {

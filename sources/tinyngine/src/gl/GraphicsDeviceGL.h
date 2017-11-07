@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Renderer.h"
+#include "GraphicsDevice.h"
 
 namespace tinyngine
 {
 
-class RendererGL : public Renderer {
+class GraphicsDeviceGL : public GraphicsDevice {
 public:
-	RendererGL();
-	virtual ~RendererGL();
+	GraphicsDeviceGL();
+	virtual ~GraphicsDeviceGL();
 
 	void Commit() override;
 

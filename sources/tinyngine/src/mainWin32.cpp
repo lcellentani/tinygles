@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "Input.h"
 #include "Time.h"
-#include "Renderer.h"
+#include "GraphicsDevice.h"
 #include "ImGUIWrapper.h"
 #include "Log.h"
 #include "imgui.h"
@@ -415,7 +415,7 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 	if (result != Result::Success) { return; }
 	
 	std::unique_ptr<Engine> engine = std::make_unique<Engine>();
-	Renderer& renderer = engine->GetSystem<Renderer>();
+	GraphicsDevice& graphicsDevice = engine->GetSystem<GraphicsDevice>();
 	Input& input = engine->GetSystem<Input>();
 	ImGUIWrapper& uiWrapper = engine->GetSystem<ImGUIWrapper>();
 
@@ -431,7 +431,7 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 				break;
 			case Event::Size:
 				if (SizeEvent* sizeEvent = reinterpret_cast<SizeEvent*>(event.get())) {
-					renderer.SetViewport(0, 0, sizeEvent->mWidth, sizeEvent->mHeight);
+					graphicsDevice.SetViewport(0, 0, sizeEvent->mWidth, sizeEvent->mHeight);
 				}
 				break;
 			case Event::Key:

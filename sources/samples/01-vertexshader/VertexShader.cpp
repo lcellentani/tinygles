@@ -1,6 +1,6 @@
 #include "Application.h"
-#include "Renderer.h"
-#include "GeometryUtil.h"
+#include "GraphicsDevice.h"
+#include "MeshLoader.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
 #include "Log.h"
@@ -14,9 +14,7 @@ using namespace tinyngine;
 class VertexShader : public Application {
 public:
 	VertexShader() = default;
-	virtual ~VertexShader() {
-
-	}
+	virtual ~VertexShader() = default;
 
 	ContextAttribs& GetContextAttribs() override {
 		static ContextAttribs sAttributes;
@@ -36,11 +34,12 @@ public:
 
 	}
 
-	void InitView(Engine& engine, uint32_t, uint32_t) override {
-		Renderer& renderer = engine.GetSystem<Renderer>();
-		GenerateCube(1.0f, mCube);
-		mColors.reserve(mCube.numVertices * 4);
-		for (uint32_t i = 0; i < mCube.numVertices * 4; i += 4) {
+	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
+		MeshLoader& meshLoader = engine.GetSystem<MeshLoader>();
+		mCube = meshLoader.GenerateCube(1.0f);
+		mColors.reserve(mCube.mNumVertices * 4);
+		for (uint32_t i = 0; i < mCube.mNumVertices * 4; i += 4) {
 			mColors.push_back(255);
 			mColors.push_back(255);
 			mColors.push_back(0);
@@ -50,9 +49,9 @@ public:
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
-		mPositionsHandle = renderer.CreateVertexBuffer(&mCube.positions[0], sizeof(mCube.positions[0]) * mCube.numVertices * 3, mPosVertexFormat);
-		mColorsHandle = renderer.CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
-		mIndexesBufferHandle = renderer.CreateIndexBuffer(&mCube.indices[0], sizeof(mCube.indices[0]) * mCube.numIndices);
+		mPositionsHandle = graphicsDevice.CreateVertexBuffer(&mCube.mPositions[0], sizeof(mCube.mPositions[0]) * mCube.mNumVertices * 3, mPosVertexFormat);
+		mColorsHandle = graphicsDevice.CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
+		mIndexesBufferHandle = graphicsDevice.CreateIndexBuffer(&mCube.mIndices[0], sizeof(mCube.mIndices[0]) * mCube.mNumIndices);
 
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
@@ -74,12 +73,13 @@ public:
 				v_color = a_color0;
 			}
 		);
-		ShaderHandle vsHandle = renderer.CreateShader(ShaderType::VertexProgram, vertexShaderSource);
-		ShaderHandle fsHandle = renderer.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
-		mProgramHandle = renderer.CreateProgram(vsHandle, fsHandle, true);
-		mModelViewProjHandle = renderer.GetUniform(mProgramHandle, "u_modelViewProj");
+		ShaderHandle vsHandle = graphicsDevice.CreateShader(ShaderType::VertexProgram, vertexShaderSource);
+		ShaderHandle fsHandle = graphicsDevice.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		mProgramHandle = graphicsDevice.CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = graphicsDevice.GetUniform(mProgramHandle, "u_modelViewProj");
 
-		mProj = glm::perspective(glm::radians(60.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
+		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
 		mView = glm::lookAt(glm::vec3(-2.0f, 2.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		mRight = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -90,11 +90,11 @@ public:
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::View);
 		mTransformHelper.LoadMatrix(mView);
 
-		renderer.SetState(RendererStateType::CullFace, true);
+		graphicsDevice.SetState(RendererStateType::CullFace, true);
 	}
 
 	void RenderFrame(Engine& engine) override {
-		Renderer& renderer = engine.GetSystem<Renderer>();
+		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		mAngles.x -= mSpeed.x;
 		if (mAngles.x < 0.0f) {
 			mAngles.x += 360.0f;
@@ -109,18 +109,18 @@ public:
 		mTransformHelper.Rotate(mAngles.y, mUp);
 		mTransformHelper.Rotate(-mAngles.x, mRight);
 
-		renderer.Clear(Renderer::ColorBuffer | Renderer::DepthBuffer, Color(92, 92, 92));
+		graphicsDevice.Clear(GraphicsDevice::ColorBuffer | GraphicsDevice::DepthBuffer, Color(92, 92, 92));
 
-		renderer.SetVertexBuffer(mPositionsHandle, Attributes::Position);
-		renderer.SetVertexBuffer(mColorsHandle, Attributes::Color0);
+		graphicsDevice.SetVertexBuffer(mPositionsHandle, Attributes::Position);
+		graphicsDevice.SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
-		renderer.SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		graphicsDevice.SetProgram(mProgramHandle, mPosVertexFormat);
+		graphicsDevice.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
 
-		renderer.SetIndexBuffer(mIndexesBufferHandle);
-		renderer.DrawElements(PrimitiveType::Triangles, mCube.numIndices);
+		graphicsDevice.SetIndexBuffer(mIndexesBufferHandle);
+		graphicsDevice.DrawElements(PrimitiveType::Triangles, mCube.mNumIndices);
 
-		renderer.Commit();
+		graphicsDevice.Commit();
 	}
 
 	void ReleaseView(Engine&) override {
@@ -131,7 +131,7 @@ public:
 	}
 
 private:
-	Geometry mCube;
+	MeshInfo mCube;
 	std::vector<uint8_t> mColors;
 
 	VertexFormat mPosVertexFormat;

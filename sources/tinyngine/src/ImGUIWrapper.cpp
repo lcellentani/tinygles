@@ -1,5 +1,5 @@
 #include "ImGUIWrapper.h"
-#include "GLApi.h"
+#include "gl/GLApi.h"
 #include "imgui.h"
 
 namespace tinyngine

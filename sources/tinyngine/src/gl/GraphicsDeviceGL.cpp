@@ -1,4 +1,4 @@
-#include "RendererGL.h"
+#include "GraphicsDeviceGL.h"
 #include "PlatformDefine.h"
 #include "ShaderGL.h"
 #include "ProgramGL.h"
@@ -24,7 +24,7 @@ static constexpr uint32_t cMaxIndexBufferHandle = (1 << 10);
 namespace tinyngine
 {
 
-struct RendererGL::Impl {
+struct GraphicsDeviceGL::Impl {
 	uint32_t mVertexBuffersCount = 0;
 	std::array<VertexBufferGL, cMaxVertexBufferHandles> mVertexBuffers;
 	std::array<GLuint, Attributes::Count> mAttributesVertexBufferHandles;
@@ -45,21 +45,21 @@ struct RendererGL::Impl {
 
 //=====================================================================================================================
 
-RendererGL::RendererGL() : mImpl(new Impl()) {
+GraphicsDeviceGL::GraphicsDeviceGL() : mImpl(new Impl()) {
 	std::fill(std::begin(mImpl->mStatesCache), std::end(mImpl->mStatesCache), UINT8_MAX);
 }
 
-RendererGL::~RendererGL() {
+GraphicsDeviceGL::~GraphicsDeviceGL() {
 	GL_CHECK(glUseProgram(0));
 	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
 	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-void RendererGL::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
+void GraphicsDeviceGL::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
 	GL_CHECK(glViewport(x, y, width, height));
 }
 
-void RendererGL::Commit() {
+void GraphicsDeviceGL::Commit() {
 	GL_CHECK(glFlush());
 
 	if (mImpl->mCurrentProgramHandle.IsValid()) {
@@ -72,7 +72,7 @@ void RendererGL::Commit() {
 	GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-void RendererGL::Clear(uint8_t flags, Color color, float depth, uint8_t stencil) {
+void GraphicsDeviceGL::Clear(uint8_t flags, Color color, float depth, uint8_t stencil) {
 	if (flags & ClearFlags::ColorBuffer) {
 		GL_CHECK(glClearColor(color.red(), color.green(), color.blue(), color.alpha()));
 		GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
@@ -89,18 +89,18 @@ void RendererGL::Clear(uint8_t flags, Color color, float depth, uint8_t stencil)
 	mImpl->mCurrentProgramHandle = ProgramHandle(cInvalidHandle);
 }
 
-void RendererGL::SetColorMake(bool red, bool green, bool blue, bool alpha) {
+void GraphicsDeviceGL::SetColorMake(bool red, bool green, bool blue, bool alpha) {
 	GL_CHECK(glColorMask(red, green, blue, alpha));
 }
-void RendererGL::SetDepthMask(bool flag) {
+void GraphicsDeviceGL::SetDepthMask(bool flag) {
 	GL_CHECK(glDepthMask(flag));
 }
 
-void RendererGL::SetStencilMask(uint32_t mask) {
+void GraphicsDeviceGL::SetStencilMask(uint32_t mask) {
 	GL_CHECK(SetStencilMask(mask));
 }
 
-void RendererGL::SetState(RendererStateType::Enum type, bool value) {
+void GraphicsDeviceGL::SetState(RendererStateType::Enum type, bool value) {
 	if (mImpl->mStatesCache[type] != UINT8_MAX && (mImpl->mStatesCache[type] ? 1 : 0) == value) {
 		return;
 	}
@@ -113,82 +113,82 @@ void RendererGL::SetState(RendererStateType::Enum type, bool value) {
 	GL_CHECK(glDisable(cap));
 }
 
-void RendererGL::SetCullMode(CullFaceModes::Enum mode) {
+void GraphicsDeviceGL::SetCullMode(CullFaceModes::Enum mode) {
 	GL_CHECK(glCullFace(tinyngine::gl::GetCullFaceMode(mode)));
 }
 
-void RendererGL::SetWinding(WindingModes::Enum mode) {
+void GraphicsDeviceGL::SetWinding(WindingModes::Enum mode) {
 	GL_CHECK(glFrontFace(tinyngine::gl::GetWindingMode(mode)));
 }
 
-void RendererGL::SetBlendFunc(BlendFuncs::Enum sfactor, BlendFuncs::Enum dfactor) {
+void GraphicsDeviceGL::SetBlendFunc(BlendFuncs::Enum sfactor, BlendFuncs::Enum dfactor) {
 	GL_CHECK(glBlendFunc(tinyngine::gl::GetBlendFunc(sfactor), tinyngine::gl::GetBlendFunc(dfactor)));
 }
 
-void RendererGL::SetDepthFunc(DepthFuncs::Enum func) {
+void GraphicsDeviceGL::SetDepthFunc(DepthFuncs::Enum func) {
 	GL_CHECK(glDepthFunc(tinyngine::gl::GetDepthFunc(func)));
 }
 
-void RendererGL::SetStencilFunc(StencilFuncs::Enum func, int32_t ref, uint32_t mask) {
+void GraphicsDeviceGL::SetStencilFunc(StencilFuncs::Enum func, int32_t ref, uint32_t mask) {
 	GL_CHECK(glStencilFunc(func, ref, mask))
 }
 
-void RendererGL::SetStencilOp(StencilOpTypes::Enum sfail, StencilOpTypes::Enum dpfail, StencilOpTypes::Enum dppass) {
+void GraphicsDeviceGL::SetStencilOp(StencilOpTypes::Enum sfail, StencilOpTypes::Enum dpfail, StencilOpTypes::Enum dppass) {
 	GL_CHECK(glStencilOp(tinyngine::gl::GetStencilOpType(sfail), tinyngine::gl::GetStencilOpType(dpfail), tinyngine::gl::GetStencilOpType(dppass)));
 }
 
-void RendererGL::SetBlendColor(Color color) {
+void GraphicsDeviceGL::SetBlendColor(Color color) {
 	GL_CHECK(glBlendColor(color.red(), color.green(), color.blue(), color.alpha()));
 }
 
-void RendererGL::SetPolygonffset(float factor, float units) {
+void GraphicsDeviceGL::SetPolygonffset(float factor, float units) {
 	GL_CHECK(glPolygonOffset(factor, units));
 }
 
-void RendererGL::DrawArray(PrimitiveType::Enum primitive, uint32_t first, uint32_t count) {
+void GraphicsDeviceGL::DrawArray(PrimitiveType::Enum primitive, uint32_t first, uint32_t count) {
 	GL_CHECK(glDrawArrays(tinyngine::gl::GetPrimitiveType(primitive), first, count));
 }
 
-void RendererGL::DrawElements(PrimitiveType::Enum primitive, uint32_t count) {
+void GraphicsDeviceGL::DrawElements(PrimitiveType::Enum primitive, uint32_t count) {
 	GL_CHECK(glDrawElements(tinyngine::gl::GetPrimitiveType(primitive), count, GL_UNSIGNED_INT, 0));
 }
 
-VertexBufferHandle RendererGL::CreateVertexBuffer(const void* data, uint32_t size, const VertexFormat& vertexFormat) {
+VertexBufferHandle GraphicsDeviceGL::CreateVertexBuffer(const void* data, uint32_t size, const VertexFormat& vertexFormat) {
 	VertexBufferHandle handle = VertexBufferHandle(mImpl->mVertexBuffersCount++);
 	auto& vertexBuffer = mImpl->mVertexBuffers[handle.mHandle];
 	vertexBuffer.Create(data, size, vertexFormat);
 	return vertexBuffer.IsValid() ? handle : VertexBufferHandle(cInvalidHandle);
 }
 
-void RendererGL::SetVertexBuffer(const VertexBufferHandle& handle, Attributes::Enum attribute) {
+void GraphicsDeviceGL::SetVertexBuffer(const VertexBufferHandle& handle, Attributes::Enum attribute) {
 	if (handle.IsValid()) {
 		auto& vertexBuffer = mImpl->mVertexBuffers[handle.mHandle];
 		mImpl->mAttributesVertexBufferHandles[attribute] = vertexBuffer.GetId();
 	}
 }
 
-IndexBufferHandle RendererGL::CreateIndexBuffer(const void* data, uint32_t size) {
+IndexBufferHandle GraphicsDeviceGL::CreateIndexBuffer(const void* data, uint32_t size) {
 	IndexBufferHandle handle = IndexBufferHandle(mImpl->mIndexBuffersCount++);
 	auto& indexBuffer = mImpl->mIndexBuffers[handle.mHandle];
 	indexBuffer.Create(data, size);
 	return indexBuffer.IsValid() ? handle : IndexBufferHandle(cInvalidHandle);
 }
 
-void RendererGL::SetIndexBuffer(const IndexBufferHandle& handle) {
+void GraphicsDeviceGL::SetIndexBuffer(const IndexBufferHandle& handle) {
 	if (handle.IsValid()) {
 		auto& indexBuffer = mImpl->mIndexBuffers[handle.mHandle];
 		GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.GetId()));
 	}
 }
 
-ShaderHandle RendererGL::CreateShader(ShaderType::Enum type, const char* source) {
+ShaderHandle GraphicsDeviceGL::CreateShader(ShaderType::Enum type, const char* source) {
 	ShaderHandle handle = ShaderHandle(mImpl->mShadersCount++);
 	auto& shader = mImpl->mShaders[handle.mHandle];
 	shader.Create(tinyngine::gl::GetShaderType(type), source);
 	return shader.IsValid() ? handle : ShaderHandle(cInvalidHandle);
 }
 
-ProgramHandle RendererGL::CreateProgram(ShaderHandle& vertexShaderHandle, ShaderHandle& fragmentShaderHandle, bool destroyShaders) {
+ProgramHandle GraphicsDeviceGL::CreateProgram(ShaderHandle& vertexShaderHandle, ShaderHandle& fragmentShaderHandle, bool destroyShaders) {
 	if (!vertexShaderHandle.IsValid()) {
 		return ProgramHandle(cInvalidHandle);
 	}
@@ -210,7 +210,7 @@ ProgramHandle RendererGL::CreateProgram(ShaderHandle& vertexShaderHandle, Shader
 	return program.IsValid() ? handle : ProgramHandle(cInvalidHandle);
 }
 
-void RendererGL::SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) {
+void GraphicsDeviceGL::SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) {
 	if (mImpl->mCurrentProgramHandle.IsValid()) {
 		auto& program = mImpl->mPrograms[mImpl->mCurrentProgramHandle.mHandle];
 		program.UnbindAttributes();
@@ -224,7 +224,7 @@ void RendererGL::SetProgram(const ProgramHandle& handle, const VertexFormat& ver
 	}
 }
 
-UniformHandle RendererGL::GetUniform(const ProgramHandle& programHandle, const char* uniformName) const {
+UniformHandle GraphicsDeviceGL::GetUniform(const ProgramHandle& programHandle, const char* uniformName) const {
 	if (!programHandle.IsValid()) {
 		return UniformHandle(cInvalidHandle);
 	}
@@ -232,7 +232,7 @@ UniformHandle RendererGL::GetUniform(const ProgramHandle& programHandle, const c
 	return program.GetUniformHandle(uniformName);
 }
 
-void RendererGL::SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) {
+void GraphicsDeviceGL::SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) {
 	if (!programHandle.IsValid()) {
 		return;
 	}
@@ -240,7 +240,7 @@ void RendererGL::SetUniformFloat(const ProgramHandle& programHandle, UniformHand
 	program.SetUniformFloat(uniformHandle, data);
 }
 
-void RendererGL::SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) {
+void GraphicsDeviceGL::SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) {
 	if (!programHandle.IsValid()) {
 		return;
 	}
@@ -248,7 +248,7 @@ void RendererGL::SetUniformFloat3(const ProgramHandle& programHandle, UniformHan
 	program.SetUniformFloat3(uniformHandle, data);
 }
 
-void RendererGL::SetUniformMat4(const ProgramHandle& programHandle, const UniformHandle& uniformHandle, const float* data, bool transpose) {
+void GraphicsDeviceGL::SetUniformMat4(const ProgramHandle& programHandle, const UniformHandle& uniformHandle, const float* data, bool transpose) {
 	if (!programHandle.IsValid()) {
 		return;
 	}

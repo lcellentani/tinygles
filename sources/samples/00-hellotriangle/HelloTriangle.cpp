@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "Renderer.h"
+#include "GraphicsDevice.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
 #include "Log.h"
@@ -8,12 +8,8 @@ using namespace tinyngine;
 
 class HelloTriangle : public Application {
 public:
-	HelloTriangle() {
-	}
-
-	virtual ~HelloTriangle() {
-
-	}
+	HelloTriangle() = default;
+	virtual ~HelloTriangle() = default;
 
 	ContextAttribs& GetContextAttribs() override {
 		static ContextAttribs sAttributes;
@@ -40,11 +36,11 @@ public:
 			0.0f, 0.4f, 0.0f // Top Middle
 		};
 
-		Renderer& renderer = engine.GetSystem<Renderer>();
+		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
 		
-		mVertexBufferHandle = renderer.CreateVertexBuffer(cVertexData, sizeof(cVertexData), mPosVertexFormat);
+		mVertexBufferHandle = graphicsDevice.CreateVertexBuffer(cVertexData, sizeof(cVertexData), mPosVertexFormat);
 		
 		const char* fragmentShaderSource = SHADER_SOURCE
 		(
@@ -63,28 +59,28 @@ public:
 			}
 		);
 
-		ShaderHandle vsHandle = renderer.CreateShader(ShaderType::VertexProgram, vertexShaderSource);
-		ShaderHandle fsHandle = renderer.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
+		ShaderHandle vsHandle = graphicsDevice.CreateShader(ShaderType::VertexProgram, vertexShaderSource);
+		ShaderHandle fsHandle = graphicsDevice.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource);
 		
-		mProgramHandle = renderer.CreateProgram(vsHandle, fsHandle, true);
-		mModelViewProjHandle = renderer.GetUniform(mProgramHandle, "u_modelViewProj");
+		mProgramHandle = graphicsDevice.CreateProgram(vsHandle, fsHandle, true);
+		mModelViewProjHandle = graphicsDevice.GetUniform(mProgramHandle, "u_modelViewProj");
 	}
 
 	void RenderFrame(Engine& engine) override {
-		Renderer& renderer = engine.GetSystem<Renderer>();
+		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 
 		glm::mat4 modelViewProj = mTransformHelper.GetModelViewProjectionMatrix();
 
-		renderer.Clear(Renderer::ClearFlags::ColorBuffer, Color(92, 92, 92));
+		graphicsDevice.Clear(GraphicsDevice::ColorBuffer, Color(92, 92, 92));
 
-		renderer.SetVertexBuffer(mVertexBufferHandle, Attributes::Position);
+		graphicsDevice.SetVertexBuffer(mVertexBufferHandle, Attributes::Position);
 
-		renderer.SetProgram(mProgramHandle, mPosVertexFormat);
-		renderer.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &modelViewProj[0][0], false);
+		graphicsDevice.SetProgram(mProgramHandle, mPosVertexFormat);
+		graphicsDevice.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &modelViewProj[0][0], false);
 	
-		renderer.DrawArray(PrimitiveType::Triangles, 0, 3);
+		graphicsDevice.DrawArray(PrimitiveType::Triangles, 0, 3);
 
-		renderer.Commit();
+		graphicsDevice.Commit();
 	}
 
 	void ReleaseView(Engine&) override {

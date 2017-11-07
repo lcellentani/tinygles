@@ -20,6 +20,8 @@ file(GLOB TINYNGINE_TINYOBJLOADER_INCLUDES "${PROJECT_SOURCE_DIR}/3rdparty/tinyo
 file(GLOB TINYNGINE_TINYOBJLOADER_SOURCES "${PROJECT_SOURCE_DIR}/3rdparty/tinyobjloader/*.c*")
 
 file(GLOB TINYNGINE_PRIVATE_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h*")
+file(GLOB TINYNGINE_PRIVATE_GL_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/*.h*")
+file(GLOB TINYNGINE_PRIVATE_GL_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/gl/*.c*")
 
 if(MSVC) 
 	list(APPEND TINYNGINE_ALL_INCLUDES ${TINYNGINE_INCLUDES}) 
@@ -30,34 +32,40 @@ endif()
 add_library(tinyngine
 	${TINYNGINE_ALL_INCLUDES}
 	${TINYNGINE_PRIVATE_INCLUDES}
+	${TINYNGINE_PRIVATE_GL_INCLUDES}
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_demo.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/imgui/imgui_draw.cpp
 	${PROJECT_SOURCE_DIR}/3rdparty/tinyobjloader/tiny_obj_loader.cc
 	src/mainWin32.cpp
+	src/Application.cpp
 	src/DynLibLoader.cpp
-	src/EGLPlatformContext.cpp
-	src/EGLTrampoline.cpp
 	src/Engine.cpp
 	src/GeometryUtil.cpp
-	src/GLApi.cpp
+	src/ImageLoader.cpp
 	src/ImGUIWrapper.cpp
-	src/IndexBufferGL.cpp
 	src/InputWin32.cpp
 	src/Log.cpp
-	src/ProgramGL.cpp
-	src/RendererGL.cpp
-	src/ShaderGL.cpp
+	src/MeshLoader.cpp
 	src/StringUtils.cpp
 	src/Time.cpp
 	src/TransformHelper.cpp
-	src/VertexBufferGL.cpp
 	src/VertexFormat.cpp
+	src/gl/EGLPlatformContext.cpp
+	src/gl/EGLTrampoline.cpp
+	src/gl/GLApi.cpp
+	src/gl/GraphicsDeviceGL.cpp
+	src/gl/IndexBufferGL.cpp
+	src/gl/ProgramGL.cpp
+	src/gl/ShaderGL.cpp
+	src/gl/VertexBufferGL.cpp
 )
 
 if(MSVC)
 	source_group("Header Files\\" FILES ${TINYNGINE_INCLUDES}) 
 	source_group("Source Files\\" FILES ${TINYNGINE_PRIVATE_INCLUDES})
+	source_group("Source Files\\gl" FILES ${TINYNGINE_PRIVATE_GL_INCLUDES})
+	source_group("Source Files\\gl" FILES ${TINYNGINE_PRIVATE_GL_SOURCES})
 	source_group("Header Files\\imgui" FILES ${TINYNGINE_IMGUI_INCLUDES})
 	source_group("Source Files\\imgui" FILES ${TINYNGINE_IMGUI_SOURCES})
 	source_group("Header Files\\tinyobjloader" FILES ${TINYNGINE_TINYOBJLOADER_INCLUDES})

@@ -7,7 +7,7 @@
 namespace tinyngine
 {
 
-class Renderer : public System {
+class GraphicsDevice : public System {
 public:
 	enum ClearFlags {
 		None = 0,
@@ -17,7 +17,7 @@ public:
 	};
 
 public:
-	virtual ~Renderer() = default;
+	virtual ~GraphicsDevice() = default;
 
 	virtual void Commit() = 0;
 
