@@ -20,23 +20,8 @@ struct MeshInfo {
 class MeshLoader final : public System  {
 public:
 	MeshInfo GenerateCube(float scale);
-};
-/*struct Geometry {
-	uint32_t numVertices;
-	std::vector<float> positions;
-	std::vector<float> normals;
-	std::vector<float> texcoords;
 
-	uint32_t numIndices;
-	std::vector<uint32_t> indices;
+	std::vector<MeshInfo> LoadObj(const char* filename, bool triangulate = true);
 };
-
-struct ObjGeometry {
-	uint32_t numShapes;
-	std::vector<Geometry> shapes;
-};
-
-void GenerateCube(float scale, Geometry& result);
-void LoadObj(const  char * filename, bool triangulate, ObjGeometry& result);*/
 
 } // namespace tinyngine

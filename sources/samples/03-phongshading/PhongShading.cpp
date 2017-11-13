@@ -1,7 +1,7 @@
 #include "Application.h"
 #include "GraphicsDevice.h"
 #include "Time.h"
-#include "GeometryUtil.h"
+#include "MeshLoader.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
 #include "StringUtils.h"
@@ -53,16 +53,23 @@ public:
 
 	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
+		MeshLoader& meshLoader = engine.GetSystem<MeshLoader>();
 
-		//LoadObj("models/Cube.obj", true, mObject);
-		//LoadObj("models/Sphere.obj", true, mObject);
-		LoadObj("models/Monkey.obj", true, mObject);
-		//LoadObj("models/Teapot.obj", true, mObject);
-		//LoadObj("models/Cylinder.obj", true, mObject);
+		//const char * filename = "models/Cube.obj";
+		//const char * filename = "models/Sphere.obj";
+		//const char * filename = "models/Teapot.obj";
+		//const char * filename = "models/Cylinder.obj";
+		const char * filename = "models/Monkey.obj";
+		std::vector<MeshInfo> allMeshes = meshLoader.LoadObj(filename);
+		if (allMeshes.size() == 0) {
+			return;
+		}
 
-		Geometry& shape = mObject.shapes[0];
-		mColors.reserve(shape.numVertices * 4);
-		for (uint32_t i = 0; i < shape.numVertices * 4; i += 4) {
+		auto& mesh = allMeshes[0];
+		mNumIndices = mesh.mNumIndices;
+		uint32_t numVertices = mesh.mNumVertices;
+		mColors.reserve(numVertices * 4);
+		for (uint32_t i = 0; i < numVertices * 4; i += 4) {
 			mColors.push_back(255);
 			mColors.push_back(255);
 			mColors.push_back(255);
@@ -73,10 +80,10 @@ public:
 		mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
-		mPositionsHandle = graphicsDevice.CreateVertexBuffer(&shape.positions[0], sizeof(shape.positions[0]) * shape.numVertices * 3, mPosVertexFormat);
-		mNornalsHandle = graphicsDevice.CreateVertexBuffer(&shape.normals[0], sizeof(shape.normals[0]) * shape.numVertices * 3, mPosVertexFormat);
+		mPositionsHandle = graphicsDevice.CreateVertexBuffer(&mesh.mPositions[0], sizeof(mesh.mPositions[0]) * numVertices * 3, mPosVertexFormat);
+		mNornalsHandle = graphicsDevice.CreateVertexBuffer(&mesh.mNormals[0], sizeof(mesh.mNormals[0]) * numVertices * 3, mPosVertexFormat);
 		mColorsHandle = graphicsDevice.CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
-		mIndexesBufferHandle = graphicsDevice.CreateIndexBuffer(&shape.indices[0], sizeof(shape.indices[0]) * shape.numIndices);
+		mIndexesBufferHandle = graphicsDevice.CreateIndexBuffer(&mesh.mIndices[0], sizeof(mesh.mIndices[0]) * mNumIndices);
 
 		std::string vertexShaderSource;
 		StringUtils::ReadFileToString("shaders/phong_vert_2.glsl", vertexShaderSource);
@@ -114,9 +121,13 @@ public:
 		Time& time = engine.GetSystem<Time>();
 		mLastTime = time.GetTime();
 		clear_color = ImColor(114, 144, 154);
+
+		mInitialized = true;
 	}
 
 	void RenderFrame(Engine& engine) override {
+		if (!mInitialized) { return; }
+
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		Time& time = engine.GetSystem<Time>();
 
@@ -164,7 +175,7 @@ public:
 		graphicsDevice.SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosision[0]);
 
 		graphicsDevice.SetIndexBuffer(mIndexesBufferHandle);
-		graphicsDevice.DrawElements(PrimitiveType::Triangles, mObject.shapes[0].numIndices);
+		graphicsDevice.DrawElements(PrimitiveType::Triangles, mNumIndices);
 
 		graphicsDevice.Commit();
 	}
@@ -180,7 +191,8 @@ public:
 private:
 	ImVec4 clear_color;
 
-	ObjGeometry mObject;
+	bool mInitialized = false;
+	uint32_t mNumIndices = 0;
 	std::vector<uint8_t> mColors;
 	int64_t mLastTime;
 

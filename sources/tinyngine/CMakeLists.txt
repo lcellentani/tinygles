@@ -41,7 +41,6 @@ add_library(tinyngine
 	src/Application.cpp
 	src/DynLibLoader.cpp
 	src/Engine.cpp
-	src/GeometryUtil.cpp
 	src/ImageLoader.cpp
 	src/ImGUIWrapper.cpp
 	src/InputWin32.cpp
