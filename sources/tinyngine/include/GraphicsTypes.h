@@ -172,6 +172,14 @@ namespace tinyngine
 		};
 	};
 
+	struct ImageData {
+		uint32_t mWidth;
+		uint32_t mHeight;
+		uint32_t mSize;
+		uint8_t mBitsPerPixel;
+		void* mData;
+	};
+
 	struct Color
 	{
 		static constexpr Color Red() { return Color(255, 0, 0); }
@@ -212,5 +220,6 @@ namespace tinyngine
 	using VertexBufferHandle = ResourceHandle;
 	using IndexBufferHandle = ResourceHandle;
 	using UniformHandle = ResourceHandle;
+	using TextureHandle = ResourceHandle;
 
 } // namespace tinyngine

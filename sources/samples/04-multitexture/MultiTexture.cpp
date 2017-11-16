@@ -1,17 +1,15 @@
 #include "Application.h"
-#include "GeometryUtil.h"
+#include "ImageLoader.h"
 #include "Log.h"
 
 #include <vector>
 
 using namespace tinyngine;
 
-class SimpleTexture : public Application {
+class MultiTexture : public Application {
 public:
-	SimpleTexture() = default;
-	virtual ~SimpleTexture() {
-
-	}
+	MultiTexture() = default;
+	virtual ~MultiTexture() = default;
 
 	ContextAttribs& GetContextAttribs() override {
 		static ContextAttribs sAttributes;
@@ -31,10 +29,14 @@ public:
 
 	}
 
-	void InitView(Engine&, uint32_t, uint32_t) override {
-		//InitializeShaders();
+	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		
+		ImageLoader& imageLoader = engine.GetSystem<ImageLoader>();
+		ImageData imageData;
+		imageLoader.Load("textures/woodenbox.png", imageData);
 
-		//CreateSimpleTexture();
+		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
+		TINYNGINE_UNUSED(ratio);
 	}
 
 	void RenderFrame(Engine&) override {
@@ -178,5 +180,5 @@ private:
 
 
 extern "C" tinyngine::Application * CreateApplication() {
-	return new SimpleTexture();
+	return new MultiTexture();
 }

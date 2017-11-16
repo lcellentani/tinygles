@@ -4,6 +4,7 @@
 #include "ProgramGL.h"
 #include "VertexBufferGL.h"
 #include "IndexBufferGL.h"
+#include "TextureGL.h"
 
 #include <array>
 #include <unordered_map>
@@ -18,6 +19,7 @@ static constexpr uint32_t cMaxShaderHandles = (1 << 6);
 static constexpr uint32_t cMaxProgramHandles = (1 << 6);
 static constexpr uint32_t cMaxVertexBufferHandles = (1 << 10);
 static constexpr uint32_t cMaxIndexBufferHandle = (1 << 10);
+static constexpr uint32_t cMaxTextureHandle = (1 << 10);
 
 }
 
@@ -39,6 +41,9 @@ struct GraphicsDeviceGL::Impl {
 	std::array<ProgramGL, cMaxProgramHandles> mPrograms;
 	ProgramHandle mCurrentProgramHandle = ResourceHandle(cInvalidHandle);
 	ProgramGL mInvalidProgram;
+
+	uint32_t mTexturesCount = 0;
+	std::array<TextureGL, cMaxTextureHandle> mTextures;
 
 	std::array<uint8_t, RendererStateType::Count> mStatesCache;
 };
@@ -254,6 +259,21 @@ void GraphicsDeviceGL::SetUniformMat4(const ProgramHandle& programHandle, const 
 	}
 	auto& program = mImpl->mPrograms[programHandle.mHandle];
 	program.SetUniformMat4(uniformHandle, data, transpose);
+}
+
+TextureHandle GraphicsDeviceGL::CreateTexture2D(const ImageData& imageData) {
+	TextureHandle handle = TextureHandle(mImpl->mTexturesCount++);
+	auto& texture = mImpl->mTextures[handle.mHandle];
+	texture.Create(GL_TEXTURE_2D, imageData);
+	return texture.IsValid() ? handle : TextureHandle(cInvalidHandle);
+}
+
+void GraphicsDeviceGL::SetTexture(const TextureHandle& textureHandle) {
+	if (!textureHandle.IsValid()) {
+		return;
+	}
+	auto& texture = mImpl->mTextures[textureHandle.mHandle];
+	texture.Bind();
 }
 
 } // namespace tinyngine

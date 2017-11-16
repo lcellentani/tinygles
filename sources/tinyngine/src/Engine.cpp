@@ -4,6 +4,7 @@
 #include "gl/GraphicsDeviceGL.h"
 #include "ImGUIWrapper.h"
 #include "MeshLoader.h"
+#include "ImageLoader.h"
 
 namespace tinyngine
 {
@@ -14,6 +15,7 @@ Engine::Engine() {
 	mSystems[std::type_index(typeid(ImGUIWrapper))] = CreateImGUIWrapper();
 	mSystems[std::type_index(typeid(Time))] = new Time();
 	mSystems[std::type_index(typeid(MeshLoader))] = new MeshLoader();
+	mSystems[std::type_index(typeid(ImageLoader))] = new ImageLoader();
 }
 
 Engine::~Engine() {

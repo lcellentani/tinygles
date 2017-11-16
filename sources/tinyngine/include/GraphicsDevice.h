@@ -56,6 +56,9 @@ public:
 	virtual void SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) = 0;
 	virtual void SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) = 0;
 	virtual void SetUniformMat4(const ProgramHandle& programHandle, const UniformHandle& uniformHandle, const float* data, bool transpose) = 0;
+
+	virtual TextureHandle CreateTexture2D(const ImageData& imageData) = 0;
+	virtual void SetTexture(const TextureHandle& textureHandle) = 0;
 };
 
 } // namespace tinyngine

@@ -56,6 +56,7 @@ add_library(tinyngine
 	src/gl/GraphicsDeviceGL.cpp
 	src/gl/IndexBufferGL.cpp
 	src/gl/ProgramGL.cpp
+	src/gl/TextureGL.cpp
 	src/gl/ShaderGL.cpp
 	src/gl/VertexBufferGL.cpp
 )

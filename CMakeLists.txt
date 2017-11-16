@@ -27,7 +27,7 @@ add_subdirectory(sources/samples/00-hellotriangle)
 add_subdirectory(sources/samples/01-vertexshader)
 add_subdirectory(sources/samples/02-gouraudshading)
 add_subdirectory(sources/samples/03-phongshading)
-#add_subdirectory(sources/samples/04-simpletexture)
+add_subdirectory(sources/samples/04-multitexture)
 #add_subdirectory(sources/samples/05-simplemipmapping)
 
 if (MSVC)

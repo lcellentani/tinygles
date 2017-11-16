@@ -1,5 +1,4 @@
 #include "ShaderGL.h"
-#include "GLApi.h"
 
 namespace tinyngine
 {
