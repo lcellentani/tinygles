@@ -23,6 +23,7 @@ public:
 
 	UniformHandle GetUniformHandle(const char* uniformName) const;
 
+	void SetUniformInt(const UniformHandle& uniformHandle, int32_t data);
 	void SetUniformFloat(const UniformHandle& uniformHandle, float data);
 	void SetUniformFloat3(const UniformHandle& uniformHandle, const float* data);
 	void SetUniformMat4(const UniformHandle& uniformHandle, const float* data, bool transpose);

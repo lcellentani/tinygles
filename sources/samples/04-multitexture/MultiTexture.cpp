@@ -58,10 +58,12 @@ public:
 		}
 
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
+		mPosVertexFormat.Add(Attributes::TexCoord0, AttributeType::Float, 2, false);
 		//mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
 		mPositionsHandle = graphicsDevice.CreateVertexBuffer(&mesh.mPositions[0], sizeof(mesh.mPositions[0]) * numVertices * 3, mPosVertexFormat);
+		mTexcoords0Handle = graphicsDevice.CreateVertexBuffer(&mesh.mTexcoords[0], sizeof(mesh.mTexcoords[0]) * numVertices * 2, mPosVertexFormat);
 		//mNornalsHandle = graphicsDevice.CreateVertexBuffer(&mesh.mNormals[0], sizeof(mesh.mNormals[0]) * numVertices * 3, mPosVertexFormat);
 		mColorsHandle = graphicsDevice.CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
 		mIndexesBufferHandle = graphicsDevice.CreateIndexBuffer(&mesh.mIndices[0], sizeof(mesh.mIndices[0]) * mNumIndices);
@@ -75,10 +77,12 @@ public:
 		ShaderHandle fsHandle = graphicsDevice.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource.c_str());
 		mProgramHandle = graphicsDevice.CreateProgram(vsHandle, fsHandle, true);
 		mModelViewProjHandle = graphicsDevice.GetUniform(mProgramHandle, "u_modelViewProj");
+		mTexture0Handle = graphicsDevice.GetUniform(mProgramHandle, "u_texture0");
 
 		ImageLoader& imageLoader = engine.GetSystem<ImageLoader>();
 		ImageData imageData;
 		imageLoader.Load("textures/woodenbox.png", imageData);
+		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(imageData, TextureFormats::RGB8);
 
 		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
@@ -113,17 +117,21 @@ public:
 
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Model);
 		mTransformHelper.LoadIdentity();
-		mTransformHelper.Rotate(mAngles.y, mUp);
-		mTransformHelper.Rotate(-mAngles.x, mRight);
+		//mTransformHelper.Rotate(mAngles.y, mUp);
+		//mTransformHelper.Rotate(-mAngles.x, mRight);
 
 		graphicsDevice.Clear(GraphicsDevice::ColorBuffer | GraphicsDevice::DepthBuffer, Color(92, 92, 92), 1.0f);
 
 		graphicsDevice.SetVertexBuffer(mPositionsHandle, Attributes::Position);
 		//graphicsDevice.SetVertexBuffer(mNornalsHandle, Attributes::Normal);
+		graphicsDevice.SetVertexBuffer(mTexcoords0Handle, Attributes::TexCoord0);
 		graphicsDevice.SetVertexBuffer(mColorsHandle, Attributes::Color0);
+
+		graphicsDevice.SetTexture(0, mPrimaryTextureHandle);
 
 		graphicsDevice.SetProgram(mProgramHandle, mPosVertexFormat);
 		graphicsDevice.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		graphicsDevice.setUniform1i(mProgramHandle, mTexture0Handle, 0);
 
 		graphicsDevice.SetIndexBuffer(mIndexesBufferHandle);
 		graphicsDevice.DrawElements(PrimitiveType::Triangles, mNumIndices);
@@ -213,6 +221,7 @@ private:
 	ProgramHandle mProgramHandle;
 
 	VertexBufferHandle mPositionsHandle;
+	VertexBufferHandle mTexcoords0Handle;
 	VertexBufferHandle mNornalsHandle;
 	VertexBufferHandle mColorsHandle;
 	IndexBufferHandle mIndexesBufferHandle;
@@ -220,6 +229,7 @@ private:
 	TextureHandle mSecondaryTextureHandle;
 
 	UniformHandle mModelViewProjHandle;
+	UniformHandle mTexture0Handle;
 
 	bool mInitialized = false;
 	uint32_t mNumIndices = 0;

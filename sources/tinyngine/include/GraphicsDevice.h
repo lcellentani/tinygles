@@ -53,12 +53,14 @@ public:
 	virtual void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) = 0;
 
 	virtual UniformHandle GetUniform(const ProgramHandle& handle, const char* uniformName) const = 0;
+
+	virtual void setUniform1i(const ProgramHandle& programHandle, UniformHandle& uniformHandle, int32_t data) = 0;
 	virtual void SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) = 0;
 	virtual void SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) = 0;
 	virtual void SetUniformMat4(const ProgramHandle& programHandle, const UniformHandle& uniformHandle, const float* data, bool transpose) = 0;
 
 	virtual TextureHandle CreateTexture2D(const ImageData& imageData, TextureFormats::Enum textureFormat) = 0;
-	virtual void SetTexture(const TextureHandle& textureHandle) = 0;
+	virtual void SetTexture(uint32_t stage, const TextureHandle& textureHandle) = 0;
 };
 
 } // namespace tinyngine

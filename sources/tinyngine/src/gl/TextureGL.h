@@ -11,7 +11,7 @@ public:
 
 	void Create(GLenum target, const ImageData& imageData, TextureFormats::Enum textureFormat);
 	void Destroy();
-	void Bind();
+	void Bind(uint32_t stage);
 
 	inline GLint GetId() const { return mId; }
 	inline GLenum GetTarget() const { return mTarget; }

@@ -237,6 +237,14 @@ UniformHandle GraphicsDeviceGL::GetUniform(const ProgramHandle& programHandle, c
 	return program.GetUniformHandle(uniformName);
 }
 
+void GraphicsDeviceGL::setUniform1i(const ProgramHandle& programHandle, UniformHandle& uniformHandle, int32_t data) {
+	if (!programHandle.IsValid()) {
+		return;
+	}
+	auto& program = mImpl->mPrograms[programHandle.mHandle];
+	program.SetUniformInt(uniformHandle, data);
+}
+
 void GraphicsDeviceGL::SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) {
 	if (!programHandle.IsValid()) {
 		return;
@@ -268,12 +276,12 @@ TextureHandle GraphicsDeviceGL::CreateTexture2D(const ImageData& imageData, Text
 	return texture.IsValid() ? handle : TextureHandle(cInvalidHandle);
 }
 
-void GraphicsDeviceGL::SetTexture(const TextureHandle& textureHandle) {
+void GraphicsDeviceGL::SetTexture(uint32_t stage, const TextureHandle& textureHandle) {
 	if (!textureHandle.IsValid()) {
 		return;
 	}
 	auto& texture = mImpl->mTextures[textureHandle.mHandle];
-	texture.Bind();
+	texture.Bind(stage);
 }
 
 } // namespace tinyngine

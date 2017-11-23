@@ -44,12 +44,13 @@ public:
 	void SetProgram(const ProgramHandle& handle, const VertexFormat& vertexFormat) override;
 
 	UniformHandle GetUniform(const ProgramHandle& handle, const char* uniformName) const override;
+	void setUniform1i(const ProgramHandle& programHandle, UniformHandle& uniformHandle, int32_t data) override;
 	void SetUniformFloat(const ProgramHandle& programHandle, UniformHandle& uniformHandle, float data) override;
 	void SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) override;
 	void SetUniformMat4(const ProgramHandle& handle, const UniformHandle& uniform, const float* data, bool transpose) override;
 	
 	TextureHandle CreateTexture2D(const ImageData& imageData, TextureFormats::Enum textureFormat) override;
-	void SetTexture(const TextureHandle& textureHandle) override;
+	void SetTexture(uint32_t stage, const TextureHandle& textureHandle) override;
 
 private:
 	struct Impl;
