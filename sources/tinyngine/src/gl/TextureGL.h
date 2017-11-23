@@ -7,20 +7,22 @@ namespace tinyngine
 
 class TextureGL {
 public:
-	TextureGL() : mId(0), mType(0) {}
+	TextureGL() = default;
 
-	void Create(GLenum type, const ImageData& imageData);
+	void Create(GLenum target, const ImageData& imageData, TextureFormats::Enum textureFormat);
 	void Destroy();
 	void Bind();
 
 	inline GLint GetId() const { return mId; }
-	inline GLenum GetType() const { return mType; }
+	inline GLenum GetTarget() const { return mTarget; }
 
 	inline bool IsValid() const { return mId > 0; }
 
 private:
-	GLuint mId;
-	GLenum mType;
+	GLuint mId = 0;
+	GLenum mTarget = 0;
+	GLsizei mWidth = 0;
+	GLsizei mHeight = 0;
 };
 
 } // namespace tinyngine

@@ -6,6 +6,14 @@
 
 namespace tinyngine
 {
+	struct TextureFormats {
+		enum Enum {
+			RGB8,
+			RGBA8,
+			BGRA8,
+			Count
+		};
+	};
 	struct Attributes {
 		enum Enum {
 			Position,
