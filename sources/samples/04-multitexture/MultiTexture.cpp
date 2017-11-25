@@ -59,12 +59,12 @@ public:
 
 		mPosVertexFormat.Add(Attributes::Position, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::TexCoord0, AttributeType::Float, 2, false);
-		//mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
+		mPosVertexFormat.Add(Attributes::Normal, AttributeType::Float, 3, false);
 		mPosVertexFormat.Add(Attributes::Color0, AttributeType::Uint8, 4, true);
 
 		mPositionsHandle = graphicsDevice.CreateVertexBuffer(&mesh.mPositions[0], sizeof(mesh.mPositions[0]) * numVertices * 3, mPosVertexFormat);
 		mTexcoords0Handle = graphicsDevice.CreateVertexBuffer(&mesh.mTexcoords[0], sizeof(mesh.mTexcoords[0]) * numVertices * 2, mPosVertexFormat);
-		//mNornalsHandle = graphicsDevice.CreateVertexBuffer(&mesh.mNormals[0], sizeof(mesh.mNormals[0]) * numVertices * 3, mPosVertexFormat);
+		mNornalsHandle = graphicsDevice.CreateVertexBuffer(&mesh.mNormals[0], sizeof(mesh.mNormals[0]) * numVertices * 3, mPosVertexFormat);
 		mColorsHandle = graphicsDevice.CreateVertexBuffer(&mColors[0], sizeof(mColors[0]) * mColors.size() * 4, mPosVertexFormat);
 		mIndexesBufferHandle = graphicsDevice.CreateIndexBuffer(&mesh.mIndices[0], sizeof(mesh.mIndices[0]) * mNumIndices);
 
@@ -77,12 +77,19 @@ public:
 		ShaderHandle fsHandle = graphicsDevice.CreateShader(ShaderType::FragmentProgram, fragmentShaderSource.c_str());
 		mProgramHandle = graphicsDevice.CreateProgram(vsHandle, fsHandle, true);
 		mModelViewProjHandle = graphicsDevice.GetUniform(mProgramHandle, "u_modelViewProj");
+		mModelViewHandle = graphicsDevice.GetUniform(mProgramHandle, "u_modelView");
+		mLightPositionHandle = graphicsDevice.GetUniform(mProgramHandle, "u_lightPosition");
 		mTexture0Handle = graphicsDevice.GetUniform(mProgramHandle, "u_texture0");
+		mTexture1Handle = graphicsDevice.GetUniform(mProgramHandle, "u_texture1");
 
 		ImageLoader& imageLoader = engine.GetSystem<ImageLoader>();
 		ImageData imageData;
+
 		imageLoader.Load("textures/woodenbox.png", imageData);
 		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(imageData, TextureFormats::RGB8);
+
+		imageLoader.Load("textures/smile.png", imageData);
+		mSecondaryTextureHandle = graphicsDevice.CreateTexture2D(imageData, TextureFormats::RGBA8);
 
 		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
@@ -102,8 +109,12 @@ public:
 		mInitialized = true;
 	}
 
+	bool first = true;
+
 	void RenderFrame(Engine& engine) override {
 		if (!mInitialized) { return; }
+
+		static float cLightPosisiont[] = { 0.0f, 00.0f, 10.0f };
 
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		mAngles.x += mSpeed.x;
@@ -117,21 +128,25 @@ public:
 
 		mTransformHelper.SetMatrixMode(TransformHelper::MatrixMode::Model);
 		mTransformHelper.LoadIdentity();
-		//mTransformHelper.Rotate(mAngles.y, mUp);
-		//mTransformHelper.Rotate(-mAngles.x, mRight);
+		mTransformHelper.Rotate(mAngles.y, mUp);
+		mTransformHelper.Rotate(-mAngles.x, mRight);
 
 		graphicsDevice.Clear(GraphicsDevice::ColorBuffer | GraphicsDevice::DepthBuffer, Color(92, 92, 92), 1.0f);
 
 		graphicsDevice.SetVertexBuffer(mPositionsHandle, Attributes::Position);
-		//graphicsDevice.SetVertexBuffer(mNornalsHandle, Attributes::Normal);
+		graphicsDevice.SetVertexBuffer(mNornalsHandle, Attributes::Normal);
 		graphicsDevice.SetVertexBuffer(mTexcoords0Handle, Attributes::TexCoord0);
 		graphicsDevice.SetVertexBuffer(mColorsHandle, Attributes::Color0);
 
 		graphicsDevice.SetTexture(0, mPrimaryTextureHandle);
+		graphicsDevice.SetTexture(1, mSecondaryTextureHandle);
 
 		graphicsDevice.SetProgram(mProgramHandle, mPosVertexFormat);
 		graphicsDevice.SetUniformMat4(mProgramHandle, mModelViewProjHandle, &mTransformHelper.GetModelViewProjectionMatrix()[0][0], false);
+		graphicsDevice.SetUniformMat4(mProgramHandle, mModelViewHandle, &mTransformHelper.GetModelViewMatrix()[0][0], false);
+		graphicsDevice.SetUniformFloat3(mProgramHandle, mLightPositionHandle, &cLightPosisiont[0]);
 		graphicsDevice.setUniform1i(mProgramHandle, mTexture0Handle, 0);
+		graphicsDevice.setUniform1i(mProgramHandle, mTexture1Handle, 1);
 
 		graphicsDevice.SetIndexBuffer(mIndexesBufferHandle);
 		graphicsDevice.DrawElements(PrimitiveType::Triangles, mNumIndices);
@@ -147,76 +162,6 @@ public:
 	}
 
 private:
-	/*bool CreateSimpleTexture() {
-		const GLubyte pixels[4 * 3]{
-			255, 0, 0,
-			0, 255, 0,
-			0, 0, 255,
-			255, 255, 0
-		};
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		glGenTextures(1, &mTextureId);
-		glBindTexture(GL_TEXTURE_2D, mTextureId);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		return true;
-	}
-
-	bool InitializeShaders() {
-		const char* fragmentShaderSource = SHADER_SOURCE
-		(
-			precision mediump float;
-			varying vec2 v_texcoord;
-			uniform sampler2D u_texture;
-			void main (void)
-			{
-				
-				gl_FragColor = texture2D(u_texture, v_texcoord);
-			}
-		);
-		const char* vertexShaderSource = SHADER_SOURCE
-		(
-			attribute highp vec4 a_position;
-			attribute lowp vec2 a_texcoord;
-			varying lowp vec2 v_texcoord;
-			void main(void)
-			{
-				gl_Position = a_position;
-				v_texcoord = a_texcoord;
-			}
-		);
-		mShaderProgram = CompileProgram(vertexShaderSource, fragmentShaderSource, [](GLenum type, const char * errorMessage) {
-			if (errorMessage) {
-				if (type == GL_VERTEX_SHADER) {
-					Log(Logger::Error, "Failed compile vertex shader : %s", errorMessage);
-				}
-				else if (type == GL_FRAGMENT_SHADER) {
-					Log(Logger::Error, "Failed compile fragment shader : %s", errorMessage);
-				}
-				else {
-					Log(Logger::Error, "Failed compile ling program : %s", errorMessage);
-				}
-			}
-		}); 
-		if (mShaderProgram == 0) {
-			return false;
-		}
-
-		glUseProgram(mShaderProgram);
-		GLenum lastError = glGetError();
-		if (lastError != GL_NO_ERROR) { return false; }
-		mPositionAttributePos = glGetAttribLocation(mShaderProgram, "a_position");
-		mTexcoordAttributePos = glGetAttribLocation(mShaderProgram, "a_texcoord");
-		mSamplerPos = glGetUniformLocation(mShaderProgram, "s_texture");
-
-		return true;
-	}*/
-
-private:
 	VertexFormat mPosVertexFormat;
 	ProgramHandle mProgramHandle;
 
@@ -229,7 +174,10 @@ private:
 	TextureHandle mSecondaryTextureHandle;
 
 	UniformHandle mModelViewProjHandle;
+	UniformHandle mModelViewHandle;
+	UniformHandle mLightPositionHandle;
 	UniformHandle mTexture0Handle;
+	UniformHandle mTexture1Handle;
 
 	bool mInitialized = false;
 	uint32_t mNumIndices = 0;
