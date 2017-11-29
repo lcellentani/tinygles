@@ -15,7 +15,7 @@ Engine::Engine() {
 	mSystems[std::type_index(typeid(ImGUIWrapper))] = CreateImGUIWrapper();
 	mSystems[std::type_index(typeid(Time))] = new Time();
 	mSystems[std::type_index(typeid(MeshLoader))] = new MeshLoader();
-	mSystems[std::type_index(typeid(ImageLoader))] = new ImageLoader();
+	mSystems[std::type_index(typeid(ImagesManager))] = new ImagesManager();
 }
 
 Engine::~Engine() {

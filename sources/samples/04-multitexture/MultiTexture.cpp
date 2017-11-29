@@ -82,14 +82,15 @@ public:
 		mTexture0Handle = graphicsDevice.GetUniform(mProgramHandle, "u_texture0");
 		mTexture1Handle = graphicsDevice.GetUniform(mProgramHandle, "u_texture1");
 
-		ImageLoader& imageLoader = engine.GetSystem<ImageLoader>();
-		ImageData imageData;
+		ImagesManager& imagesManager = engine.GetSystem<ImagesManager>();
 
-		imageLoader.Load("textures/woodenbox.png", imageData);
-		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(imageData, TextureFormats::RGB8);
+		ImageHandle handle1 = imagesManager.LoadImageFromFile("textures/woodenbox.png");
+		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(handle1, imagesManager, TextureFormats::RGB8);
+		imagesManager.ReleaseImage(handle1);
 
-		imageLoader.Load("textures/smile.png", imageData);
-		mSecondaryTextureHandle = graphicsDevice.CreateTexture2D(imageData, TextureFormats::RGBA8);
+		ImageHandle handle2 = imagesManager.LoadImageFromFile("textures/smile.png");
+		mSecondaryTextureHandle = graphicsDevice.CreateTexture2D(handle2, imagesManager, TextureFormats::RGBA8);
+		imagesManager.ReleaseImage(handle2);
 
 		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
@@ -105,6 +106,7 @@ public:
 
 		graphicsDevice.SetState(RendererStateType::CullFace, true);
 		graphicsDevice.SetState(RendererStateType::DepthTest, true);
+
 
 		mInitialized = true;
 	}

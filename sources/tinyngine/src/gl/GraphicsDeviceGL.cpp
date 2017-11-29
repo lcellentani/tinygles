@@ -269,10 +269,13 @@ void GraphicsDeviceGL::SetUniformMat4(const ProgramHandle& programHandle, const 
 	program.SetUniformMat4(uniformHandle, data, transpose);
 }
 
-TextureHandle GraphicsDeviceGL::CreateTexture2D(const ImageData& imageData, TextureFormats::Enum textureFormat) {
+TextureHandle GraphicsDeviceGL::CreateTexture2D(const ImageHandle& imageHandle, ImagesManager& imagesManager, TextureFormats::Enum textureFormat) {
+	(void)imageHandle;
+	(void)imagesManager;
+	(void)textureFormat;
 	TextureHandle handle = TextureHandle(mImpl->mTexturesCount++);
 	auto& texture = mImpl->mTextures[handle.mHandle];
-	texture.Create(GL_TEXTURE_2D, imageData, textureFormat);
+	texture.Create(GL_TEXTURE_2D, imageHandle, imagesManager, textureFormat);
 	return texture.IsValid() ? handle : TextureHandle(cInvalidHandle);
 }
 

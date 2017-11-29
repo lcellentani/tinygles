@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GLApi.h"
+#include "ImageLoader.h"
 
 namespace tinyngine
 {
@@ -9,7 +10,7 @@ class TextureGL {
 public:
 	TextureGL() = default;
 
-	void Create(GLenum target, const ImageData& imageData, TextureFormats::Enum textureFormat);
+	void Create(GLenum target, ImageHandle imageHandle, ImagesManager& imagesManager, TextureFormats::Enum textureFormat);
 	void Destroy();
 	void Bind(uint32_t stage);
 

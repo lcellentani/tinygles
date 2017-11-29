@@ -229,5 +229,6 @@ namespace tinyngine
 	using IndexBufferHandle = ResourceHandle;
 	using UniformHandle = ResourceHandle;
 	using TextureHandle = ResourceHandle;
+	using ImageHandle = ResourceHandle;
 
 } // namespace tinyngine
