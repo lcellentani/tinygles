@@ -31,6 +31,8 @@ GLenum GetDepthFunc(DepthFuncs::Enum func);
 GLenum GetStencilFunc(StencilFuncs::Enum func);
 GLenum GetStencilOpType(StencilOpTypes::Enum type);
 
+GLint GetWrapMode(TextureWrapMode::Enum mode);
+
 } // namespace gl
 } // namespace tinyngine
 

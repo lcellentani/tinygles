@@ -15,7 +15,8 @@ public:
 
 	ImageHandle LoadImageFromFile(const char * filename);
 
-	bool ImageHasMipmaps(const ImageHandle& imaageHandle);
+	bool ImageHasMipmaps(const ImageHandle& imageHandle) const;
+	uint32_t ImageGetMipmapsCount(const ImageHandle& imageHandle) const;
 	bool GetImageData(const ImageHandle& imageHandle, uint32_t level, ImageData& imageData);
 
 private:

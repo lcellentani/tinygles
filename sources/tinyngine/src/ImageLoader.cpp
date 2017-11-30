@@ -77,12 +77,17 @@ ImageHandle ImagesManager::LoadImageFromFile(const char * filename) {
 	return ImageHandle(cInvalidHandle);
 }
 
-bool ImagesManager::ImageHasMipmaps(const ImageHandle& imageHandle) {
+bool ImagesManager::ImageHasMipmaps(const ImageHandle& imageHandle) const {
+	uint32_t mips = ImageGetMipmapsCount(imageHandle);
+	return mips > 1;
+}
+
+uint32_t ImagesManager::ImageGetMipmapsCount(const ImageHandle& imageHandle) const {
 	if (imageHandle.IsValid()) {
 		auto& image = mImpl->mImages[imageHandle.mHandle];
-		return image.mNumMipmaps > 1;
+		return image.mNumMipmaps;
 	}
-	return false;
+	return 0;
 }
 
 bool ImagesManager::GetImageData(const ImageHandle& imageHandle, uint32_t level, ImageData& imageData) {

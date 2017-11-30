@@ -14,6 +14,27 @@ namespace tinyngine
 			Count
 		};
 	};
+
+	struct TextureFilteringMode {
+		enum Enum {
+			None,
+			Nearest,
+			Bilinear,
+			Trilinear,
+			Count
+		};
+	};
+
+	struct TextureWrapMode {
+		enum Enum {
+			Repeat,
+			ClampToEdge,
+			Mirrored,
+			ClampToBorder,
+			Count
+		};
+	};
+
 	struct Attributes {
 		enum Enum {
 			Position,

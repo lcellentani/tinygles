@@ -105,6 +105,13 @@ static const GLenum cStencilOpTypes[]{
 	GL_INVERT
 };
 
+static const GLint cWrapMode[]{
+	GL_REPEAT,
+	GL_CLAMP_TO_EDGE,
+	GL_MIRRORED_REPEAT,
+	0 //OpenGL specific GL_CLAMP_TO_BORDER
+};
+
 }
 
 namespace tinyngine {
@@ -172,6 +179,10 @@ GLenum GetStencilFunc(StencilFuncs::Enum func) {
 
 GLenum GetStencilOpType(StencilOpTypes::Enum type) {
 	return cStencilOpTypes[type];
+}
+
+GLint GetWrapMode(TextureWrapMode::Enum mode) {
+	return cWrapMode[mode];
 }
 
 }

@@ -85,11 +85,11 @@ public:
 		ImagesManager& imagesManager = engine.GetSystem<ImagesManager>();
 
 		ImageHandle handle1 = imagesManager.LoadImageFromFile("textures/woodenbox.png");
-		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(handle1, imagesManager, TextureFormats::RGB8);
+		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(handle1, imagesManager, TextureFormats::RGB8, TextureFilteringMode::Trilinear, true);
 		imagesManager.ReleaseImage(handle1);
 
 		ImageHandle handle2 = imagesManager.LoadImageFromFile("textures/smile.png");
-		mSecondaryTextureHandle = graphicsDevice.CreateTexture2D(handle2, imagesManager, TextureFormats::RGBA8);
+		mSecondaryTextureHandle = graphicsDevice.CreateTexture2D(handle2, imagesManager, TextureFormats::RGBA8, TextureFilteringMode::Trilinear, true);
 		imagesManager.ReleaseImage(handle2);
 
 		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
