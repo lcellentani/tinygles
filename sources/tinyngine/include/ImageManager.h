@@ -6,10 +6,10 @@
 namespace tinyngine
 {
 
-class ImagesManager final : public System {
+class ImageManager final : public System {
 public:
-	ImagesManager();
-	virtual ~ImagesManager();
+	ImageManager();
+	virtual ~ImageManager();
 
 	bool ReleaseImage(ImageHandle& handle);
 

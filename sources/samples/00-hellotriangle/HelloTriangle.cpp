@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "ExampleBaseApp.h"
 #include "GraphicsDevice.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
@@ -6,7 +6,7 @@
 
 using namespace tinyngine;
 
-class HelloTriangle : public Application {
+class HelloTriangle final : public ExampleApp {
 public:
 	HelloTriangle() = default;
 	virtual ~HelloTriangle() = default;
@@ -25,11 +25,9 @@ public:
 		return sAttributes;
 	}
 
-	void InitApplication() override {
+	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		ExampleApp::InitView(engine, windowWidth, windowHeight);
 
-	}
-
-	void InitView(Engine& engine, uint32_t, uint32_t) override {
 		const float cVertexData[] = {
 			-0.4f, -0.4f, 0.0f, // Bottom Left
 			0.4f, -0.4f, 0.0f, // Bottom Right
@@ -67,6 +65,8 @@ public:
 	}
 
 	void RenderFrame(Engine& engine) override {
+		ExampleApp::RenderFrame(engine);
+
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 
 		glm::mat4 modelViewProj = mTransformHelper.GetModelViewProjectionMatrix();
@@ -81,13 +81,6 @@ public:
 		graphicsDevice.DrawArray(PrimitiveType::Triangles, 0, 3);
 
 		graphicsDevice.Commit();
-	}
-
-	void ReleaseView(Engine&) override {
-	}
-
-	void ReleaseApplication() override {
-
 	}
 
 private:

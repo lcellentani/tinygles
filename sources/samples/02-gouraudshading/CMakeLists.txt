@@ -12,6 +12,8 @@ set_target_properties(02-gouraudshading
         VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/media"
 )
 
+SetupSample(02-gouraudshading)
+
 Enable_Cpp11(02-gouraudshading)
 AddCompilerFlags(02-gouraudshading)
 

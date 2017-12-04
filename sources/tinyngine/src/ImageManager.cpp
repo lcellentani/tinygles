@@ -1,4 +1,4 @@
-#include "ImageLoader.h"
+#include "ImageManager.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -25,20 +25,20 @@ struct Image {
 	std::vector<uint8_t*> mData;
 };
 
-struct ImagesManager::Impl {
+struct ImageManager::Impl {
 	uint32_t mImagesCount = 0;
 	std::array<Image, cMaxImageHandle> mImages;
 };
 
 //=====================================================================================================================
 
-ImagesManager::ImagesManager() : mImpl(new Impl()) {
+ImageManager::ImageManager() : mImpl(new Impl()) {
 
 }
 
-ImagesManager::~ImagesManager() {}
+ImageManager::~ImageManager() {}
 
-bool ImagesManager::ReleaseImage(ImageHandle& imageHandle) {
+bool ImageManager::ReleaseImage(ImageHandle& imageHandle) {
 	if (imageHandle.IsValid()) {
 		auto& image = mImpl->mImages[imageHandle.mHandle];
 		for (auto data : image.mData) {
@@ -53,7 +53,7 @@ bool ImagesManager::ReleaseImage(ImageHandle& imageHandle) {
 	return false;
 }
 
-ImageHandle ImagesManager::LoadImageFromFile(const char * filename) {
+ImageHandle ImageManager::LoadImageFromFile(const char * filename) {
 	if (filename) {
 		ImageHandle handle = ImageHandle(mImpl->mImagesCount++);
 		auto& image = mImpl->mImages[handle.mHandle];
@@ -77,12 +77,12 @@ ImageHandle ImagesManager::LoadImageFromFile(const char * filename) {
 	return ImageHandle(cInvalidHandle);
 }
 
-bool ImagesManager::ImageHasMipmaps(const ImageHandle& imageHandle) const {
+bool ImageManager::ImageHasMipmaps(const ImageHandle& imageHandle) const {
 	uint32_t mips = ImageGetMipmapsCount(imageHandle);
 	return mips > 1;
 }
 
-uint32_t ImagesManager::ImageGetMipmapsCount(const ImageHandle& imageHandle) const {
+uint32_t ImageManager::ImageGetMipmapsCount(const ImageHandle& imageHandle) const {
 	if (imageHandle.IsValid()) {
 		auto& image = mImpl->mImages[imageHandle.mHandle];
 		return image.mNumMipmaps;
@@ -90,7 +90,7 @@ uint32_t ImagesManager::ImageGetMipmapsCount(const ImageHandle& imageHandle) con
 	return 0;
 }
 
-bool ImagesManager::GetImageData(const ImageHandle& imageHandle, uint32_t level, ImageData& imageData) {
+bool ImageManager::GetImageData(const ImageHandle& imageHandle, uint32_t level, ImageData& imageData) {
 	if (imageHandle.IsValid()) {
 		auto& image = mImpl->mImages[imageHandle.mHandle];
 		if (image.mNumMipmaps > level) {

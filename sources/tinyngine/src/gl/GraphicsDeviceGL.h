@@ -49,7 +49,7 @@ public:
 	void SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) override;
 	void SetUniformMat4(const ProgramHandle& handle, const UniformHandle& uniform, const float* data, bool transpose) override;
 	
-	TextureHandle CreateTexture2D(const ImageHandle& imageHandle, ImagesManager& imagesManager, TextureFormats::Enum format, TextureFilteringMode::Enum filtering, bool useMipmaps) override;
+	TextureHandle CreateTexture2D(const ImageHandle& imageHandle, ImageManager& imageManager, TextureFormats::Enum format, TextureFilteringMode::Enum filtering, bool useMipmaps) override;
 	void SetTexture(uint32_t stage, const TextureHandle& textureHandle) override;
 
 private:

@@ -9,9 +9,6 @@
 #include <array>
 #include <unordered_map>
 
-//#define GL_GLEXT_PROTOTYPES
-//#include <GLES2/gl2.h>
-
 namespace
 {
 
@@ -269,10 +266,10 @@ void GraphicsDeviceGL::SetUniformMat4(const ProgramHandle& programHandle, const 
 	program.SetUniformMat4(uniformHandle, data, transpose);
 }
 
-TextureHandle GraphicsDeviceGL::CreateTexture2D(const ImageHandle& imageHandle, ImagesManager& imagesManager, TextureFormats::Enum format, TextureFilteringMode::Enum filtering, bool useMipmaps) {
+TextureHandle GraphicsDeviceGL::CreateTexture2D(const ImageHandle& imageHandle, ImageManager& imageManager, TextureFormats::Enum format, TextureFilteringMode::Enum filtering, bool useMipmaps) {
 	TextureHandle handle = TextureHandle(mImpl->mTexturesCount++);
 	auto& texture = mImpl->mTextures[handle.mHandle];
-	texture.Create(GL_TEXTURE_2D, imageHandle, imagesManager, format, filtering, useMipmaps);
+	texture.Create(GL_TEXTURE_2D, imageHandle, imageManager, format, filtering, useMipmaps);
 	return texture.IsValid() ? handle : TextureHandle(cInvalidHandle);
 }
 

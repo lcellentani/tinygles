@@ -12,6 +12,8 @@ set_target_properties(04-multitexture
         VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/media"
 )
 
+SetupSample(04-multitexture)
+
 Enable_Cpp11(04-multitexture)
 AddCompilerFlags(04-multitexture)
 

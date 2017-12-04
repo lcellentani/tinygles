@@ -408,6 +408,8 @@ void MainThread::Func(tinyngine::PlatformBridgeWin32* pinst) {
 	pinst->mApplication = CreateApplication();
 	if (!pinst->mApplication) { return; }
 
+	pinst->mApplication->InitApplication();
+
 	pinst->mPlatformContext = CreatePlatformContext(pinst->mHwnd, pinst->mApplication->GetContextAttribs());
 	if (!pinst->mPlatformContext) { return; }
 

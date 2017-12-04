@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "ExampleBaseApp.h"
 #include "GraphicsDevice.h"
 #include "MeshLoader.h"
 #include "VertexFormat.h"
@@ -11,7 +11,7 @@
 
 using namespace tinyngine;
 
-class VertexShader : public Application {
+class VertexShader final : public ExampleApp {
 public:
 	VertexShader() = default;
 	virtual ~VertexShader() = default;
@@ -30,11 +30,9 @@ public:
 		return sAttributes;
 	}
 
-	void InitApplication() override {
-
-	}
-
 	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		ExampleApp::InitView(engine, windowWidth, windowHeight);
+
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		MeshLoader& meshLoader = engine.GetSystem<MeshLoader>();
 		mCube = meshLoader.GenerateCube(1.0f);
@@ -94,6 +92,8 @@ public:
 	}
 
 	void RenderFrame(Engine& engine) override {
+		ExampleApp::RenderFrame(engine);
+
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		mAngles.x -= mSpeed.x;
 		if (mAngles.x < 0.0f) {
@@ -121,13 +121,6 @@ public:
 		graphicsDevice.DrawElements(PrimitiveType::Triangles, mCube.mNumIndices);
 
 		graphicsDevice.Commit();
-	}
-
-	void ReleaseView(Engine&) override {
-	}
-
-	void ReleaseApplication() override {
-
 	}
 
 private:

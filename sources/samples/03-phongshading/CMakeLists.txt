@@ -12,6 +12,8 @@ set_target_properties(03-phongshading
         VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/media"
 )
 
+SetupSample(03-phongshading)
+
 Enable_Cpp11(03-phongshading)
 AddCompilerFlags(03-phongshading)
 

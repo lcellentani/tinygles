@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "ExampleBaseApp.h"
 #include "GraphicsDevice.h"
 #include "Time.h"
 #include "MeshLoader.h"
@@ -26,12 +26,10 @@ static float cLightPosision[] = { 0.0f, 20.0f, 10.0f };
 
 using namespace tinyngine;
 
-class PhongShading : public Application {
+class PhongShading final : public ExampleApp {
 public:
 	PhongShading() = default;
-	virtual ~PhongShading() {
-
-	}
+	virtual ~PhongShading() = default;
 
 	ContextAttribs& GetContextAttribs() override {
 		static ContextAttribs sAttributes;
@@ -47,11 +45,9 @@ public:
 		return sAttributes;
 	}
 
-	void InitApplication() override {
-
-	}
-
 	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		ExampleApp::InitView(engine, windowWidth, windowHeight);
+
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		MeshLoader& meshLoader = engine.GetSystem<MeshLoader>();
 
@@ -126,6 +122,8 @@ public:
 	}
 
 	void RenderFrame(Engine& engine) override {
+		ExampleApp::RenderFrame(engine);
+
 		if (!mInitialized) { return; }
 
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
@@ -178,14 +176,6 @@ public:
 		graphicsDevice.DrawElements(PrimitiveType::Triangles, mNumIndices);
 
 		graphicsDevice.Commit();
-	}
-
-	void ReleaseView(Engine& engine) override {
-		TINYNGINE_UNUSED(engine);
-	}
-
-	void ReleaseApplication() override {
-
 	}
 
 private:

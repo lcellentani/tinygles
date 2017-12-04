@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "ExampleBaseApp.h"
 #include "GraphicsDevice.h"
 #include "MeshLoader.h"
 #include "VertexFormat.h"
@@ -26,12 +26,10 @@ static float cLightPosisiont[] = { 0.0f, 20.0f, 10.0f };
 
 using namespace tinyngine;
 
-class GouraudShading : public Application {
+class GouraudShading final : public ExampleApp {
 public:
 	GouraudShading() = default;
-	virtual ~GouraudShading() {
-
-	}
+	virtual ~GouraudShading() = default;
 
 	ContextAttribs& GetContextAttribs() override {
 		static ContextAttribs sAttributes;
@@ -52,6 +50,8 @@ public:
 	}
 
 	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		ExampleApp::InitView(engine, windowWidth, windowHeight);
+
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		MeshLoader& meshLoader = engine.GetSystem<MeshLoader>();
 		//LoadObj("models/Cube.obj", true, mObject);
@@ -119,6 +119,8 @@ public:
 	}
 
 	void RenderFrame(Engine& engine) override {
+		ExampleApp::RenderFrame(engine);
+
 		if (!mInitialized) { return; }
 
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
@@ -158,13 +160,6 @@ public:
 		graphicsDevice.DrawElements(PrimitiveType::Triangles, mNumIndices);
 
 		graphicsDevice.Commit();
-	}
-
-	void ReleaseView(Engine&) override {
-	}
-
-	void ReleaseApplication() override {
-
 	}
 
 private:

@@ -37,3 +37,14 @@ function(SetLinkerSubsystem target)
 		message(SEND_ERROR "You are on an unsupported platform! (Not Win32 or Unix)")
 	endif()
 endfunction(SetLinkerSubsystem)
+
+function(SetupSample target)
+target_include_directories(${target}
+	PUBLIC
+		"${PROJECT_SOURCE_DIR}/sources/samples/common"
+)
+target_link_libraries(${target}
+	tinyngine
+	examples-common
+)
+endfunction(SetupSample)

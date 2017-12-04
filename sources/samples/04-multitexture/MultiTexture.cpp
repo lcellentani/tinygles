@@ -1,6 +1,6 @@
-#include "Application.h"
+#include "ExampleBaseApp.h"
 #include "GraphicsDevice.h"
-#include "ImageLoader.h"
+#include "ImageManager.h"
 #include "MeshLoader.h"
 #include "VertexFormat.h"
 #include "TransformHelper.h"
@@ -15,7 +15,7 @@
 
 using namespace tinyngine;
 
-class MultiTexture : public Application {
+class MultiTexture final : public ExampleApp {
 public:
 	MultiTexture() = default;
 	virtual ~MultiTexture() = default;
@@ -34,11 +34,9 @@ public:
 		return sAttributes;
 	}
 
-	void InitApplication() override {
-
-	}
-
 	void InitView(Engine& engine, uint32_t windowWidth, uint32_t windowHeight) override {
+		ExampleApp::InitView(engine, windowWidth, windowHeight);
+
 		GraphicsDevice& graphicsDevice = engine.GetSystem<GraphicsDevice>();
 		MeshLoader& meshLoader = engine.GetSystem<MeshLoader>();
 		std::vector<MeshInfo> allMeshes = meshLoader.LoadObj("models/Cube.obj");
@@ -82,15 +80,15 @@ public:
 		mTexture0Handle = graphicsDevice.GetUniform(mProgramHandle, "u_texture0");
 		mTexture1Handle = graphicsDevice.GetUniform(mProgramHandle, "u_texture1");
 
-		ImagesManager& imagesManager = engine.GetSystem<ImagesManager>();
+		ImageManager& imageManager = engine.GetSystem<ImageManager>();
 
-		ImageHandle handle1 = imagesManager.LoadImageFromFile("textures/woodenbox.png");
-		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(handle1, imagesManager, TextureFormats::RGB8, TextureFilteringMode::Trilinear, true);
-		imagesManager.ReleaseImage(handle1);
+		ImageHandle handle1 = imageManager.LoadImageFromFile("textures/woodenbox.png");
+		mPrimaryTextureHandle = graphicsDevice.CreateTexture2D(handle1, imageManager, TextureFormats::RGB8, TextureFilteringMode::Trilinear, true);
+		imageManager.ReleaseImage(handle1);
 
-		ImageHandle handle2 = imagesManager.LoadImageFromFile("textures/smile.png");
-		mSecondaryTextureHandle = graphicsDevice.CreateTexture2D(handle2, imagesManager, TextureFormats::RGBA8, TextureFilteringMode::Trilinear, true);
-		imagesManager.ReleaseImage(handle2);
+		ImageHandle handle2 = imageManager.LoadImageFromFile("textures/smile.png");
+		mSecondaryTextureHandle = graphicsDevice.CreateTexture2D(handle2, imageManager, TextureFormats::RGBA8, TextureFilteringMode::Trilinear, true);
+		imageManager.ReleaseImage(handle2);
 
 		float ratio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 		mProj = glm::perspective(glm::radians(60.0f), ratio, 0.1f, 100.0f);
@@ -111,9 +109,9 @@ public:
 		mInitialized = true;
 	}
 
-	bool first = true;
-
 	void RenderFrame(Engine& engine) override {
+		ExampleApp::RenderFrame(engine);
+
 		if (!mInitialized) { return; }
 
 		static float cLightPosisiont[] = { 0.0f, 00.0f, 10.0f };
@@ -154,13 +152,6 @@ public:
 		graphicsDevice.DrawElements(PrimitiveType::Triangles, mNumIndices);
 
 		graphicsDevice.Commit();
-	}
-
-	void ReleaseView(Engine&) override {
-	}
-
-	void ReleaseApplication() override {
-
 	}
 
 private:

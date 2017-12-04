@@ -41,7 +41,7 @@ add_library(tinyngine
 	src/Application.cpp
 	src/DynLibLoader.cpp
 	src/Engine.cpp
-	src/ImageLoader.cpp
+	src/ImageManager.cpp
 	src/ImGUIWrapper.cpp
 	src/InputWin32.cpp
 	src/Log.cpp
@@ -59,6 +59,8 @@ add_library(tinyngine
 	src/gl/TextureGL.cpp
 	src/gl/ShaderGL.cpp
 	src/gl/VertexBufferGL.cpp
+	src/gl/WGLPlatformContext.cpp
+	src/gl/WGLTrampoline.cpp
 )
 
 if(MSVC)

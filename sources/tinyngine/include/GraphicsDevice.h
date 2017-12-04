@@ -3,7 +3,7 @@
 #include "System.h"
 #include "GraphicsTypes.h"
 #include "VertexFormat.h"
-#include "ImageLoader.h"
+#include "ImageManager.h"
 
 namespace tinyngine
 {
@@ -60,7 +60,7 @@ public:
 	virtual void SetUniformFloat3(const ProgramHandle& programHandle, UniformHandle& uniformHandle, const float* data) = 0;
 	virtual void SetUniformMat4(const ProgramHandle& programHandle, const UniformHandle& uniformHandle, const float* data, bool transpose) = 0;
 
-	virtual TextureHandle CreateTexture2D(const ImageHandle& imageHandle, ImagesManager& imagesManager, TextureFormats::Enum format, TextureFilteringMode::Enum filtering, bool useMipmaps) = 0;
+	virtual TextureHandle CreateTexture2D(const ImageHandle& imageHandle, ImageManager& manager, TextureFormats::Enum format, TextureFilteringMode::Enum filtering, bool useMipmaps) = 0;
 	virtual void SetTexture(uint32_t stage, const TextureHandle& textureHandle) = 0;
 };
 

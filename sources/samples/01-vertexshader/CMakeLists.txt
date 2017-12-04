@@ -12,6 +12,8 @@ set_target_properties(01-vertexshader
         VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/media"
 )
 
+SetupSample(01-vertexshader)
+
 Enable_Cpp11(01-vertexshader)
 AddCompilerFlags(01-vertexshader)
 

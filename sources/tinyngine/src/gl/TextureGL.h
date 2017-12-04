@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLApi.h"
-#include "ImageLoader.h"
+#include "ImageManager.h"
 
 namespace tinyngine
 {
@@ -10,7 +10,7 @@ class TextureGL {
 public:
 	TextureGL() = default;
 
-	void Create(GLenum target, const ImageHandle& imageHandle, ImagesManager& imagesManager, TextureFormats::Enum textureFormat, TextureFilteringMode::Enum filtering, bool useMipmaps);
+	void Create(GLenum target, const ImageHandle& imageHandle, ImageManager& imageManager, TextureFormats::Enum textureFormat, TextureFilteringMode::Enum filtering, bool useMipmaps);
 	void Destroy();
 	void Bind(uint32_t stage);
 

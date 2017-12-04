@@ -22,7 +22,7 @@ static TextureFormatInfo sTextureFormats[]{
 namespace tinyngine
 {
 
-void TextureGL::Create(GLenum target, const ImageHandle& imageHandle, ImagesManager& imagesManager, TextureFormats::Enum textureFormat, TextureFilteringMode::Enum filtering, bool useMipmaps) {
+void TextureGL::Create(GLenum target, const ImageHandle& imageHandle, ImageManager& imageManager, TextureFormats::Enum textureFormat, TextureFilteringMode::Enum filtering, bool useMipmaps) {
 	mTarget = target;
 	mUseMipmaps = useMipmaps;
 
@@ -37,13 +37,13 @@ void TextureGL::Create(GLenum target, const ImageHandle& imageHandle, ImagesMana
 	GLenum type = sTextureFormats[textureFormat].mType;
 
 	ImageData imageData;
-	imagesManager.GetImageData(imageHandle, 0, imageData);
+	imageManager.GetImageData(imageHandle, 0, imageData);
 	GL_CHECK(glTexImage2D(target, 0, internalFormat, imageData.mWidth, imageData.mHeight, 0, format, type, imageData.mData));
 	if (mUseMipmaps) {
-		uint32_t numMipmaps = imagesManager.ImageGetMipmapsCount(imageHandle);
+		uint32_t numMipmaps = imageManager.ImageGetMipmapsCount(imageHandle);
 		if (numMipmaps > 1) {
 			for (uint32_t level = 1; level < numMipmaps; level++) {
-				imagesManager.GetImageData(imageHandle, level, imageData);
+				imageManager.GetImageData(imageHandle, level, imageData);
 				GL_CHECK(glTexImage2D(target, 0, internalFormat, imageData.mWidth, imageData.mHeight, 0, format, type, imageData.mData));
 			}
 		}
